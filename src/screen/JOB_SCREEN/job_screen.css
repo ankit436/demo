@@ -1,0 +1,132 @@
+
+.Container{
+
+    margin-top: 100px;
+    width: 100%;
+    height: 100%;
+
+    background-color: #f5f5f5;
+}
+
+
+.job_container{
+    
+        width: 100%;
+        height: 100%;
+        background-color: #f5f5f5;
+        padding: 40px;
+}
+
+.job_tab{
+  
+    display:  flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 100px;
+    background-color: #f5f5f5;
+
+  
+
+}
+.JOB_LINK{
+    width: 100%;
+    height: 100%;
+    background-color: #f5f5f5;
+    text-decoration: none;
+    color: black;
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    padding-top: 30px;
+    border: 1px solid #f5f5f5;
+    border-radius: 10px;
+    transition: 0.5s;
+}
+
+.JOB_LINK:hover{
+    background-color: #f5f5f5;
+    border-bottom: 1px solid #7a0404;
+    border-radius: 0px;
+    transition: 0.5s;
+}
+
+.JOB_LINK:active{
+    background-color: #f5f5f5;
+    border: 1px solid #7a0404;
+    border-radius: 10px;
+    transition: 0.5s;
+}
+
+/* .JOB_LINK:visited{
+    background-color: #f5f5f5;
+    border: 1px solid #7a0404;
+    border-radius: 10px;
+    transition: 0.5s;
+} */
+
+.JOB_LINK:link{
+    background-color: #f5f5f5;
+    border: 1px solid #7a0404;
+    border-radius: 10px;
+    transition: 0.5s;
+}
+
+.job_filter_container{
+    width: 100%;
+    height: 100%;
+    background-color: #f5f5f5;
+    padding: 0px 40px;
+}
+.job_filter{
+  
+    display:  flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%;
+    height: 100px;
+    background-color: #f5f5f5;
+
+}
+.coutn_job{
+
+    background-color: #f5f5f5;
+    text-decoration: none;
+    color: black;
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    padding-right: 30px;
+    border: 1px solid #f5f5f5;
+    border-radius: 10px;
+    transition: 0.5s;
+
+}
+
+.Active_tab{
+    background-color: #f5f5f5;
+    border-bottom: 1px solid #7a0404;
+    border-radius: 0px;
+    transition: 0.5s;
+}
+.job_list{
+
+    width: 100%;
+    height: 100%;
+    background-color: #f5f5f5;
+    padding:  40px;
+}
+
+.job_list_container{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    flex-wrap: wrap;
+}
+
+
+
+
+
