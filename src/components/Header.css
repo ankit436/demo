@@ -1,75 +1,4 @@
-
- :root{
-    --nav-global-transition: all 0.3s ease-in-out;
-    --nav-global-tab-width: 100px;
-    --nav-global-tab-height: 100%;
-    --nav-global-tab-font-size: 20px;
-    --nav-global-tab-font-weight: 600;
-    --nav-global-tab-color: #111010;
-    --nav-global-tab-transition: all 0.3s ease-in-out;
-    --nav-global-tab-cursor: pointer;
-    --nav-global--margin: 20px;
-    --nav-global-tab-white-space: nowrap;
-    --nav-height: 100px;
-    --nav-scroll-height: 70px;
-    --nav-bg: #f5f5f5;
-    --nav-scroll-bg: #fff;
-    --nav-shadow: 0 0 10px rgba(0,0,0,0.5);
-    --nav-transition: all 0.3s ease-in-out;
-    --nav-z-index: 100;
-    --nav-logo-width: 100px;
-    --nav-logo-height: 50px;
-    --nav-logo-border: 2px solid #111010;
-    --nav-logo-border-radius: 50%;
-    --nav-logo-transition: all 0.3s ease-in-out;
-    --nav-logo-cursor: pointer;
-    --nav--logo-margin: 0 0px;
-    --nav-tab-font-size: 1.2em;
-    --nav-tab-responsive-font-size: 16px;
-    --nav-tab-responsive-margin: 0 10px;
-    --nav-tab-font-weight: 600;
-    --nav-tab-color: #111010;
-    --nav-tab-transition: all 0.3s ease-in-out;
-    --nav-search-icon-left: 10px;
-    --nav-search-border: 2px solid #111010;
-    --nav-search-border-radius: 25px;
-    --nav-search-icon-color: #111010;
-    --nav-search-icon-font-size: 20px;
-    --nav-search-icon-width: 40px;
-    --nav-search-icon-height: 40px;
-    --nav-search-icon-transition: all 0.3s ease-in-out;
-    --nav-search-text-padding: 0 45px;
-    --nav-search-text-font-size: 16px;  
-    --nav-search-text-font-weight: 600;
-    --nav-search-text-transition: all 0.3s ease-in-out;
-    --nav-search-text-width: 100%;
-    --nav-search-text-height: 100%;
-    --nav-search-text-border: none;
-    --nav-search-text-outline: none;
-    --nav-search-text-background-color: transparent;
-    --nav-divider-width: 1px;
-    --nav-divider-height: 20px;
-    --nav-divider-background-color: #111010;
-    --nav-button-background-color: transparent;
-    --nav-button-color: black;
-    --nav-button-padding: 10px 10px;
-    --nav-button-border: 0px solid #111010;
-    --nav-button-border-radius: 25px;
-    --nav-button-font-size: 16px;
-    --nav-button-font-weight: 600;
-    --nav-button-transition: all 0.3s ease-in-out;
-    --nav-button-cursor: pointer;
-    --nav-button-margin: 0 10px;
-    --nav-padding: 0 20px;
-    --nav-margin: 20px;
-    --nav-item-margin: 0 20px;
-    --nav-item-list-style: none;
-    --nav-item-cursor: pointer;
-    --nav-item-transition: all 0.3s ease-in-out;
-   
-
- }
-
+@import url( "../App.css");
 
 
 .Header_container{
@@ -87,10 +16,6 @@ position: fixed;
     left: 0;
     right: 0;
     z-index: var(--nav-z-index);
-
-    
-    
-   
 }
 .header_search_login{
     display: flex;

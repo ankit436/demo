@@ -16,8 +16,9 @@ export default function Approuter(){
         <Router>  
         <Header/>  
         <Routes>  
-                 <Route exact path='/'  element={< Job_screen />}></Route> 
+                 <Route exact path='/'  element={< Visitor />}></Route> 
                  <Route exact path='/profile'  element={< Profile />}></Route> 
+                 <Route exact path='/Job/:slug'  element={< Job_screen />}></Route>
        
         </Routes> 
         <Footer/>
