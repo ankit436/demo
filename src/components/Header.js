@@ -13,10 +13,10 @@ export default function Header() {
       <div className="header_box_item">
         <div className="header_tab_list_item">
           <ul className="header_tab_list">
-            <li className="header_tab_item_styled">Find Talent </li>
-            <li className="header_tab_item_styled">Find Work </li>
-            <li className="header_tab_item_styled">Why Upwork </li>
-            <li className="header_tab_item_styled">Enterprise </li>
+          <Link to="/" className="Nav_link"> <li className="header_tab_item_styled">Find Talent </li></Link> 
+           <Link to="/Job/All-job"className="Nav_link"><li className="header_tab_item_styled">Find Work </li></Link> 
+           <Link to="/"className="Nav_link"><li className="header_tab_item_styled">Why Upwork </li></Link> 
+           <Link to="/"className="Nav_link"><li className="header_tab_item_styled">Enterprise </li></Link> 
           </ul>
         </div>
         <div className="header_search_login">

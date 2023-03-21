@@ -1,5 +1,6 @@
 import React from "react";
 import "./fotter.css";
+import { Link } from "react-router-dom";
 
 export default function Footer() {
   return (
@@ -13,57 +14,56 @@ export default function Footer() {
             <div className="footer-accordion-content">
               <ul className="footer-list list-unstyled">
                 <li className="footer-list-item">
-                  <a
-                    href="/i/how-it-works/client/"
+                  <Link to="/i/how-it-works/client/"
                     className="footer-list-link"
                   >
                     How to Hire
-                  </a>
+                  </Link>
                 </li>
                 <li className="footer-list-item">
-                  <a href="/talent-marketplace/" className="footer-list-link">
+                  <Link to="/talent-marketplace/" className="footer-list-link">
                     Talent Marketplace
-                  </a>
+                  </Link>
                 </li>
                 <li className="footer-list-item">
-                  <a href="/services/" className="footer-list-link">
+                  <Link to="/services/" className="footer-list-link">
                     Project Catalog
-                  </a>
+                  </Link>
                 </li>
                 <li className="footer-list-item">
-                  <a href="/staffing" className="footer-list-link">
+                  <Link to="/staffing" className="footer-list-link">
                     Talent Scout
-                  </a>
+                  </Link>
                 </li>
                 <li className="footer-list-item">
-                  <a href="/agencies" className="footer-list-link">
+                  <Link to="/agencies" className="footer-list-link">
                     Hire an Agency
-                  </a>
+                  </Link>
                 </li>
                 <li className="footer-list-item">
-                  <a href="/enterprise/" className="footer-list-link">
+                  <Link to="/enterprise/" className="footer-list-link">
                     Enterprise
-                  </a>
+                  </Link>
                 </li>
                 <li className="footer-list-item">
-                  <a href="/i/payroll-client/" className="footer-list-link">
+                  <Link to="/i/payroll-client/" className="footer-list-link">
                     Payroll Services
-                  </a>
+                  </Link>
                 </li>
                 <li className="footer-list-item">
-                  <a href="/direct-contracts/cl" className="footer-list-link">
+                  <Link to="/direct-contracts/cl" className="footer-list-link">
                     Direct Contracts
-                  </a>
+                  </Link>
                 </li>
                 <li className="footer-list-item">
-                  <a href="/hire/" className="footer-list-link">
+                  <Link to="/hire/" className="footer-list-link">
                     Hire Worldwide
-                  </a>
+                  </Link>
                 </li>
                 <li className="footer-list-item">
-                  <a href="/hire/us/" className="footer-list-link">
+                  <Link to="/hire/us/" className="footer-list-link">
                     Hire in the USA
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
@@ -83,14 +83,14 @@ export default function Footer() {
                   </a>
                 </li>
                 <li className="footer-list-item">
-                  <a href="/direct-contracts" className="footer-list-link">
+                  <Link to="/direct-contracts" className="footer-list-link">
                     Direct Contracts
-                  </a>
+                  </Link>
                 </li>
                 <li className="footer-list-item">
-                  <a href="/freelance-jobs/" className="footer-list-link">
+                  <Link to="/freelance-jobs/" className="footer-list-link">
                     Find Freelance Jobs Worldwide
-                  </a>
+                  </Link>
                 </li>
                 <li className="footer-list-item">
                   <a
@@ -110,44 +110,44 @@ export default function Footer() {
             <div className="footer-accordion-content">
               <ul className="footer-list list-unstyled">
                 <li className="footer-list-item">
-                  <a href="/help-support" className="footer-list-link">
+                  <Link to="/help-support" className="footer-list-link">
                     Help &amp; Support
-                  </a>
+                  </Link>
                 </li>
                 <li className="footer-list-item">
-                  <a href="/success-stories" className="footer-list-link">
+                  <Link to="/success-stories" className="footer-list-link">
                     Success Stories
-                  </a>
+                  </Link>
                 </li>
                 <li className="footer-list-item">
-                  <a href="/reviews" className="footer-list-link">
+                  <Link to="/reviews" className="footer-list-link">
                     Upwork Reviews
-                  </a>
+                  </Link>
                 </li>
                 <li className="footer-list-item">
-                  <a href="/resources" className="footer-list-link">
+                  <Link to="/resources" className="footer-list-link">
                     Resources
-                  </a>
+                  </Link>
                 </li>
                 <li className="footer-list-item">
-                  <a href="/blog" className="footer-list-link">
+                  <Link to="/blog" className="footer-list-link">
                     Blog
-                  </a>
+                  </Link>
                 </li>
                 <li className="footer-list-item">
-                  <a href="/Community" className="footer-list-link">
+                  <Link to="/Community" className="footer-list-link">
                     Community
-                  </a>
+                  </Link>
                 </li>
                 <li className="footer-list-item">
-                  <a href="/affiliates" className="footer-list-link">
+                  <Link to="/affiliates" className="footer-list-link">
                     Affiliate Program
-                  </a>
+                  </Link>
                 </li>
                 <li className="footer-list-item">
-                  <a href="/tools" className="footer-list-link">
+                  <Link to="/tools" className="footer-list-link">
                     Free Business tools
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
@@ -159,39 +159,39 @@ export default function Footer() {
             <div className="footer-accordion-content">
               <ul className="footer-list list-unstyled">
                 <li className="footer-list-item">
-                  <a href="/about" className="footer-list-link">
+                  <Link to="/about" className="footer-list-link">
                     About Us
-                  </a>
+                  </Link>
                 </li>
                 <li className="footer-list-item">
-                  <a href="/about/team" className="footer-list-link">
+                  <Link to="/about/team" className="footer-list-link">
                     Leadership
-                  </a>
+                  </Link>
                 </li>
                 <li className="footer-list-item">
-                  <a href="/Investor-Relations" className="footer-list-link">
+                  <Link to="/Investor-Relations" className="footer-list-link">
                     Investor Relations
-                  </a>
+                  </Link>
                 </li>
                 <li className="footer-list-item">
-                  <a href="/careers" className="footer-list-link">
+                  <Link to="/careers" className="footer-list-link">
                     Careers
-                  </a>
+                  </Link>
                 </li>
                 <li className="footer-list-item">
-                  <a href="/about/our-impact" className="footer-list-link">
+                  <Link to="/about/our-impact" className="footer-list-link">
                     Our Impact
-                  </a>
+                  </Link>
                 </li>
                 <li className="footer-list-item">
-                  <a href="/press" className="footer-list-link">
+                  <Link to="/press" className="footer-list-link">
                     Press
-                  </a>
+                  </Link>
                 </li>
                 <li className="footer-list-item">
-                  <a href="/about/contact" className="footer-list-link">
+                  <Link to="/about/contact" className="footer-list-link">
                     Contact Us
-                  </a>
+                  </Link>
                 </li>
                 <li className="footer-list-item">
                   <a
@@ -300,14 +300,14 @@ export default function Footer() {
           <p className="footer-copy">© 2015 - 2023 Upwork® Global Inc.</p>{" "}
           <ul className="footer-bottom-list list-unstyled">
             <li className="footer-bottom-list-item">
-              <a href="/legal" className="footer-bottom-list-link">
+              <Link to="/legal" className="footer-bottom-list-link">
                 Terms of Service
-              </a>
+              </Link>
             </li>
             <li className="footer-bottom-list-item">
-              <a href="/legal#privacy" className="footer-bottom-list-link">
+              <Link to="/legal#privacy" className="footer-bottom-list-link">
                 Privacy Policy
-              </a>
+              </Link>
             </li>
             <li className="footer-bottom-list-item">
               <a

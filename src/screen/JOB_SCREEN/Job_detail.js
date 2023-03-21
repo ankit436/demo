@@ -35,33 +35,33 @@ const Job_detail = ({navigation}) => {
             }
         }
 
-        const timer = setTimeout(() => {
-            fetchData();
-          }, 6000);
+        // const timer = setTimeout(() => {
+        //     fetchData();
+        //   }, 6000);
       
-        return () => clearTimeout(timer);
+        // return () => clearTimeout(timer);
         
 
        
     }, [job,slug]);
 
-    if(loading){
-        return <h1> Loading... </h1>
-    }
+    // if(loading){
+    //     return <h1> Loading... </h1>
+    // }
 
-    if(error){
-        return <h1> Error... </h1>
-    }
+    // if(error){
+    //     return <h1> Error... </h1>
+    // }
 
     
 
     return (
        
-        <div className="JobsContainer">
-            <div className="job_detail">
-                <h1>{job.title}</h1>
-                <p>{job.body}</p>
-            </div>
+        <div className="JobsdetailsContainer">
+            <div className="job_details_container"> 
+            
+            
+               </div>
         </div>
 
     );
