@@ -7,6 +7,7 @@ import Header from './Header';
 import Footer from './Footer';
 import Profile from '../screen/Profile';
 import Job_screen from '../screen/JOB_SCREEN/Job_sceen';
+import Job_detail from '../screen/JOB_SCREEN/Job_detail';
 
 export default function Approuter(){
 
@@ -19,6 +20,7 @@ export default function Approuter(){
                  <Route exact path='/'  element={< Visitor />}></Route> 
                  <Route exact path='/profile'  element={< Profile />}></Route> 
                  <Route exact path='/Job/:slug'  element={< Job_screen />}></Route>
+                 <Route exact path='/Job-detail/:slug'  element={< Job_detail />}></Route>
        
         </Routes> 
         <Footer/>

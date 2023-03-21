@@ -10,7 +10,7 @@ export default function All_job() {
                 
 
         <div className="job_list">
-          <Job_tile />
+          <Job_tile/>
         </div> 
     )
 }

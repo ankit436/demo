@@ -13,7 +13,7 @@ import { Link, useParams } from 'react-router-dom';
 export default function Job_screen() {
 const { slug } = useParams();
 
-const type ={
+const types ={
   "All-job": "All job",
   "My-job": "My job",
   "Saved-job": "Saved job",
@@ -31,11 +31,11 @@ const Function_type = {
   "Inactive job": <Inactive_job></Inactive_job>,
 
 };
-const [job_type,setJob_type]=useState(type['All-job']  );
+const [job_type,setJob_type]=useState(types['All-job']  );
 
 useEffect(() => {
  
-  setJob_type(type[slug]||type['All-job']  );
+  setJob_type(types[slug]||types['All-job']  );
     
 }, [job_type,slug]);
 
@@ -55,24 +55,24 @@ const getclasses = (type) => {
     <div className="JobsContainer">
       <div className="job_container">
         <div className="job_tab">
-          <a href="/Job/All-job" className={getclasses("All-job")}  >
+          <Link to="/Job/All-job" className={getclasses("All-job")}  >
             All Jobs
-          </a>
-          <a href="/Job/My-job" className={getclasses("My-job")}>
+          </Link>
+          <Link to="/Job/My-job" className={getclasses("My-job")}>
             My Jobs
-          </a>
-          <a href="/Job/Saved-job" className={getclasses("Saved-job")}>
+          </Link>
+          <Link to="/Job/Saved-job" className={getclasses("Saved-job")}>
             Saved Jobs
-          </a>
-          <a href="/Job/Applied-job" className={getclasses("Applied-job")}>
+          </Link>
+          <Link to="/Job/Applied-job" className={getclasses("Applied-job")}>
             Applied Jobs
-          </a>
-          <a href="/Job/Active-job" className={getclasses("Active-job")}>
+          </Link>
+          <Link to="/Job/Active-job" className={getclasses("Active-job")}>
             Active jobs
-          </a>
-          <a href="/Job/Inactive-job" className={getclasses("Inactive-job")}>
+          </Link>
+          <Link to="/Job/Inactive-job" className={getclasses("Inactive-job")}>
             Inactive jobs
-          </a>
+          </Link>
         </div>
         <div className="job_filter_container">
           <div className="job_filter">

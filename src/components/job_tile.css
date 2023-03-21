@@ -15,10 +15,32 @@
 
 }
 
+.job_tiles:hover{
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+    transform: scale(1.05);
+    transition: 0.3s;
+
+
+}
+
 
 .job_list_container{
     display: flex;
     flex-direction: row;
     justify-content: space-evenly;
     flex-wrap: wrap;
+}
+
+.job_list_container > div{
+    margin: 10px;
+}
+
+.job_list_container > div:hover{
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+}
+
+
+.link{
+    text-decoration: none;
+    color: black;
 }

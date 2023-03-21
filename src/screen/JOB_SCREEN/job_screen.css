@@ -17,59 +17,47 @@
         padding:0px 40px;
 }
 
+
+
 .job_tab{
-  
-    display:  flex;
+    display: flex;
     flex-direction: row;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
     width: 100%;
     height: 100px;
     background-color: #f5f5f5;
-    padding-top: 5px;
-
+    
 }
 .JOB_LINK{
-    width: 100%;
-    height: 100%;
-    background-color: #f5f5f5;
     text-decoration: none;
     color: black;
     font-size: 20px;
     font-weight: bold;
     text-align: center;
-    padding-top: 30px;
+    padding: 10px 30px;
     border: 1px solid #f5f5f5;
     border-radius: 10px;
     transition: 0.5s;
+    white-space: nowrap;
+  
 }
 
 .JOB_LINK:hover{
-    background-color: #f5f5f5;
-    border-bottom: 1px solid #7a0404;
-    border-radius: 0px;
+    transform: scale(1.1);
     transition: 0.5s;
+    color:yellowgreen
+    
+   
 }
 .JOB_LINK.active{
-    background-color: #f5f5f5;
-    border: 1px solid #7a0404;
-    border-radius: 10px;
+    
+    transform: scale(1.1);
     transition: 0.5s;
+    color: brown
+
+
 }
-
-/* .JOB_LINK:active{
-    background-color: #f5f5f5;
-    border: 1px solid #7a0404;
-    border-radius: 10px;
-    transition: 0.5s;
-} */
-
-/* .JOB_LINK:visited{
-    background-color: #f5f5f5;
-    border: 1px solid #7a0404;
-    border-radius: 10px;
-    transition: 0.5s;
-} */
 
 .JOB_LINK:link{
     background-color: #f5f5f5;
