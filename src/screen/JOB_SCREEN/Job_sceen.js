@@ -85,15 +85,16 @@ const getclasses = (type) => {
               <h1> {slug} </h1>
             </div>
             <div className="Sort_job">
-              <div className="Sorting_job"></div>
+              <div className="Sorting_job">
+                <h1>Sort by</h1>
+                <div className="Sort_icon"></div>
+                
+              </div>
               <div className="Status"></div>
             </div>
           </div>
         </div>
         {Function_type[job_type]}
-
-
-
       </div>
     </div>
   );

@@ -1,77 +1,82 @@
 
+
+
+
 .JobsContainer{
+  
+   margin-top: var(--global-fixes-height);
+    width: var(--global-parent-width); 
+    height: var(--global-parent-height); 
 
-   margin-top: 100px; 
-    width: 100%;
-    height: 100%;
-
-    background-color: #f5f5f5;
+    background-color: var(--global-background-color);
 }
 
 
 .job_container{
     
-        width: 100%;
-        height: 100%;
-        background-color: #f5f5f5;
-        padding:0px 40px;
+        
+        width: var(--global-parent-width); 
+        height: var(--global-parent-height); 
+        background-color: var(--global-background-color);
+        padding:0px calc(var(--global-all-padding) * 4);
+
 }
 
 
 
 .job_tab{
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(6, auto);
+    position: fixed;
+    z-index: 50;
     flex-direction: row;
-    justify-content: space-between;
-    align-items: flex-start;
-    width: 100%;
-    height: 100px;
-    background-color: #f5f5f5;
+    
+    align-items: center;
+    width: var(--global-parent-width); 
+    height: 50px;
+    background-color: var(--global-background-color);
     
 }
 /* work om padding */
 .JOB_LINK{
     text-decoration: none;
-    color: black;
-    font-size: 20px;
-    font-weight: bold;
+    color: var(--global-link-color);
+    font-size: var(--global-font-size);
+    font-weight: var(--global-font-weight);
     text-align: center;
-    padding: 10px 30px;
-    border: 1px solid #f5f5f5;
-    border-radius: 10px;
-    transition: 0.5s;
+    padding:var(--global-padding);
+    border: var( --global-border);
+    border-radius: var(--global-border-radius);
+    transition: var(--global-text-tansistion); 
     white-space: nowrap;
   
 }
 
 .JOB_LINK:hover{
     transform: scale(1.1);
-    transition: 0.5s;
+    transition: var(--global-text-tansistion); 
     color:yellowgreen
     
    
 }
 .JOB_LINK.active{
-    
     transform: scale(1.1);
-    transition: 0.5s;
+    transition: var(--global-text-tansistion); 
     color: brown
-
-
 }
 
 .JOB_LINK:link{
-    background-color: #f5f5f5;
+    /* background-color: var(--global-background-color);
     border: 1px solid #7a0404;
-    border-radius: 10px;
-    transition: 0.5s;
+    border-radius: var(--global-border-radius);
+    transition: 0.5s; */
 }
 
 .job_filter_container{
-    width: 100%;
-    height: 100%;
-    background-color: #f5f5f5;
-    padding: 0px 40px;
+    width: var(--global-parent-width); 
+    height: var(--global-parent-height); 
+    background-color: var(--global-background-color);
+    padding:  calc(var(--global-all-padding) * 8);
 }
 .job_filter{
   
@@ -79,38 +84,39 @@
     flex-direction: row;
     justify-content: flex-start;
     align-items: center;
-    width: 100%;
+    width: var(--global-parent-width); 
     height: 100px;
-    background-color: #f5f5f5;
+    background-color: var(--global-background-color);
+    column-gap: 40px;
 
 }
 .coutn_job{
 
-    background-color: #f5f5f5;
+    background-color: var(--global-background-color);
     text-decoration: none;
     color: black;
-    font-size: 20px;
-    font-weight: bold;
+     font-size: var(--global-font-size);
+    font-weight: var(--global-font-weight);
     text-align: center;
-    padding-right: 30px;
-    border: 1px solid #f5f5f5;
-    border-radius: 10px;
-    transition: 0.5s;
+    padding-right: calc(var(--global-all-padding) * 6);
+    border: var( --global-border);
+    border-radius: calc(var(--global-border-radius) * 2);
+    transition: var(--global-text-tansistion); 
 
 }
 
 .Active_tab{
-    background-color: #f5f5f5;
+    background-color: var(--global-background-color);
     border-bottom: 1px solid #7a0404;
-    border-radius: 0px;
-    transition: 0.5s;
+    border-radius: var(--global-border-radius);
+    transition: var(--global-text-tansistion); 
 }
 .job_list{
 
-    width: 100%;
-    height: 100%;
-    background-color: #f5f5f5;
-    padding:  40px;
+    width: var(--global-parent-width); 
+    height: var(--global-parent-height); 
+    background-color: var(--global-background-color);
+    padding:  calc(var(--global-all-padding) * 4);
 }
 
 .job_list_container{
@@ -134,7 +140,8 @@
     .JOB_LINK{
         font-size: 8px;
         
-        padding: 5px 0px;
+        padding-left: var(--global-all-padding);
+        padding-right: var(--global-all-padding);
 
    }
 
@@ -142,10 +149,10 @@
 @media only screen and (min-width: 600px) {
 
     .JOB_LINK{
-        font-size: 8px;
+        font-size: calc(var(--global-font-size)/2);
         
-        padding: 10px 0px;
-
+        padding-left:calc(var( --global-all-padding) * 2);
+        padding-right:calc(var( --global-all-padding) * 2);
    }
 
 }
@@ -153,8 +160,10 @@
 /* Medium devices (landscape tablets, 768px and up) */
 @media only screen and (min-width: 768px) {
     .JOB_LINK{
-        font-size: 11px;
-        padding: 10px 10px;
+        font-size: calc(var(--global-font-size)/1.5);
+        
+        padding:calc(var(--global-padding) / 2);
+
 
    }
     
@@ -165,9 +174,9 @@
     
     
     .JOB_LINK{
-        font-size: 15px;
+        font-size: calc(var(--global-font-size));
         
-         padding: 10px 20px;
+        padding:var(--global-padding);
 
     }
 
@@ -176,8 +185,8 @@
 /* Extra large devices (large laptops and desktops, 1200px and up) */
 @media only screen and (min-width: 1200px) {
     .JOB_LINK{
-        font-size: 20px;
-        padding: 10px 30px;
+        font-size: var(--global-font-size);
+        padding: var(--global-padding);
 
    }
 

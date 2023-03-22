@@ -13,7 +13,7 @@ const Job_tile = ({ job }) => {
             <div className="job_tiles">
               <div className="job_dropdown">
                 <i className="dropdown_icon"></i>
-                <div className="Add_to_bookmark_icon"></div>
+                <div className="Add_to_bookmark_icon book_mark_icon_filled"></div>
                 <div className="three_dot"></div>
               </div>
               <div className="job_icon_image"></div>
@@ -21,11 +21,11 @@ const Job_tile = ({ job }) => {
               <div className="job_data">
                 <div className="job_title">
                   {" "}
-                  <h3>tuiewuriur</h3>
+                  <h3>tuiewu hsgds wiiw  wije riur</h3>
                 </div>
-                <div className="job_description">
+                <div className="job_description scroll">
                   {" "}
-                  <p>wgetuiwiwgiuewgeurgeurogoe</p>
+                  <p>wgetuiwiwgiuewsdhiodhasdbjkasbdjwm wel e jbewr 3 uhh4h3h3 rgrgeg regregregrervevrurerpoerwehok  jd ew we ew j we jwje    wejhiohe e e oe w  rfewjwoi geurg iwgiuewsdhiodhasdbjkasbdjwm wel e jbewr 3 uhh4h3h3 rgrgeg regregregrervevrurerpoerwehok  jd ew we ew j we jwje    wejhiohe e e oe w  rfewjwoi geurgeurogoeurogoe</p>
                 </div>
               </div>
 

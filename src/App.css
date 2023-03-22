@@ -1,15 +1,61 @@
 
 :root{
-  --nav-global-transition: all 0.3s ease-in-out;
-  --nav-global-tab-width: 100px;
-  --nav-global-tab-height: 100%;
-  --nav-global-tab-font-size: 20px;
-  --nav-global-tab-font-weight: 600;
-  --nav-global-tab-color: #111010;
-  --nav-global-tab-transition: all 0.3s ease-in-out;
-  --nav-global-tab-cursor: pointer;
-  --nav-global--margin: 20px;
-  --nav-global-tab-white-space: nowrap;
+  --global-transition: all 0.3s ease-in-out;
+  --global-all-padding: 5px;
+  --global-parent-width: 100%;
+  --global-parent-height: 100%;
+  --global-fixes-width: 100vw;
+  --global-fixes-height: 100px;
+  --global-font-size: 20px;
+  --global-font-weight: 600;
+  --global-color: #111010;
+  --global-transition: all 0.3s ease-in-out;
+  --global-cursor: pointer;
+  --global--margin: 20px;
+  --global-white-space: nowrap;
+  --global-border: 1px solid #f5f5f5;
+  --global-border-radius: 5px;
+  --global-background-color: #f5f5f5;
+  --global-link-color: #111010;
+  --global-padding: 10px 20px;
+  --global-box-shadow: 0 0 10px rgba(0,0,0,0.5);
+  --global-z-index: 100;
+
+  --global-position: absolute;
+  --global-top: 50%;
+  --global-left: 50%;
+  --global-transform: translate(-50%,-50%);
+  --global-text-align: center;
+  --global-display: flex;
+  --global-justify-content: center;
+  --global-align-items: center;
+  --global-flex-direction: column;
+  --global-flex-wrap: nowrap;
+  --global-flex: 1;
+  --global-flex-grow: 1;
+  --global-flex-shrink: 1;
+  --global-flex-basis: 0;
+  --global-flex-flow: row nowrap;
+  --global-order: 0;
+  --global-align-self: auto;
+  --global-align-content: stretch;
+  --global-overflow: hidden;
+  --global-text-decoration: none;
+  --global-text-transform: uppercase;
+  --global-text-overflow: ellipsis;
+  --global-overflow-wrap: break-word;
+  --global-word-wrap: break-word;
+  --global-word-break: break-word;
+  --global-line-height: 1.5;
+  --global-letter-spacing: 1px;
+  --global-text-shadow: 0 0 10px rgba(0,0,0,0.5);
+  --global-box-sizing: border-box;
+  --global-outline: none;
+  --global-border-box: border-box;
+  --global-text-tansistion: all 0.3s ease-in-out; 
+  --global-text-color: #111010;
+  --global-tile-transition: all 0.5s ease-in-out;
+  --global-transform: Scale(1.08);
   --nav-height: 100px;
   --nav-scroll-height: 70px;
   --nav-bg: #f5f5f5;
@@ -77,4 +123,14 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+
+Link{
+  text-decoration: none;
+  color: var(--global-link-color);
+}
+link:hover{
+  text-decoration: none;
+  color: var(--global-link-color);
 }

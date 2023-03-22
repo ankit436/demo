@@ -2,21 +2,22 @@
   display: flex;
 
   flex-direction: column;
-  height: 100%;
-  max-width: 270px;
-  background-color: white;
-  border-radius: 10px;
-  margin: 10px;
-  padding: 15px;
-  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
-  transition: 0.3s;
-  border: 1px solid #f5f5f5;
+  height: var(--global-parent-height);
+  max-width: 600px;
+  max-height: 400px;
+  background-color: var(--global-background-color);
+  border-radius: calc(var(--global-border-radius) * 2);
+  margin: calc(var(--global--margin) / 2);
+  padding: calc(var(--global-all-padding) * 3);
+  box-shadow: var( --global-box-shadow);
+  transition: var(--global-tile-transition);
+  border: 1px solid #110797;
 }
 
 .job_tiles:hover {
-  box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
-  transform: scale(1.05);
-  transition: 0.3s;
+  box-shadow: calc( var( --global-box-shadow) * 2)  ;
+  transform: calc(var(--global-tile-transition) /1.2);
+  transition: var(--global-tile-transition);
 }
 
 .job_list_container {
@@ -28,7 +29,7 @@
 }
 
 .job_list_container > div {
-  margin: 10px;
+  margin: calc(var(--global--margin) / 2);
 }
 
 .job_list_container > div:hover {
@@ -43,9 +44,12 @@
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  margin-top: 10px;
-  border: 1px solid #110797;
+  /* border: 1px solid #110797; */
   transition: 0.5s;
+  background-image: url('../Assets/Image/process-gear.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
 }
 
 .job_title {
@@ -55,12 +59,35 @@
   white-space: nowrap;
 }
 
-.job_description {
+.scroll {
+  width: 100%;
+  height: 100px;
+  overflow-y: auto;
+}
+
+.scroll:active::-webkit-scrollbar-thumb,
+.scroll:focus::-webkit-scrollbar-thumb,
+.scroll:hover::-webkit-scrollbar-thumb {
+    visibility: visible;
+}
+.scroll::-webkit-scrollbar-thumb {
+    background-color: darkgrey;
+    visibility: hidden;
+}
+
+.scroll::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+}
+
+.job_description.scroll {
   font-size: 15px;
   font-weight: bold;
   transition: 0.5s;
-  white-space: nowrap;
+  text-align: start;
   color: #b1b4b7;
+  line-height: 21px;
+  
 }
 
 .Job_task {
@@ -86,22 +113,35 @@
 .Nav_link {
   text-decoration: none;
 }
-.Add_to_bookmark_icon {
-  width: 50px;
-  height: 22px;
-  border-radius: 50%;
-  margin-top: 10px;
-  border: 1px solid #702121;
+.book_mark_icon_filled {
+
+  background-image: url('../Assets/Image/favourite_filled-1.png');
+ 
+}
+.book_mark_icon_outlined{
+
+  background-image: url('../Assets/Image/favourite-1.png');
+ 
+}
+
+
+.Add_to_bookmark_icon.book_mark_icon_filled {
+  width: 30px;
+  height: 30px;
+  padding-right: 5px;
   transition: 0.5s;
+  background-repeat: no-repeat;
+  background-position: center;  
+  
 }
 
 .three_dot {
-  width: 50px;
-  height: 22px;
-  border-radius: 50%;
-  margin-top: 10px;
-  border: 1px solid #188356;
+  width: 30px;
+  height: 30px;
   transition: 0.5s;
+  background-image: url('../Assets/Image/three_dot.png');
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 .Job_group_date_icon {
@@ -116,4 +156,11 @@
 
   border: 1px solid #83182f;
   transition: 0.5s;
+}
+.Sort_job{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin: 10px;
 }

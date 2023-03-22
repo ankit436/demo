@@ -1,22 +1,30 @@
-import React, { useState } from "react";
+import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
+import { useOnHoverOutside } from "../Helpers/useOnHoverOutside";
 
 import "./Header.css";
 
 export default function Header() {
   const [user, setuser] = useState(localStorage.getItem("user"));
+  const dropdownRef = useRef(null);
+  const [isMenuDropDownOpen, setMenuDropDownOpen] = useState(false);
 
+  const closeHoverMenu = () => {
+    setMenuDropDownOpen(false);
+  };
+  useOnHoverOutside(dropdownRef, closeHoverMenu);
 
   return (
+    <div className="Container_body" ref={dropdownRef}>
     <div className="Header_container">
       <div className="Header_logo"></div>
       <div className="header_box_item">
-        <div className="header_tab_list_item">
+        <div className="header_tab_list_item"  >
           <ul className="header_tab_list">
-          <Link to="/" className="Nav_link"> <li className="header_tab_item_styled">Find Talent </li></Link> 
-           <Link to="/Job/All-job"className="Nav_link"><li className="header_tab_item_styled">Find Work </li></Link> 
-           <Link to="/"className="Nav_link"><li className="header_tab_item_styled">Why Upwork </li></Link> 
-           <Link to="/"className="Nav_link"><li className="header_tab_item_styled">Enterprise </li></Link> 
+           <Link to="/" className="Nav_link" onMouseOver={ () => setMenuDropDownOpen(true)} > <li className="header_tab_item_styled">Find Talent </li></Link> 
+           <Link to="/Job/All-job"className="Nav_link" onMouseOver={ () => setMenuDropDownOpen(true)}><li className="header_tab_item_styled">Find Work </li></Link> 
+           <Link to="/"className="Nav_link" onMouseOver={ () => setMenuDropDownOpen(true)}><li className="header_tab_item_styled">Why Upwork </li></Link> 
+           <Link to="/"className="Nav_link" onMouseOver={ () => setMenuDropDownOpen(true)}><li className="header_tab_item_styled">Enterprise </li></Link> 
           </ul>
         </div>
         <div className="header_search_login">
@@ -47,6 +55,9 @@ export default function Header() {
           </div>
         </div>
       </div>
+    </div>
+    {isMenuDropDownOpen&&<div className="header_dropdown_container">
+      </div>}
     </div>
   );
 }
