@@ -44,7 +44,7 @@ const [loadingState, setLoadingState] = useState(true);
     console.log(loadingState),
     <div className="App">
 
-      {loadingState ? <Loading_screen/> : <Approuter/>}
+      {loadingState ? <Loading_screen/> :   <Approuter/>}
 
      
  

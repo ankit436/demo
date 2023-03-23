@@ -1,5 +1,6 @@
 
 import axios from 'axios';
+import { json } from 'react-router-dom';
 
 const base_Api="https://localhost:7006";
 // https://localhost:7006/Authentication
@@ -20,7 +21,23 @@ export const login = async (username, password) => {
     .catch((e) => null);
     
 };
-   
+
+export const isUserLoggedIn = () => {
+    let user = localStorage.getItem('user');
+    if (user === null) return false;
+    return true;
+}
+
+export const getLoggedInUser = () => {
+    let user = localStorage.getItem('user');
+    if (user === null) return '';
+    return JSON.parse(user);
+}
+
+
+
+
+
 
 
 export const logout = () => {
