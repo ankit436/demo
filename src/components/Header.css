@@ -220,6 +220,10 @@ input[type="text"] {
     margin: 0 10px;
     cursor: pointer;
     transition: var(--global-transition);
+    background-image: url('../Assets/Image/user.png');
+    background-size: 100%;
+    background-repeat: no-repeat;
+    background-position: center;
 
 
 }

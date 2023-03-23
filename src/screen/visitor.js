@@ -78,7 +78,7 @@ const  get_categories_link_classes = () => {
               />
             </div>
             <div className="search_buttons">
-              <button className="search_button">Search</button>
+              <button className="search_button">Get Started</button>
             </div>
           </div>
         </div>

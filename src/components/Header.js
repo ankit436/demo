@@ -46,7 +46,7 @@ export default function Header() {
           </div>
           <div className="header_login">
             {user ? (
-             <Link to="/profile"> <button className="profile_container">Profile</button></Link>
+             <Link to="/profile"> <button className="profile_container"></button></Link>
             ) : (
               <button type="submit" className="button">
                 Login
