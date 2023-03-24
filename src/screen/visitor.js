@@ -99,7 +99,7 @@ const  get_categories_link_classes = () => {
             </div>
 
             <div className={get_categories_inline_classes()}>
-              <Link to ="/" className={get_categories_link_classes()}>
+              <Link to ="/Admin/1" className={get_categories_link_classes()}>
                 Admin & Customer Support
               </Link>
             </div>
