@@ -41,6 +41,7 @@
 }
 
 .Admin_permission_table_body_item{
+    position: relative;
     font-size: 18px;
     color: #000;
     border-radius: 0 0 10px 10px;
@@ -72,4 +73,47 @@
     flex-direction: row;
     align-content: center;
     align-items: center;
+}
+.Permission_button{
+   
+  
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+    align-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    font-weight: bold;
+    color: #131212;
+  
+
+
+}
+.button{
+    width: 100%;
+    display: flex;
+    height: auto;
+    border-radius: 10px;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    font-weight: bold;
+    color: #131212;
+  
+}
+.button:hover{
+    box-shadow: 1px 1px 10px 1px rgba(0,0,0,0.5);
+}
+.button.Approve_button{
+    background-color: #77dd77
+}
+.button.Reject_button{
+    background-color: #ff6961
 }

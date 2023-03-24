@@ -16,6 +16,7 @@ export const isclient=(id)=>{
 }
 
 
+
 export const isfreelancer=(id)=>{
     return axios.get(base_Api + "/Authentication/Freelancer/"+id)
     .then(Response => {
@@ -31,6 +32,36 @@ export const isadmin=(id)=>{
     })
     .catch((e) => null);
 }
+
+export const getAllPendingApprovalByid=async (id) => {
+    return await axios
+    .get( "https://mocki.io/v1/4c5cb089-5e0d-436e-b3a6-92dd6d8ca632",
+    
+    
+    )
+    
+    .then(Response => {
+        return Response.data;
+    })
+    .catch((e) => null);
+    
+    
+}
+
+export const  getAllapprovedclient=async () => {
+    return await axios
+    .get(base_Api + "/Client/Approved"
+    )
+    
+    .then(Response => {
+        return Response.data;
+    })
+    .catch((e) => null);
+    
+}
+
+
+
 
 export const IsUserNew=(id)=>{
     return axios.get(base_Api + "/Authentication/New/"+id)

@@ -4,6 +4,7 @@ import { useEffect,useState } from 'react';
 import {login,logout } from './Service/WindowAuthentication'
 import Loading_screen from './components/Loading_screen';
 import Approuter from './components/Approuter';
+import Newuser from './components/newuser';
 
 
 
@@ -44,7 +45,7 @@ const [loadingState, setLoadingState] = useState(true);
     console.log(loadingState),
     <div className="App">
 
-      {loadingState ? <Loading_screen/> :   <Approuter/>}
+      {loadingState ? <Loading_screen/> :   <Newuser/>}
 
      
  
