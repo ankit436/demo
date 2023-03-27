@@ -61,6 +61,15 @@ export const  getAllapprovedclient=async () => {
 }
 
 
+export const setuser=( id)=>{
+    return axios.get(base_Api + "/Authentication/Getuser/"+id)
+    .then(Response => {
+
+        return  json.parse(Response.data);
+    })
+    .catch((e) => null);
+
+}
 
 
 export const IsUserNew=(id)=>{
