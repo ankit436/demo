@@ -33,6 +33,7 @@ export default function Newuser() {
 
 
     const checkuser = () => {
+        console.log(isClient);
 
         if (isClient === null) {
             alert("Please select client or freelancer");

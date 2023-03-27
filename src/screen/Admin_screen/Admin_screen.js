@@ -33,6 +33,10 @@ export default function Admin_screen() {
 
   return (
     <div className="Admin_container">
+      <div className="Admin_header">
+        <div className="Admin_header_Navbar">Admin</div>
+
+      </div>
       <div className="Admin_permission_table">
         <div className="Admin_permission_body">
           <div className="Admin_permission_table_header">

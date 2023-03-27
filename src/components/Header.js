@@ -3,16 +3,89 @@ import { Link } from "react-router-dom";
 import { useOnHoverOutside } from "../Helpers/useOnHoverOutside";
 
 import "./Header.css";
+import { DashboardNavbar,AdminNavbar,ClientNavbar,FreelancerNavbar,JobNavbar } from "./header_drop_down";
 
 export default function Header() {
   const [user, setuser] = useState(localStorage.getItem("user"));
   const dropdownRef = useRef(null);
   const [isMenuDropDownOpen, setMenuDropDownOpen] = useState(false);
+  const [isuser, setisuser] = useState(localStorage.getItem("userType")||"admin");
+  const [isdropdowncontent, setdropdowncontent] = useState("");
 
   const closeHoverMenu = () => {
+
     setMenuDropDownOpen(false);
+    setdropdowncontent(null);
   };
   useOnHoverOutside(dropdownRef, closeHoverMenu);
+
+  const setdropdownscontent = (content) => {
+    setdropdowncontent(content);
+  }
+
+  const dropdownopent = (content) => {
+    setMenuDropDownOpen(true);
+    setdropdownscontent(content);
+
+  }
+
+const Navbar_dropdown = () => {
+  switch (isdropdowncontent) {
+    case "Dashboard":
+      return <DashboardNavbar></DashboardNavbar>
+    case "Job":
+      return <JobNavbar></JobNavbar>
+    case "Admin":
+      return <AdminNavbar></AdminNavbar>
+    case "Freelancer":
+      return <FreelancerNavbar></FreelancerNavbar>
+    case "Client":
+      return <ClientNavbar></ClientNavbar>
+  }
+}
+
+const commontab_link = () => {
+  return <>
+   <Link to="/" className="Nav_link" > <li className="header_tab_item_styled"  onMouseOver={()=>dropdownopent("Dashboard")} >Dashboard </li></Link>
+    <Link to="/" className="Nav_link" ><li className="header_tab_item_styled" onMouseOver={()=>dropdownopent("Job")}>Job </li></Link>
+  </>
+};
+
+  const commontab = () =>{
+    return   <ul className="header_tab_list">
+    {commontab_link()}
+    </ul>
+  }
+
+  const admintab = () =>{
+    return   <ul className="header_tab_list">
+     {commontab_link()}
+    <Link to="/" className="Nav_link" ><li className="header_tab_item_styled" onMouseOver={()=>dropdownopent("Admin")}>Admin </li></Link>
+  </ul>
+  }
+
+const FreelancerTab = () =>{
+  return   <ul className="header_tab_list">
+   {commontab_link()}
+  <Link to="/" className="Nav_link" ><li className="header_tab_item_styled" onMouseOver={()=>dropdownopent("Freelancer")}>Freelancer </li></Link>
+  
+</ul>
+}
+
+const ClientTab = () =>{
+  return   <ul className="header_tab_list">
+    {commontab_link()}
+  <Link to="/" className="Nav_link" ><li className="header_tab_item_styled" onMouseOver={()=>dropdownopent("Client")}>Client </li></Link>
+  </ul>
+}
+
+
+
+const dropdowncontainer = () =>{
+  return Navbar_dropdown();
+}
+
+
 
   return (
     <div className="Container_body" ref={dropdownRef}>
@@ -20,12 +93,9 @@ export default function Header() {
       <div className="Header_logo"></div>
       <div className="header_box_item">
         <div className="header_tab_list_item"  >
-          <ul className="header_tab_list">
-           <Link to="/" className="Nav_link" onMouseOver={ () => setMenuDropDownOpen(true)} > <li className="header_tab_item_styled">Find Talent </li></Link> 
-           <Link to="/Job/All-job"className="Nav_link" onMouseOver={ () => setMenuDropDownOpen(true)}><li className="header_tab_item_styled">Find Work </li></Link> 
-           <Link to="/"className="Nav_link" onMouseOver={ () => setMenuDropDownOpen(true)}><li className="header_tab_item_styled">Why Upwork </li></Link> 
-           <Link to="/"className="Nav_link" onMouseOver={ () => setMenuDropDownOpen(true)}><li className="header_tab_item_styled">Enterprise </li></Link> 
-          </ul>
+          {isuser===null? commontab():isuser==="admin"?admintab():isuser==="client"?ClientTab():FreelancerTab()
+        
+          }
         </div>
         <div className="header_search_login">
           <div className="header_search_container">
@@ -47,17 +117,13 @@ export default function Header() {
           <div className="header_login">
             {user ? (
              <Link to="/profile"> <button className="profile_container"></button></Link>
-            ) : (
-              <button type="submit" className="button">
-                Login
-              </button>
-            )}
+            ) : null}
           </div>
         </div>
       </div>
     </div>
-    {isMenuDropDownOpen&&<div className="header_dropdown_container">
-      </div>}
+    {isMenuDropDownOpen&&dropdowncontainer()
+    }
     </div>
   );
 }

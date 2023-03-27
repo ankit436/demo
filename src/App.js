@@ -45,11 +45,9 @@ const [loadingState, setLoadingState] = useState(true);
     console.log(loadingState),
     <div className="App">
 
-      {loadingState ? <Loading_screen/> :   <Newuser/>}
+      {<Approuter/>  }
 
      
- 
-   <button onClick={logout}>Logout</button> 
 
     </div>
   );
