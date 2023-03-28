@@ -1,7 +1,7 @@
 import React from "react";
 import "./Admin_screen.css";
 import { useState, useEffect } from "react";
-import { getAllPendingApprovalByid, getAllapprovedclient } from "../../Service/Cruds";
+import { getAllPendingApprovalByid, getAllapprovedclient ,updaterequest} from "../../Service/Cruds";
 import {isUserLoggedIn } from  "../../Service/WindowAuthentication"
 import {admin_request} from "../../Model/Model"
 
@@ -30,16 +30,40 @@ export default function Admin_screen() {
           }, 6000);
       
         return () => clearTimeout(timer);
-    }, [adminData]);
+    }, []);
 
-    const Approved =(item)=>{
+    const Approved =async (item)=>{
+      
+      item[admin_request[5].name]="access";
 
-      console.log(item[admin_request[5].name])
-      item[admin_request[5].name]="aceess"
-      const newstate=adminData;
-      const index= adminData.findIndex((i)=>i[admin_request[8].name]===item[admin_request[8].name])
-      newstate[index]=item;
-      setAdminData(newstate)
+      var response=await updaterequest(item)
+      
+      if(response!=null){
+        const newstate=[...adminData];
+        const index= adminData.findIndex((i)=>i[admin_request[8].name]===item[admin_request[8].name])
+        newstate[index]=item;
+        console.log( newstate[index])
+        setAdminData(newstate)
+      }
+      
+      
+    }
+
+    const Rejected =async (item)=>{
+      
+      item[admin_request[5].name]="denied";
+
+      var response=await updaterequest(item)
+      
+      if(response!=null){
+        const newstate=[...adminData];
+        const index= adminData.findIndex((i)=>i[admin_request[8].name]===item[admin_request[8].name])
+        newstate[index]=item;
+        console.log( newstate[index])
+        setAdminData(newstate)
+      }
+      
+      
     }
 
   return (
@@ -85,10 +109,12 @@ export default function Admin_screen() {
                         </div>
                         <div className="Admin_permission_table_body_item">
                         <div className="Admin_permission_table_body_item">
+                          {item[admin_request[5].name]==='access'?item[admin_request[5].name]:item[admin_request[5].name]==="denied"? item[admin_request[5].name]:
                         <div className='Permission_button'>
                             <button className='button Approve_button' onClick={()=>Approved(item)}  >Access</button>
-                            <button className='button Reject_button'>Reject</button>
+                            <button className='button Reject_button' onClick={()=>Rejected(item)}>Reject</button>
                         </div>
+            }
                     </div>
                         </div>
                     </div>
