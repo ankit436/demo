@@ -9,6 +9,8 @@ import "./All_user_screen.css";
 
 import { Profile_detail } from "../../Model/Model";
 
+import  "../../Helpers/Loader.css"
+
 export default function All_user_screen() {
   const [alluser, setAlluser] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -32,28 +34,27 @@ export default function All_user_screen() {
 
     const timer = setTimeout(() => {
       fetchData();
-    }, 6000);
+    }, 3000);
 
     return () => clearTimeout(timer);
   }, []);
 
-  const edit_profile = async (item) => {
-    console.log(isediting.isedit);
-    setisediting({"index":-1,"isedit":null})
-    console.log(isediting.isedit);
+  const edit_profile = async () => {
  
-    // var response = await update_profile_data(
-    //   localStorage.getItem("user").substring(5),
-    //   item
-    // );
-    // if (response != null) {
-    //   const newstate = [...alluser];
-    //   const index = alluser.findIndex(
-    //     (i) => i[Profile_detail[0].name] === item[Profile_detail[0].name]
-    //   );
-    //   newstate[index] = item;
-    //   setAlluser(newstate);
-    // }
+    var response = await update_profile_data(
+      localStorage.getItem("user").substring(5),
+      isediting.isedit
+    );
+    if (response != null) {
+      const newstate = [...alluser];
+      const index = alluser.findIndex(
+        (i) => i[Profile_detail[0].name] === isediting.isedit[Profile_detail[0].name]
+      );
+      newstate[index] = isediting.isedit;
+      setAlluser(newstate);
+    }
+
+    setisediting({"index":-1,"isedit":null})
   };
 
   const Delete_user_profile = async (item) => {
@@ -73,17 +74,15 @@ export default function All_user_screen() {
 
   const inputvalue = (item_profile_value, item_profile_name) => {};
 
-  const handle_change = (e)=>{  
-   
-    const newstate = [...alluser];
-    const index = alluser.findIndex(
-      (i) => i[Profile_detail[0].name] === isediting.isedit[Profile_detail[0].name]
-    );
-    newstate[index][e.target.name]=e.target.value;
-    setisediting({"index":index,"isedit":newstate[index]})
-    console.log(isediting.isedit);
+  const handle_change = (e)=>{    
+    
+const {name,value}=e.target;
+const newstate=isediting.isedit;
 
-  } 
+newstate[name]=value;
+setisediting({"index":isediting.index,isedit:newstate})
+
+} 
 
   return (
     <div className="user_container">
@@ -101,7 +100,9 @@ export default function All_user_screen() {
             </div>
           </div>
           <div className="user_body">
-            {alluser.map((item, index) => (
+            
+            {loading?  <div className="loading">  <span class="loading__anim"></span></div> :
+            alluser.map((item, index) => (
               <div className="user_body_item_list" key={index}>
                 <div className="user_body_item item_id">
                   {item[Profile_detail[0].name]}
@@ -118,19 +119,21 @@ export default function All_user_screen() {
                 </div>
                 <div className="user_body_item item_email">
                   <input
-                    name={Profile_detail[2].name}
-                    value={item[Profile_detail[2].name]}
+                     name={Profile_detail[2].name}
+                    value={isediting.index===index? isediting.isedit[Profile_detail[2].name]: item[Profile_detail[2].name]}
                     type="text"
                     placeholder=""
+                    onChange={(e)=>handle_change(e)}
                     disabled ={isediting.index===index?false:true}
                   ></input>
                 </div>
                 <div className="user_body_item item_phone">
                   <input
                     name={Profile_detail[3].name}
-                    value={item[Profile_detail[3].name]}
+                    value={isediting.index===index? isediting.isedit[Profile_detail[3].name]: item[Profile_detail[3].name]}
                     type="text"
                     placeholder=""
+                    onChange={(e)=>handle_change(e)}
                     disabled ={isediting.index===index?false:true}
                   ></input>
                 </div>
@@ -139,9 +142,10 @@ export default function All_user_screen() {
                   {" "}
                   <input
                     name={Profile_detail[4].name}
-                    value={item[Profile_detail[4].name]}
+                    value={isediting.index===index? isediting.isedit[Profile_detail[4].name]: item[Profile_detail[4].name]}
                     type="text"
                     placeholder=""
+                    onChange={(e)=>handle_change(e)}
                     disabled ={isediting.index===index?false:true}
                   ></input>
                 </div>
@@ -181,7 +185,10 @@ export default function All_user_screen() {
                   
                 </div>
               </div>
-            ))}
+            ))
+            }
+            
+            
           </div>
         </div>
       </div>
