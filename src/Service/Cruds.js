@@ -1,7 +1,7 @@
 
 import axios from "axios";
 import { json } from "react-router-dom";
-const base_Api="https://localhost:7006";
+const base_Api="https://localhost:7104";
 
 
 
@@ -34,9 +34,17 @@ export const isadmin=(id)=>{
 }
 
 export const getAllPendingApprovalByid=async (id) => {
+    console.log(id)
     return await axios
-    .get( "https://mocki.io/v1/4c5cb089-5e0d-436e-b3a6-92dd6d8ca632",
-    
+    // .get( "https://mocki.io/v1/4c5cb089-5e0d-436e-b3a6-92dd6d8ca632",
+    .get(
+        base_Api +"/api/Admin/getAllPending_Request",
+        {
+            headers:{
+                "id":id
+
+            }
+        }
     
     )
     
@@ -47,6 +55,46 @@ export const getAllPendingApprovalByid=async (id) => {
     
     
 }
+
+export const updaterequest= async (data)=>{
+   
+   
+    return await axios
+    // .get( "https://mocki.io/v1/4c5cb089-5e0d-436e-b3a6-92dd6d8ca632",
+    .post(
+        base_Api +"/api/Admin/update_admin_request",data
+        
+            
+    
+    )
+    
+    .then(Response => {
+        return Response.data;
+    })
+    .catch((e) => null);
+
+}
+
+export const setuser=( id)=>{
+    return axios.get(base_Api + "/api/Profile/IsUserNew",
+    {
+        params:{
+            id:id
+        }
+    }
+
+    )
+    .then(Response => {
+
+        var x= JSON.parse( JSON.stringify(Response.data));
+        console.log(x);
+        localStorage.setItem("userType",x.Role)
+        return x.Role;
+    })
+    .catch((e) => null);
+
+}
+
 
 export const  getAllapprovedclient=async () => {
     return await axios
@@ -61,21 +109,21 @@ export const  getAllapprovedclient=async () => {
 }
 
 
-export const setuser=( id)=>{
-    return axios.get(base_Api + "/Authentication/Getuser/"+id)
+
+
+export const IsUserNew=(id,isclient)=>{
+    return axios.get(base_Api + "/api/Profile/IsUserNew/",
+    {
+        params:{
+            "id":id,
+            "isclient":isclient
+            
+        }
+    }
+    )
     .then(Response => {
-
-        return  json.parse(Response.data);
-    })
-    .catch((e) => null);
-
-}
-
-
-export const IsUserNew=(id)=>{
-    return axios.get(base_Api + "/Authentication/New/"+id)
-    .then(Response => {
-        return  json.parse(Response.data)===true;
+        
+        return  JSON.parse(JSON.stringify(Response.data)).Status===true;
     })
     .catch((e) => null);
 }
