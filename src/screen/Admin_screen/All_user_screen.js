@@ -14,7 +14,7 @@ export default function All_user_screen() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isediting ,setisediting]=useState({"index":-1,"isedit":null})
-  const [editing_data,setediting_data]=useState({});
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -73,8 +73,14 @@ export default function All_user_screen() {
 
   const inputvalue = (item_profile_value, item_profile_name) => {};
 
-  const handle_change = (e)=>{    
-    
+  const handle_change = (e,index)=>{  
+   
+    const newstate = [...isediting.isedit];
+    const index = isediting.isedit.findIndex(
+      (i) => i[Profile_detail[0].name] === item[Profile_detail[0].name]
+    );
+    newstate[index] = item;
+    setisediting({"index":index,"isedit":newstate});
 
     
 
