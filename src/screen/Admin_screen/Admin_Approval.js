@@ -1,6 +1,7 @@
 import React from "react";
 import "./Admin_Approval.css";
 import { useState, useEffect } from "react";
+import  "../../Helpers/Loader.css"
 import {
   getAllPendingApprovalByid,
   getAllapprovedclient,
@@ -30,7 +31,7 @@ export default function Admin_Approval() {
 
     const timer = setTimeout(() => {
       fetchData();
-    }, 6000);
+    }, 3000);
 
     return () => clearTimeout(timer);
   }, []);
@@ -46,7 +47,6 @@ export default function Admin_Approval() {
         (i) => i[admin_request[8].name] === item[admin_request[8].name]
       );
       newstate[index] = item;
-      console.log(newstate[index]);
       setAdminData(newstate);
     }
   };
@@ -69,11 +69,12 @@ export default function Admin_Approval() {
 
   return (
     <div className="Admin_container">
-      <div className="Admin_header">
+      {/* <div className="Admin_header">
         <div className="Admin_header_Navbar">Admin</div>
-      </div>
+      </div> */}
       <div className="Admin_permission_table">
         <div className="Admin_permission_body">
+          <div className="Permission_header_item_list">
           <div className="Admin_permission_table_header">
             <div className="Admin_permission_table_header_item">ID</div>
             <div className="Admin_permission_table_header_item">Request by</div>
@@ -88,7 +89,10 @@ export default function Admin_Approval() {
             </div>
             <div className="Admin_permission_table_header_item">Action</div>
           </div>
-          {adminData.length > 0 &&
+          </div>
+          <div className="permission_body">
+          {loading?  <div className="loading">  <span class="loading__anim"></span></div> :
+          adminData.length > 0 &&
             adminData.map((item, index) => {
               return (
                 <div key={index} className="Admin_permission_table_body">
@@ -98,7 +102,7 @@ export default function Admin_Approval() {
                   <div className="Admin_permission_table_body_item">
                     <div className="user_icon_with_Name">
                       <div className="user_icon"></div>
-                      <span className="user_name">
+                      <span className="user_names">
                         {item[admin_request[1].name]}
                       </span>
                     </div>
@@ -145,6 +149,8 @@ export default function Admin_Approval() {
                 </div>
               );
             })}
+            </div>
+            
         </div>
       </div>
     </div>
