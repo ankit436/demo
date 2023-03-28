@@ -20,7 +20,7 @@ export function AdminNavbar(){
         <div className="header_dropdown_item">
             <ul className="header_tab_list unstyled">
             <Link to="/admin/users" className="Nav_link" ><li className="header_tab_item_styled dropdown_unstyled" >Users </li></Link>
-            <Link to="/admin/users" className="Nav_link" ><li className="header_tab_item_styled dropdown_unstyled" >Pending Approval </li></Link>
+            <Link to="/admin/approval" className="Nav_link" ><li className="header_tab_item_styled dropdown_unstyled" >Pending Approval </li></Link>
             </ul>
         </div>
 

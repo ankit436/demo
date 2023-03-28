@@ -1,0 +1,51 @@
+
+.user_container{
+    margin-top: 100px;
+    width: 100%;
+    height: 100%;
+}
+.User_table_container{
+    
+   
+
+   
+
+
+
+    
+
+    
+}
+.user_header{
+    width: 100%;
+    height: 100px;
+    padding: 20px;
+}
+.user_table_header_item_list{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: row;
+    align-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.user_header_item{
+    /* padding: 10px; */
+    text-align: start;
+    white-space: nowrap;
+    max-width: 200px;
+    font-weight: bold;
+    font-size: 20px;
+   
+}
+
+.user_body{
+    background-color:beige ;
+    z-index: 100;
+    /* box-shadow: 1px 1px 10px 1px rgba(0,0,0,0.5);
+    border-radius: 10px; */
+}
