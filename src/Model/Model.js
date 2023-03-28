@@ -64,3 +64,20 @@ export const Profile_detail =[
 ]
 
 
+
+
+export  const admin_request =[
+   {'name': "requester_id", 'type':'text'},
+   {'name': "requester_name", 'type':'text'},
+   {'name': "requester_Email", 'type':'text'},
+   {'name': "requester_priority", 'type':'text'},
+   {'name': "request_status", 'type':'text'},
+   {'name': "request_access", 'type':'text'},
+   {'name': "request_created", 'type':'text'},
+   {'name': "requester_description", 'type':'text'},
+   {'name': "aR_id", 'type':'text'},
+   {'name': "request_updated", 'type':'text'},
+   {'name': "requester_image", 'type':'text'},
+  
+   
+]
