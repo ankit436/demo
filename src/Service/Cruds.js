@@ -56,16 +56,83 @@ export const getAllPendingApprovalByid=async (id) => {
     
 }
 
+export const getAllUser_detail= async (id)=>{
+   
+   
+    return await axios
+    // .get( "https://mocki.io/v1/4c5cb089-5e0d-436e-b3a6-92dd6d8ca632",
+    .get(
+        base_Api +"/api/Admin/getProfile_data",{
+            headers :{
+                id:id
+            }
+        }
+        
+            
+    
+    )
+    
+    .then(Response => {
+        return Response.data;
+    })
+    .catch((e) => null);
+
+}
+
+
+export const update_profile_data= async (id,profile)=>{
+
+   
+    return await axios
+    .put(
+        base_Api +"/api/Admin/Update_Profile_data",profile,
+        {
+            headers :{
+                id:id
+            }
+        },
+        
+    )
+    
+    .then(Response => {
+        return Response.data;
+    })
+    .catch((e) => null);
+
+}
+
+
+export const Delete_profile_data= async (id,profile)=>{
+
+   
+    return await axios
+    .post(
+        base_Api +"/api/Admin/Update_Profile_data",profile,
+        {
+            headers :{
+                id:id
+            }
+        },
+        
+    )
+    
+    .then(Response => {
+        return Response.data;
+    })
+    .catch((e) => null);
+
+}
+
+
+
 export const updaterequest= async (data)=>{
    
    
     return await axios
     // .get( "https://mocki.io/v1/4c5cb089-5e0d-436e-b3a6-92dd6d8ca632",
-    .post(
+    .put(
         base_Api +"/api/Admin/update_admin_request",data
-        
-            
-    
+
     )
     
     .then(Response => {
