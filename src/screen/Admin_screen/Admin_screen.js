@@ -30,6 +30,16 @@ export default function Admin_screen() {
         return () => clearTimeout(timer);
     }, [adminData]);
 
+    const Approved = (item)=>{
+
+
+        console.log(item);
+
+        const oldstate=[...adminData];
+       const index= oldstate.findIndex((i)=>i.id===item.id);
+        
+
+    }
 
   return (
     <div className="Admin_container">
@@ -100,7 +110,7 @@ export default function Admin_screen() {
                         <div className="Admin_permission_table_body_item">
                         <div className="Admin_permission_table_body_item">
                         <div className='Permission_button'>
-                            <button className='button Approve_button'>Access</button>
+                            <button className='button Approve_button' onClick={()=>Approved(item)} >Access</button>
                             <button className='button Reject_button'>Reject</button>
                         </div>
                     </div>

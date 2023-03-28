@@ -30,7 +30,6 @@ export default function Approuter(){
           const timer = setTimeout(() => {
             fetchuser();
           }, 6000);
-      
           return () => clearTimeout(timer);
         }
         else{
