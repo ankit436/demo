@@ -51,16 +51,16 @@ export const Project_skill =[
 
 
 export const Profile_detail =[
-    {'name':'Profile_id','type':'text'},
-    {'name':'Freelancer_id','type':'text'},
-    {'name':'Client_id','type':'text'},
-    {'name':'description','type':'text'},
-    {'name':'Gender','type':'text'},
-    {'name':'Prfile_photo','type':'text'},
-    {'name':'MobilePhone','type':'text'},
-    {'name':'Email','type':'text'},
-    {'name':'Address','type':'text'},
-
+    {'name':'profile_id','type':'text'},
+    {'name':'name','type':'text'},
+    {'name':'email','type':'text'},
+    {'name':'mobilePhone','type':'text'},
+    {'name':'profile_role','type':'text'},
+    {'name':'gender','type':'text'},
+    {'name':'address','type':'text'},
+    {'name':'profile_created','type':'text'},
+    {'name':'profile_photo','type':'text'},
+    {'name':'profile_updated','type':'text'},
 ]
 
 
@@ -79,5 +79,5 @@ export  const admin_request =[
    {'name': "request_updated", 'type':'text'},
    {'name': "requester_image", 'type':'text'},
   
-   
 ]
+
