@@ -73,16 +73,15 @@ export default function All_user_screen() {
 
   const inputvalue = (item_profile_value, item_profile_name) => {};
 
-  const handle_change = (e,index)=>{  
+  const handle_change = (e)=>{  
    
-    const newstate = [...isediting.isedit];
-    const index = isediting.isedit.findIndex(
-      (i) => i[Profile_detail[0].name] === item[Profile_detail[0].name]
+    const newstate = [...alluser];
+    const index = alluser.findIndex(
+      (i) => i[Profile_detail[0].name] === isediting.isedit[Profile_detail[0].name]
     );
-    newstate[index] = item;
-    setisediting({"index":index,"isedit":newstate});
-
-    
+    newstate[index][e.target.name]=e.target.value;
+    setisediting({"index":index,"isedit":newstate[index]})
+    console.log(isediting.isedit);
 
   } 
 
