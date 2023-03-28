@@ -13,6 +13,9 @@ export default function All_user_screen() {
     const [alluser, setAlluser] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [isediting, setIsediting] = useState(false);
+
+
     
 
     useEffect(() => {
@@ -88,6 +91,7 @@ const Delete_user_profile = async (item)=>{
                         
                         <div className='user_body_item item_status'>{item[Profile_detail[4].name]}</div>
                         <div className='user_body_item item_action'>
+                           
                             <button className='user_body_item edit_action_button' onClick={()=>edit_profile(item)}>Edit</button>
                             <button className='user_body_item delete_action_button' onClick={()=>Delete_user_profile(item)}>Delete</button>    
                         </div>
