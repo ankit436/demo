@@ -106,10 +106,9 @@ export const update_profile_data= async (id,profile)=>{
 
 
 export const Delete_profile_data= async (id,profile)=>{
-
-   
+    console.log(profile)
     return await axios
-    .post(
+    .put(
         base_Api +"/api/Admin/Update_Profile_data",profile,
         {
             headers :{
@@ -120,6 +119,7 @@ export const Delete_profile_data= async (id,profile)=>{
     )
     
     .then(Response => {
+        console.log(Response.data)
         return Response.data;
     })
     .catch((e) => null);
@@ -186,6 +186,27 @@ export const  getAllapprovedclient=async () => {
 }
 
 
+export const Create_user_Role=(id,isclient)=>{
+    return  axios
+    .get(
+        "https://localhost:7104/api/Profile/Create_Role",
+        {
+        headers:{
+            id:id,
+            role:isclient
+        }
+    }
+        
+    )
+    
+    .then(Response => {
+        console.log(Response.data)
+        return Response.data;
+    })
+    .catch((e) => null);
+
+}
+
 
 
 export const IsUserNew=(id,isclient)=>{
@@ -202,6 +223,15 @@ export const IsUserNew=(id,isclient)=>{
     .then(Response => {
         
         return  JSON.parse(JSON.stringify(Response.data)).Status===true;
+    })
+    .catch((e) => null);
+}
+
+export const post_a_job=(post_job)=>{
+    return axios.post(base_Api + "/api/Projectdetail/post_a_job",post_job)
+    .then(Response => {
+        console.log(Response.data);
+        return Response.data;
     })
     .catch((e) => null);
 }
@@ -295,6 +325,32 @@ export const GetProjectdetailsByClientid=async (id) => {
         .catch((e) => null);
         
 }
+
+
+export const getallactivejob= async ({project_status,project_state}) => {
+    
+    console.log("stated");
+    return await  axios
+    .get(base_Api + "/api/Projectdetail/Getallactiveprojects",
+    {
+        headers:{
+            project_status:project_status,
+            project_state:project_state
+        }
+    }
+
+    )
+    
+    .then(Response => {
+        
+        return Response.data;
+    })
+    .catch((e) => null);
+    
+}
+
+
+
 
 
 
