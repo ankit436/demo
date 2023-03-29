@@ -1,14 +1,15 @@
-
-
+/* eslint-disable react/jsx-pascal-case */
 
 
 import "./job_screen.css";
 import React from "react";
+import "../../Helpers/Loader.css"
 
 
 import Job_tile from "../../components/Job_tile";
 import axios from "axios";
 
+import {getallactivejob} from "../../Service/Cruds"
 
 export default function All_job() {
 
@@ -20,8 +21,8 @@ export default function All_job() {
 
     const fetchData = async () => {
       try {
-        const data = await axios.get("https://mocki.io/v1/4c5cb089-5e0d-436e-b3a6-92dd6d8ca632");
-        setJob_list(data == null ? [] : data.data);
+        const data = await getallactivejob({project_state:-1,project_status:-1});
+        setJob_list(data == null ? [] : data);
        
         setLoadingState(false);
       } catch (error) {
@@ -33,16 +34,13 @@ export default function All_job() {
       fetchData();
     }, 3000);
 
-   }, []);
+    return ()=>clearTimeout(timer)
 
-
-
+   }, [job_list]);
 
     return (
-                
-
         <div className="job_list">
-          <Job_tile job ={job_list} />
+           {loadingState?<div className="loading">  <span class="loading__anim"></span></div>: <Job_tile job ={job_list} />}
         </div> 
     )
 }
