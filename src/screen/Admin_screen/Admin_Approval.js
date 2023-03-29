@@ -19,7 +19,7 @@ export default function Admin_Approval() {
     const fetchData = async () => {
       try {
         const data = await getAllPendingApprovalByid(
-          localStorage.getItem("user").substring(5)
+          isUserLoggedIn().substring(5)
         );
         setAdminData(data == null ? [] : data);
 

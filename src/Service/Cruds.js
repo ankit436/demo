@@ -17,6 +17,9 @@ export const isclient=(id)=>{
 
 
 
+
+
+
 export const isfreelancer=(id)=>{
     return axios.get(base_Api + "/Authentication/Freelancer/"+id)
     .then(Response => {
@@ -154,12 +157,19 @@ export const setuser=( id)=>{
     .then(Response => {
 
         var x= JSON.parse( JSON.stringify(Response.data));
-        console.log(x);
-        localStorage.setItem("userType",x.Role)
+        sessionStorage.setItem("userType",x.Role)
         return x.Role;
     })
     .catch((e) => null);
 
+}
+
+export const getuser_role=()=>{
+    return sessionStorage.getItem("userType");
+}
+
+export const setuser_role=(role)=>{
+    sessionStorage.setItem("userType",role);
 }
 
 
@@ -179,12 +189,13 @@ export const  getAllapprovedclient=async () => {
 
 
 export const IsUserNew=(id,isclient)=>{
+    console.log(id)
+    console.log(isclient)
     return axios.get(base_Api + "/api/Profile/IsUserNew/",
     {
         params:{
             "id":id,
             "isclient":isclient
-            
         }
     }
     )

@@ -22,7 +22,7 @@ export default function All_user_screen() {
     const fetchData = async () => {
       try {
         const data = await getAllUser_detail(
-          localStorage.getItem("user").substring(5)
+          isUserLoggedIn().substring(5)
         );
         setAlluser(data == null ? [] : data);
         console.log(data);
@@ -42,7 +42,7 @@ export default function All_user_screen() {
   const edit_profile = async () => {
  
     var response = await update_profile_data(
-      localStorage.getItem("user").substring(5),
+      isUserLoggedIn().substring(5),
       isediting.isedit
     );
     if (response != null) {
@@ -59,7 +59,7 @@ export default function All_user_screen() {
 
   const Delete_user_profile = async (item) => {
     var response = await Delete_profile_data(
-      localStorage.getItem("user").substring(5),
+      isUserLoggedIn().substring(5),
       item
     );
     if (response != null) {
@@ -82,7 +82,15 @@ const newstate=isediting.isedit;
 newstate[name]=value;
 setisediting({"index":isediting.index,isedit:newstate})
 
+
 } 
+const sorting =()=>{
+  console.log("sorting")
+  const newstate=[...alluser]
+  newstate.sort((a,b)=>a[Profile_detail[0].name]-b[Profile_detail[0].name])
+  setAlluser(newstate)
+}
+
 
   return (
     <div className="user_container">
@@ -90,7 +98,14 @@ setisediting({"index":isediting.index,isedit:newstate})
         <div className="User_table_container_body">
           <div className="user_header">
             <div className="user_table_header_item_list">
-              <div className="user_header_item">ID</div>
+              <div className="user_header_item">ID
+              <span className="sorting" onClick={sorting}> 
+              <i class="fa-sort-up">  U
+                {/* <img src="" /> */}
+              </i>
+               </span>
+              
+              </div>
               <div className="user_header_item">Name</div>
               <div className="user_header_item">Email</div>
               <div className="user_header_item">Phone</div>

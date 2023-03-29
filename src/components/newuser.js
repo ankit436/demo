@@ -2,8 +2,9 @@
 import React from 'react';
 import { useEffect,useState } from 'react';
 import './newuser.css';
-import { IsUserNew } from '../Service/Cruds';
+import { IsUserNew,setuser_role } from '../Service/Cruds';
 import Approuter from './Approuter';
+import { isUserLoggedIn } from '../Service/WindowAuthentication';
 
 
 
@@ -13,40 +14,42 @@ export default function Newuser() {
     const [isClient, setisClient] = React.useState(null);
 
     const handleClient = (value) => {
-        setisClient(value);
+        if(isClient!==value){
+            setisClient(value);
+        }
+        else{
+            setisClient(null);
+        }
+       
         
     };
 
     const handleClient2 = (value) => {
      
-        switch (value) {
-            case "client":
-                return "Box Active"
-                break;
-            case "Freelancer":
-                return "Box Active"
-                break;
-            default:
-                return "Box"
+        if (isClient === value) {
+            return "Box Active";
+        }
+        else {
+            return "Box";
         }
     }
 
 
-    const checkuser = () => {
-        console.log(isClient);
+    const CreateUseRrole = () => {
+        
+        if (isClient === "client") {
 
-        if (isClient === null) {
-            alert("Please select client or freelancer");
+            IsUserNew( isUserLoggedIn(), "client");
+            setuser_role("client");
+            window.location.href = "/profile";
+        }
+        else if (isClient === "Freelancer") {
+            IsUserNew( isUserLoggedIn(), "freelancer");
+            setuser_role("freelancer");
+            window.location.href = "/profile";
         }
         else {
-            IsUserNew().then((response) => {
-                if (response === true&&isClient==="client") {
-                    alert("pless wait for admin approval");
-                }
-                else {
-                    <Approuter></Approuter>
-                }
-            });
+            alert("Please Select Client or Freelancer");
         }
 
 
@@ -56,21 +59,21 @@ export default function Newuser() {
 
     return (
 
-        <div className="Container">
+        <div className="card_Container">
             
             <div className='CardContainer'>
                 <div className="CardTitle">
                     <h1>Join As Client or Freelancer</h1>
                 </div>
             <div className="Box_container"   >
-                <div className={handleClient2()} onClick={() => handleClient("client")} >
+                <div className={handleClient2("client")} onClick={() => handleClient("client")} >
                     <div className={"BoxTitle" }>
                         <h1>Client</h1>
                     </div>
                     <div className="BoxContent"></div>
 
                 </div>
-                <div className={handleClient2()} onClick={() => handleClient("Freelancer")}>
+                <div className={handleClient2("Freelancer")} onClick={() => handleClient("Freelancer")}>
                     <div className="BoxTitle">
 
                         <h1>Freelancer</h1>
@@ -81,7 +84,7 @@ export default function Newuser() {
             </div>
 
             <div className='Create_Account'>
-                <button className='Create_account_button' onClick={checkuser} >Create Account </button>
+                <button className='Create_account_button' onClick={CreateUseRrole} >Create Account </button>
             </div>
             </div>
 

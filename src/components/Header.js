@@ -1,16 +1,23 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useOnHoverOutside } from "../Helpers/useOnHoverOutside";
+import { getuser_role } from "../Service/Cruds";
+
+import { isUserLoggedIn } from "../Service/WindowAuthentication";
 
 import "./Header.css";
 import { DashboardNavbar,AdminNavbar,ClientNavbar,FreelancerNavbar,JobNavbar } from "./header_drop_down";
 
-export default function Header() {
-  const [user, setuser] = useState(localStorage.getItem("user"));
+export default  function Header() {
   const dropdownRef = useRef(null);
   const [isMenuDropDownOpen, setMenuDropDownOpen] = useState(false);
-  const [isuser, setisuser] = useState(localStorage.getItem("userType")||"admin");
+  const [isuser, setisuser] = useState( getuser_role()||"admin");
   const [isdropdowncontent, setdropdowncontent] = useState("");
+
+
+  useEffect(() => {
+    setisuser(getuser_role()||"admin");
+  }, [isuser]);
 
   const closeHoverMenu = () => {
 
@@ -22,6 +29,8 @@ export default function Header() {
   const setdropdownscontent = (content) => {
     setdropdowncontent(content);
   }
+
+
 
   const dropdownopent = (content) => {
     setMenuDropDownOpen(true);
@@ -115,7 +124,7 @@ const dropdowncontainer = () =>{
             </div>
           </div>
           <div className="header_login">
-            {user ? (
+            {isUserLoggedIn() ? (
              <Link to="/profile"> <button className="profile_container"></button></Link>
             ) : null}
           </div>

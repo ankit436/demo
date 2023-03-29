@@ -24,7 +24,7 @@ export const login = async (username, password) => {
 
 export const isUserLoggedIn = () => {
     let user = localStorage.getItem('user');
-    if (user === null) return false;
+    if (user === null) return null;
     return JSON.parse(user).Name;
 }
 

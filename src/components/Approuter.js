@@ -5,6 +5,7 @@ import React, { useEffect } from "react";
 import { BrowserRouter as Router,Routes, Route,  } from 'react-router-dom';  
 
 import { setuser } from '../Service/Cruds'
+import { isUserLoggedIn } from '../Service/WindowAuthentication'
 import Visitor from '../screen/visitor';
 import Header from './Header';
 import Footer from './Footer';
@@ -14,31 +15,21 @@ import Job_detail from '../screen/JOB_SCREEN/Job_detail';
 import Admin_routes from '../screen/Admin_screen/Admin_routes';
 
 export default function Approuter(){
-
-    
     useEffect(() => {
-
-        const user = localStorage.getItem('user');
-        if(user!=null){
+        if(isUserLoggedIn()!=null){
           async function fetchuser() {
-
-            const response = await setuser(user);
-            console.log(response);
-            localStorage.setItem(response)
-           
+            const response = await setuser(isUserLoggedIn());
           }
+          fetchuser();
           const timer = setTimeout(() => {
-            fetchuser();
-          }, 6000);
+          
+          }, 1000);
       
           return () => clearTimeout(timer);
         }
         else{
             alert('Please Login');
         }
-        
-
-        
 
     }, []);
 
