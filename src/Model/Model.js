@@ -31,19 +31,23 @@ export const Skill_detail =[
 
 // review table
 export const Project_detail =[
-    {'name':'Project_id','type':'text'},
+    {'name':'project_id','type':'text'},
     {'name':'Client_id','type':'text'},
-    {'name':'Department_id','type':'text'},
+    {'name':'project_department_id','type':'text'},
     {'name':'Department_name','type':'text'},   /*3*/
-    {'name':'Project_title','type':'text'},
-    {'name':'Project_description','type':'text'},
-    {'name':'Project_details','type':'text'},
-    {'name':'Project_start_date','type':'text'}, 
-    {'name':'Project_deadline','type':'text'},
-    {'name':'Project_budget','type':'text'},
-    {'name':'Project_status','type':'text'},
-    {'name':'No_of_openings','type':'text'}
+    {'name':'project_title','type':'text'},
+    {'name':'project_description','type':'text'},
+    {'name':'project_details','type':'text'},
+    {'name':'project_start_date','type':'text'}, 
+    {'name':'project_deadline','type':'text'},
+    {'name':'project_budget','type':'text'},
+    {'name':'project_status','type':'text'},
+    {'name':'No_of_openings','type':'text'},
+    {'name':'project_department_name','type':'text'},
+    {'name':'project_skills','type':'text'},
+    {'name':'project_state','type':'text'}
 
+  
 ]
 
 export const Project_skill =[
@@ -65,7 +69,7 @@ export const Profile_detail =[
     {'name':'profile_created','type':'text'},
     {'name':'profile_photo','type':'text'},
     {'name':'profile_updated','type':'text'},
-    {'name': "isdelted", 'type':'int'},
+    {'name': "is_deletd", 'type':'text'},
 ]
 
 
@@ -83,7 +87,7 @@ export  const admin_request =[
    {'name': "aR_id", 'type':'text'},
    {'name': "request_updated", 'type':'text'},
    {'name': "requester_image", 'type':'text'},
-
+ 
   
 ]
 
