@@ -8,10 +8,10 @@ const Job_tile = ({ job }) => {
   console.log(job);
   return (
     <div className="job_list_container">
-      { job.length>0&& Project_detail.map((job,index) => {
+      { job.length>0&& job.map((item,index) => {
         return (
-          <Link to="/Job-detail/2" className="link">
-            <div className="job_tiles" key={index}>
+          <Link to="/Job-detail/2" className="link"  key={index}>
+            <div className="job_tiles">
               <div className="job_dropdown">
                 <i className="dropdown_icon"></i>
                 <div className="Add_to_bookmark_icon book_mark_icon_filled"></div>
@@ -22,11 +22,11 @@ const Job_tile = ({ job }) => {
               <div className="job_data">
                 <div className="job_title">
                   {" "}
-                  <h3>{job[Project_detail[4].name]}</h3>
+                  <h3>{item[Project_detail[4].name]}</h3>
                 </div>
                 <div className="job_description scroll">
                   {" "}
-                  <p>{job[Project_detail[6].name]}</p>
+                  <p>{item[Project_detail[6].name]}</p>
                 </div>
               </div>
 
@@ -37,7 +37,7 @@ const Job_tile = ({ job }) => {
               <div className="Job_group_date_icon">
                 <div className="Job_Date">
                   <i className="view_Date"></i>{" "}
-                  <span className="view_Date_span">Date: {job[Project_detail[7].name]}</span>
+                  <span className="view_Date_span">Date: {item[Project_detail[7].name]}</span>
                 </div>
                 <div className="Job_group_icon"></div>
               </div>
