@@ -39,12 +39,12 @@ export default function Newuser() {
         
         if (isClient === "client") {
 
-            IsUserNew( isUserLoggedIn(), "client");
+            IsUserNew(  isUserLoggedIn().substring(5), "client");
             setuser_role("client");
             window.location.href = "/profile";
         }
         else if (isClient === "Freelancer") {
-            IsUserNew( isUserLoggedIn(), "freelancer");
+            IsUserNew(  isUserLoggedIn().substring(5), "freelancer");
             setuser_role("freelancer");
             window.location.href = "/profile";
         }

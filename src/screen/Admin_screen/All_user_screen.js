@@ -6,9 +6,7 @@ import {
 } from "../../Service/Cruds";
 import { isUserLoggedIn } from "../../Service/WindowAuthentication";
 import "./All_user_screen.css";
-
 import { Profile_detail } from "../../Model/Model";
-
 import  "../../Helpers/Loader.css"
 
 export default function All_user_screen() {
@@ -116,7 +114,11 @@ const sorting =()=>{
           </div>
           <div className="user_body">
             
-            {loading?  <div className="loading">  <span class="loading__anim"></span></div> :
+            {loading?  <div className="loading">  <span class="loading__anim"></span></div> :  alluser.length <= 0?
+
+<div className="Nothing_found_container">No User Found </div>
+
+:
             alluser.map((item, index) => (
               <div className="user_body_item_list" key={index}>
                 <div className="user_body_item item_id">

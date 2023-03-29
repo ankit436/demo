@@ -80,7 +80,7 @@ export default function Admin_Approval() {
             <div className="Admin_permission_table_header_item">Request by</div>
             <div className="Admin_permission_table_header_item">Email</div>
             <div className="Admin_permission_table_header_item">Priority</div>
-            <div className="Admin_permission_table_header_item">Status</div>
+            {/* <div className="Admin_permission_table_header_item">Status</div> */}
             <div className="Admin_permission_table_header_item">
               Created Date
             </div>
@@ -91,7 +91,11 @@ export default function Admin_Approval() {
           </div>
           </div>
           <div className="permission_body">
-          {loading?  <div className="loading">  <span class="loading__anim"></span></div> :
+          {loading?  <div className="loading">  <span class="loading__anim"></span></div> :  adminData.length <= 0?
+
+          <div className="Nothing_found_container">Nothing to Approved </div>
+          
+          :
           adminData.length > 0 &&
             adminData.map((item, index) => {
               return (
@@ -113,9 +117,9 @@ export default function Admin_Approval() {
                   <div className="Admin_permission_table_body_item">
                     {item[admin_request[3].name]}
                   </div>
-                  <div className="Admin_permission_table_body_item">
+                  {/* <div className="Admin_permission_table_body_item">
                     {item[admin_request[4].name]}
-                  </div>
+                  </div> */}
                   <div className="Admin_permission_table_body_item">
                     {item[admin_request[5].name]}
                   </div>

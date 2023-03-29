@@ -106,9 +106,13 @@
 
 
 .sorting{
-    width: 50px;
-    height: 50px;
-   
+    width: 20px;
+    height: 20px;
+    /* background-image: url(../../Assets/Image/icon_up_down.png);
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    */
 }
 .fa-sort-up{
     color: #4CAF50; 

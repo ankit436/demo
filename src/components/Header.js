@@ -69,7 +69,7 @@ const commontab_link = () => {
   const admintab = () =>{
     return   <ul className="header_tab_list">
      {commontab_link()}
-    <Link to="/" className="Nav_link" ><li className="header_tab_item_styled" onMouseOver={()=>dropdownopent("Admin")}>Admin </li></Link>
+    <Link to="/admin/approval" className="Nav_link" ><li className="header_tab_item_styled" onMouseOver={()=>dropdownopent("Admin")}>Admin </li></Link>
   </ul>
   }
 
@@ -102,8 +102,8 @@ const dropdowncontainer = () =>{
       <div className="Header_logo"></div>
       <div className="header_box_item">
         <div className="header_tab_list_item"  >
-          {isuser===null? commontab():isuser==="admin"?admintab():isuser==="client"?ClientTab():FreelancerTab()
-        
+          {
+          isuser===null? commontab():isuser==="admin"?admintab():isuser==="client"?ClientTab(): isuser==="freelancer"? FreelancerTab():commontab()
           }
         </div>
         <div className="header_search_login">

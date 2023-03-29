@@ -26,16 +26,13 @@ const [loadingState, setLoadingState] = useState(true);
       }
       const timer = setTimeout(() => {
         fetchData();
-      }, 6000);
+      }, 3000);
   
       return () => clearTimeout(timer);
     }
     else{
       setLoadingState(false);
     }
-    
-
-
   }, [
     loadingState,
   ]);
