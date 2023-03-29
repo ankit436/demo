@@ -61,6 +61,7 @@ export const Profile_detail =[
     {'name':'profile_created','type':'text'},
     {'name':'profile_photo','type':'text'},
     {'name':'profile_updated','type':'text'},
+    {'name': "isdelted", 'type':'int'},
 ]
 
 
@@ -78,6 +79,7 @@ export  const admin_request =[
    {'name': "aR_id", 'type':'text'},
    {'name': "request_updated", 'type':'text'},
    {'name': "requester_image", 'type':'text'},
+
   
 ]
 

@@ -56,6 +56,7 @@ export default function All_user_screen() {
   };
 
   const Delete_user_profile = async (item) => {
+    item[Profile_detail[11].name] = 1;
     var response = await Delete_profile_data(
       isUserLoggedIn().substring(5),
       item

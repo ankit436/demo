@@ -56,7 +56,7 @@ const Navbar_dropdown = () => {
 const commontab_link = () => {
   return <>
    <Link to="/" className="Nav_link" > <li className="header_tab_item_styled"  onMouseOver={()=>dropdownopent("Dashboard")} >Dashboard </li></Link>
-    <Link to="/" className="Nav_link" ><li className="header_tab_item_styled" onMouseOver={()=>dropdownopent("Job")}>Job </li></Link>
+    <Link to="/Job/All-job" className="Nav_link" ><li className="header_tab_item_styled" onMouseOver={()=>dropdownopent("Job")}>Job </li></Link>
   </>
 };
 
