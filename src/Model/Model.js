@@ -33,12 +33,16 @@ export const Skill_detail =[
 export const Project_detail =[
     {'name':'Project_id','type':'text'},
     {'name':'Client_id','type':'text'},
-    {'name':'Project_name','type':'text'},
+    {'name':'Department_id','type':'text'},
+    {'name':'Department_name','type':'text'},   /*3*/
+    {'name':'Project_title','type':'text'},
     {'name':'Project_description','type':'text'},
-    {'name':'Project_budget','type':'text'},
+    {'name':'Project_details','type':'text'},
+    {'name':'Project_start_date','type':'text'}, 
     {'name':'Project_deadline','type':'text'},
+    {'name':'Project_budget','type':'text'},
     {'name':'Project_status','type':'text'},
-    {'name':'Project_Department','type':'text'}
+    {'name':'No_of_openings','type':'text'}
 
 ]
 
