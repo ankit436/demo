@@ -1,4 +1,3 @@
-
 import React, { useEffect } from "react";
 
 
@@ -18,7 +17,7 @@ export default function Approuter(){
     useEffect(() => {
         if(isUserLoggedIn()!=null){
           async function fetchuser() {
-            const response = await setuser(isUserLoggedIn());
+            const response = await setuser( isUserLoggedIn().substring(5));
           }
           fetchuser();
           const timer = setTimeout(() => {
@@ -32,7 +31,6 @@ export default function Approuter(){
         }
 
     }, []);
-
     return(
     
 
