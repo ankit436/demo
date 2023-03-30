@@ -11,12 +11,13 @@ import { DashboardNavbar,AdminNavbar,ClientNavbar,FreelancerNavbar,JobNavbar } f
 export default  function Header() {
   const dropdownRef = useRef(null);
   const [isMenuDropDownOpen, setMenuDropDownOpen] = useState(false);
-  const [isuser, setisuser] = useState( getuser_role()||"admin");
+  const [isuser, setisuser] = useState( getuser_role());
   const [isdropdowncontent, setdropdowncontent] = useState("");
+  const [user_notification, setuser_notification] = useState([{}]);
 
 
   useEffect(() => {
-    setisuser(getuser_role()||"admin");
+    setisuser(getuser_role());
   }, [isuser]);
 
   const closeHoverMenu = () => {
@@ -123,6 +124,7 @@ const dropdowncontainer = () =>{
               </button>
             </div>
           </div>
+          {(user_notification.length>0&&(isuser==='client'||isuser==='freelancer'))?<div className="header_notification"></div>:null}
           <div className="header_login">
             {isUserLoggedIn() ? (
              <Link to="/profile"> <button className="profile_container"></button></Link>

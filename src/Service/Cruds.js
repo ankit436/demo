@@ -165,11 +165,11 @@ export const setuser=( id)=>{
 }
 
 export const getuser_role=()=>{
-    return sessionStorage.getItem("userType");
+    return sessionStorage.getItem("userType")=="null"?null:sessionStorage.getItem("userType");
 }
 
 export const setuser_role=(role)=>{
-    sessionStorage.setItem("userType",role);
+    sessionStorage.setItem("userType",role==null||role==""?"null":role);
 }
 
 

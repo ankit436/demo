@@ -8,7 +8,7 @@ import axios from "axios";
 
 import {getallactivejob} from "../../Service/Cruds"
 
-export default function Inactive_job() {
+export default function Inactive_job({job_counts}) {
 
   const [job_list, setJob_list] = React.useState([]);
   const [loadingState, setLoadingState] = React.useState(true);
@@ -30,7 +30,7 @@ export default function Inactive_job() {
     const timer = setTimeout(() => {
       fetchData();
     }, 3000);
-
+    job_counts(job_list.length);
     return ()=>clearTimeout(timer)
 
    }, [job_list]);

@@ -9,10 +9,12 @@ import My_job from "./My_job";
 import Saved_job from "./Saved_job";
 
 import { Link, useParams } from 'react-router-dom';
+import { getuser_role } from "../../Service/Cruds";
 
 export default function Job_screen() {
 const { slug } = useParams();
-
+const [job_count , setJob_count] = useState(0);
+const [sort_job , setSort_job] = useState(0);
 const types ={
   "All-job": "All job",
   "My-job": "My job",
@@ -23,12 +25,12 @@ const types ={
 }
 
 const Function_type = {
-  "All job": <All_job></All_job>,
-  "My job": <My_job></My_job>,
-  "Saved job": <Saved_job></Saved_job>,
-  "Applied job": <Applied_job></Applied_job>,
-  "Active job": <Active_job></Active_job>,
-  "Inactive job": <Inactive_job></Inactive_job>,
+  "All job": <All_job job_counts={setJob_count}></All_job>,
+  "My job": <My_job job_counts={setJob_count}></My_job>,
+  "Saved job": <Saved_job job_counts={setJob_count}></Saved_job>,
+  "Applied job": <Applied_job job_counts={setJob_count}></Applied_job>,
+  "Active job": <Active_job job_counts={setJob_count}></Active_job>,
+  "Inactive job": <Inactive_job job_counts={setJob_count}></Inactive_job>,
 
 };
 const [job_type,setJob_type]=useState(types['All-job']  );
@@ -42,6 +44,8 @@ useEffect(() => {
 
 
 
+
+
 const getclasses = (type) => {
     if (type === slug) {
       return "JOB_LINK active";
@@ -50,15 +54,9 @@ const getclasses = (type) => {
     }
 };
 
-  return (
-    
-    <div className="JobsContainer">
-      <div className="job_container">
-        <div className="job_tab">
-          <Link to="/Job/All-job" className={getclasses("All-job")}  >
-            All Jobs
-          </Link>
-          <Link to="/Job/My-job" className={getclasses("My-job")}>
+const frelancer_tab = () => {
+  <>
+  <Link to="/Job/My-job" className={getclasses("My-job")}>
             My Jobs
           </Link>
           <Link to="/Job/Saved-job" className={getclasses("Saved-job")}>
@@ -67,6 +65,17 @@ const getclasses = (type) => {
           <Link to="/Job/Applied-job" className={getclasses("Applied-job")}>
             Applied Jobs
           </Link>
+  </>
+}
+  return (
+    
+    <div className="JobsContainer">
+      <div className="job_container">
+        <div className="job_tab">
+          <Link to="/Job/All-job" className={getclasses("All-job")}  >
+            All Jobs
+          </Link>
+          {getuser_role()==='freelancer' && frelancer_tab()}
           <Link to="/Job/Active-job" className={getclasses("Active-job")}>
             Active jobs
           </Link>
@@ -78,7 +87,7 @@ const getclasses = (type) => {
           <div className="job_filter">
             <div className="coutn_job">
               {" "}
-              <h1>4 </h1>{" "}
+              <h1>{job_count} </h1>{" "}
             </div>
             <div className="Active_tab">
               {" "}
