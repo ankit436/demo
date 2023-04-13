@@ -422,3 +422,89 @@ export const getThemedComponents = (mode) => ({
 
     
 });
+
+
+
+
+export const getDesignTokens = (mode) => (
+    {
+    
+    palette:{
+        mode,
+        ...mode === 'dark' ? {
+            primary: {
+                main :palette.dark.primary.main,
+                light: palette.dark.primary.light,
+                dark: palette.dark.primary.dark,
+
+                contrastText: palette.dark.primary.contrastText
+            },
+            secondary: {
+                main: palette.dark.secondary.main,
+                light: palette.dark.secondary.light,
+                dark: palette.dark.secondary.dark,
+
+                contrastText: palette.dark.secondary.contrastText
+            },
+            text: {
+                primary: palette.dark.text.primary,
+                secondary: palette.dark.text.secondary
+            },
+            background: {
+                default: palette.dark.background.default,
+                paper: palette.dark.background.paper
+            },
+            action: {
+                active: palette.dark.action.active,
+                hover: palette.dark.action.hover,
+                selected: palette.dark.action.selected,
+                disabled: palette.dark.action.disabled,
+                disabledBackground: palette.dark.action.disabledBackground
+
+            },
+        } : {
+            primary: {
+                main: palette.light.primary.main,
+                light: palette.light.primary.light,
+                dark: palette.light.primary.dark,
+                
+
+                contrastText: palette.light.primary.contrastText
+            },
+            secondary: {
+                main: palette.light.secondary.main,
+                contrastText: palette.light.secondary.contrastText
+            },
+            text: {
+                primary: palette.light.text.primary,
+                secondary: palette.light.text.secondary
+            },
+            background: {
+                default: palette.light.background.default,
+                paper: palette.light.background.paper
+            },
+            action: {
+                active: palette.light.action.active,
+                hover: palette.light.action.hover,
+                selected: palette.light.action.selected,
+                disabled: palette.light.action.disabled,
+                disabledBackground: palette.light.action.disabledBackground
+
+            },
+
+        }
+   
+
+        
+
+    
+
+    }
+   
+
+});
+    
+
+
+
+
