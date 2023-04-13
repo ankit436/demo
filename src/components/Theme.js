@@ -499,7 +499,105 @@ export const getDesignTokens = (mode) => (
 
     
 
-    }
+    },
+         typography: {
+        fontFamily: 'Roboto',
+        h1: {
+            fontSize: '2.5rem',
+            fontWeight: 700,
+            lineHeight: 1.5,
+            letterSpacing: '-0.01562em',
+            color: mode === 'dark' ? palette.dark.text.primary : palette.light.text.primary
+        },
+        h2: {
+            
+            fontSize: '2rem',
+            fontWeight: 700,
+            lineHeight: 1.5,
+            letterSpacing: '-0.00833em',
+            color: mode === 'dark' ? palette.dark.text.primary : palette.light.text.primary
+        },
+        h3: {
+            fontSize: '1.75rem',
+            fontWeight: 700,
+            lineHeight: 1.5,
+            letterSpacing: '0em',
+            color: mode === 'dark' ? palette.dark.text.primary : palette.light.text.primary
+        },
+        h4: {
+            fontSize: '1.5rem',
+            fontWeight: 700,
+            lineHeight: 1.5,
+            letterSpacing: '0.00735em',
+            color: mode === 'dark' ? palette.dark.text.primary : palette.light.text.primary
+        },
+        h5: {
+            fontSize: '1.25rem',
+            fontWeight: 700,
+            lineHeight: 1.5,
+            letterSpacing: '0em',
+            color: mode === 'dark' ? palette.dark.text.primary : palette.light.text.primary
+        },
+        h6: {
+            fontSize: '1rem',
+            fontWeight: 700,
+            lineHeight: 1.5,
+            letterSpacing: '0.0075em',
+            color: mode === 'dark' ? palette.dark.text.primary : palette.light.text.primary
+        },
+        subtitle1: {
+            fontSize: '1rem',
+            fontWeight: 400,
+            lineHeight: 1.5,
+            letterSpacing: '0.00938em',
+            color: mode === 'dark' ? palette.dark.text.primary : palette.light.text.primary
+        },
+        subtitle2: {
+            fontSize: '0.875rem',
+            fontWeight: 500,
+            lineHeight: 1.5,
+            letterSpacing: '0.00714em',
+            color: mode === 'dark' ? palette.dark.text.primary : palette.light.text.primary
+        },
+        body1: {
+            fontSize: '1rem',
+            fontWeight: 400,
+            lineHeight: 1.5,
+            letterSpacing: '0.00938em',
+            color: mode === 'dark' ? palette.dark.text.primary : palette.light.text.primary
+        },
+        body2: {
+            fontSize: '0.875rem',
+            fontWeight: 400,
+            lineHeight: 1.5,
+            letterSpacing: '0.01071em',
+            color: mode === 'dark'
+                ? palette.dark.text.primary : palette.light.text.primary
+        },
+        button: {
+            fontSize: '0.875rem',
+            fontWeight: 500,
+            lineHeight: 1.5,
+            letterSpacing: '0.02857em',
+            color: mode === 'dark' ? palette.dark.text.primary : palette.light.text.primary
+        },
+        caption: {
+            fontSize: '0.75rem',
+            fontWeight: 400,
+            lineHeight: 1.5,
+            letterSpacing: '0.03333em',
+            color: mode === 'dark' ? palette.dark.text.primary : palette.light.text.primary
+        },
+        overline: {
+            fontSize: '0.75rem',
+            fontWeight: 400,
+            lineHeight: 1.5,
+            letterSpacing: '0.08333em',
+            textTransform: 'uppercase',
+            color: mode === 'dark' ? palette.dark.text.primary : palette.light.text.primary
+        }
+    },
+
    
 
 });
