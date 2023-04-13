@@ -684,6 +684,34 @@ export const getThemedComponents = (mode) => (
 
         }
     },
+            
+         StyledTableCell: {
+        styleOverrides: {
+            root: {
+                backgroundColor: mode === 'dark' ? palette.dark.background.default : palette.light.background.default,
+                color: mode === 'dark' ? palette.dark.text.primary : palette.light.text.primary,
+                '&:hover': {
+                    backgroundColor: mode === 'dark' ? palette.dark.background.default : palette.light.background.default,
+                    color: mode === 'dark' ? palette.dark.text.primary : palette.light.text.primary,
+                    
+                },
+                '&:active': {                    
+                    backgroundColor: mode === 'dark' ? palette.dark.background.default : palette.light.background.default,
+                    color: mode === 'dark' ? palette.dark.text.primary : palette.light.text.primary,
+
+                },
+                '&:focus': {
+                    backgroundColor: mode === 'dark' ? palette.dark.background.default : palette.light.background.default,
+                    color: mode === 'dark' ? palette.dark.text.primary : palette.light.text.primary,
+
+                },
+                '&:disabled': {
+                    backgroundColor: mode === 'dark' ? palette.dark.background.default : palette.light.background.default,
+                    color: mode === 'dark' ? palette.dark.text.primary : palette.light.text.primary,
+
+                },
+            },
+
 
     MuiCssBaseline: {
         styleOverrides: {
