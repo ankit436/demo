@@ -1,11 +1,14 @@
 
-import dialog from 'material-ui/Dialog';
-import dialogActions from 'material-ui/DialogActions';
-import dialogContent from 'material-ui/DialogContent';
-import dialogContentText from 'material-ui/DialogContentText';
-import RaisedButton from 'material-ui/RaisedButton';
-import TextField from 'material-ui/TextField';
-import React, { Component } from 'react';
+
+import React from 'react';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
+
 
 
 
@@ -33,37 +36,40 @@ export default function Addskill(){
 
     return (
         <div>
-            <RaisedButton style={{margin: 10}} variant="outlined" color="primary" onClick={handleClickOpen}>
-                Add Skill
-            </RaisedButton>
-            <dialog open={open} onClose={handleClose}>
-                <dialogContent> 
-                    <dialogContentText>
-                        Add a new skill
-                    </dialogContentText>
+            <Button variant="outlined" color="primary" onClick={handleClickOpen}>
+                Add skill
+            </Button>
+            <Dialog open={open} onClose={handleClose}>
+                <DialogTitle>New skill</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Please add a new skill
+                    </DialogContentText>
                     <TextField
+
                         autoFocus
                         margin="dense"
-                        id="name"
-                        label="Skill"
+                        id="description"
+                        label="Description"
                         type="text"
                         fullWidth
+                        value={description}
                         onChange={e => setDescription(e.target.value)}
                     />
-                </dialogContent>
-                <dialogActions>
-                    <RaisedButton onClick={handleClose} color="primary">
+
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleClose} color="primary">
                         Cancel
-                    </RaisedButton>
-                    <RaisedButton onClick={handleSave} color="primary">
+                    </Button>
+                    <Button onClick={handleSave} color="primary">
                         Save
-                    </RaisedButton>
-
-                </dialogActions>
-
-            </dialog>
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </div>
-    )
-
+    );
+    
+     
 
 }
