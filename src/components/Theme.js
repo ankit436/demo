@@ -675,6 +675,79 @@ export const getThemedComponents = (mode) => (
 
                         }
                     },
+                    
+                    
+                     variants:[
+                        {
+                            props: { variant: 'contained', color: 'primary' },
+                            style: {
+                                color: mode === 'dark' ? palette.dark.text.primary : palette.light.text.primary,
+                                backgroundColor: mode === 'dark' ? palette.dark.primary.main : palette.light.primary.main,
+                                '&:hover': {
+                                    backgroundColor: mode === 'dark' ? palette.dark.primary.main : palette.light.primary.main,
+                                    borderColor: mode === 'dark' ? palette.dark.primary.main : palette.light.primary.main,
+                                    // Reset on touch devices, it doesn't add specificity
+                                    '@media (hover: none)': {
+                                        backgroundColor: mode === 'dark' ? palette.dark.primary.main : palette.light.primary.main,
+                                        borderColor: mode === 'dark' ? palette.dark.primary.main : palette.light.primary.main,
+                                    },
+                                }
+                            }
+                        },
+                        {
+                            props: { variant: 'contained', color: 'secondary' },
+                            style: {
+                                color: mode === 'dark' ? palette.dark.text.primary : palette.light.text.primary,
+                                backgroundColor: mode === 'dark' ? palette.dark.secondary.main : palette.light.secondary.main,
+                                '&:hover': {
+                                    backgroundColor: mode === 'dark' ? palette.dark.secondary.main : palette.light.secondary.main,
+                                    borderColor: mode === 'dark' ? palette.dark.secondary.main : palette.light.secondary.main,
+                                    // Reset on touch devices, it doesn't add specificity
+                                    '@media (hover: none)': {
+                                        backgroundColor: mode === 'dark' ? palette.dark.secondary.main : palette.light.secondary.main,
+                                        borderColor: mode === 'dark' ? palette.dark.secondary.main : palette.light.secondary.main,
+                                    },
+                                }
+                            }
+                        },
+                        {
+                            props: { variant: 'outlined', color: 'primary' },
+                            style: {
+                                color: mode === 'dark' ? palette.dark.text.primary : palette.light.text.primary,
+                                border: '1px solid',
+                                borderColor: mode === 'dark' ? palette.dark.primary.main : palette.light.primary.main,
+                                '&:hover': {
+                                    backgroundColor: mode === 'dark' ? palette.dark.background.default : palette.light.background.default,
+                                    borderColor: mode === 'dark' ? palette.dark.primary.main : palette.light.primary.main,
+                                    // Reset on touch devices, it doesn't add specificity
+                                    '@media (hover: none)': {
+                                        backgroundColor: mode === 'dark' ? palette.dark.background.default : palette.light.background.default,
+                                        borderColor: mode === 'dark' ? palette.dark.primary.main : palette.light.primary.main,
+                                    },
+                                }
+                            }
+                        },
+                        {
+                            props: { variant: 'outlined', color: 'secondary' },
+                            style: {
+                                color: mode === 'dark' ? palette.dark.text.primary : palette.light.text.primary,
+                                border: '1px solid',
+                                borderColor: mode === 'dark' ? palette.dark.secondary.main : palette.light.secondary.main,
+                                '&:hover': {
+                                    backgroundColor: mode === 'dark' ? palette.dark.background.default : palette.light.background.default,
+                                    borderColor: mode === 'dark' ? palette.dark.secondary.main : palette.light.secondary.main,
+                                    // Reset on touch devices, it doesn't add specificity
+                                    '@media (hover: none)': {
+                                        backgroundColor: mode === 'dark' ? palette.dark.background.default : palette.light.background.default
+
+
+                                    },
+
+                                }
+                            }
+                        }
+                    ]
+
 
 
 
