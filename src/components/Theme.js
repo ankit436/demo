@@ -6,34 +6,84 @@ const palette = {
     light : {
     primary: {
         main: '#000',
-        contrastText: '#fff'
+        contrastText: '#fff',
+        light: '#000',
+        dark: '#000',
+
     },
 
     secondary: {
         main: '#000',
-        contrastText: '#fff'
+        contrastText: '#fff',
+
+    },
+
+    tertiary: {
+        main: '#000',
+        contrastText: '#fff',
     },
 
     text: {
         primary: '#000',
-        secondary: '#000'
+        secondary: '#000',
+        tertiary: '#000',
+
+
+
     },
 
     background: {
         default: '#fff',
-        paper: '#fff'
+        paper: '#fff',
         
     },
-
     action: {
         active: '#000',
         hover: '#000',
         selected: '#000',
         disabled: '#000',
-        disabledBackground: '#000'
-
+        disabledBackground: '#000',
     },
+    
+
+
+
+
+
 },
+
+    dark: {
+        primary: {
+            main: '#fff',
+            contrastText: '#000'
+        },
+
+        secondary: {
+            main: '#fff',
+            contrastText: '#000'
+        },
+
+        text: {
+            primary: '#fff',
+            secondary: '#fff'
+        },
+
+        background: {
+            default: '#000',
+            paper: '#000'
+
+        },
+
+        action: {
+            active: '#fff',
+            hover: '#fff',
+            selected: '#fff',
+            disabled: '#fff',
+            disabledBackground: '#fff'
+
+        },
+    }
+}
 
     dark: {
         primary: {
