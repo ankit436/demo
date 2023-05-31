@@ -1,4 +1,89 @@
 import React from 'react';
+import React from 'react';
+
+import Select from 'react-select';
+
+const YourComponent = () => {
+
+  const options = [
+
+    { value: 'apple', label: 'Apple' },
+
+    { value: 'banana', label: 'Banana' },
+
+    { value: 'orange', label: 'Orange' },
+
+    // Add more options as needed
+
+  ];
+
+  const customStyles = {
+
+    container: (provided) => ({
+
+      ...provided,
+
+      width: 200,
+
+    }),
+
+    control: (provided, state) => ({
+
+      ...provided,
+
+      border: state.isFocused ? '2px solid #5e9ed6' : '2px solid #ced4da',
+
+      borderRadius: 4,
+
+      boxShadow: state.isFocused ? '0 0 0 3px rgba(94, 158, 214, 0.3)' : null,
+
+      '&:hover': {
+
+        border: '2px solid #5e9ed6',
+
+      },
+
+    }),
+
+    option: (provided, state) => ({
+
+      ...provided,
+
+      backgroundColor: state.isFocused ? '#5e9ed6' : 'white',
+
+      color: state.isFocused ? 'white' : 'black',
+
+      '&:hover': {
+
+        backgroundColor: '#5e9ed6',
+
+        color: 'white',
+
+      },
+
+    }),
+
+  };
+
+  return (
+
+    <div>
+
+      <Select
+
+        options={options}
+
+        styles={customStyles}
+
+      />
+
+    </div>
+
+  );
+
+};
+
+export default YourComponent;
 
 import XLSX from 'xlsx';
 
