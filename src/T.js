@@ -64,3 +64,20 @@ public static class QueryableExtensions
 
 
 
+
+
+
+
+
+var query = dbContext.People.AsQueryable();
+
+string sortColumn = "Name";
+
+bool isAscending = true;
+
+query = query.OrderByProperty(sortColumn, isAscending);
+
+var sortedPeople = query.ToList();
+
+
+
