@@ -81,3 +81,60 @@ var sortedPeople = query.ToList();
 
 
 
+using System;
+
+using System.Linq;
+
+using System.Linq.Expressions;
+
+using System.Reflection;
+
+public static class QueryableExtensions
+
+{
+
+    public static IQueryable<T> OrderByProperty<T, TEntity>(this IQueryable<T> source, string propertyName, bool isAscending)
+
+    {
+
+        var propertyInfo = typeof(TEntity).GetProperty(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+
+        if (propertyInfo == null)
+
+        {
+
+            throw new ArgumentException($"Property '{propertyName}' not found on type '{typeof(TEntity).Name}'.");
+
+        }
+
+        var parameter = Expression.Parameter(typeof(T), "x");
+
+        var propertyAccess = Expression.Property(parameter, propertyInfo);
+
+        var orderByExp = Expression.Lambda(propertyAccess, parameter);
+
+        var orderByMethod = isAscending ? "OrderBy" : "OrderByDescending";
+
+        var resultExpression = Expression.Call(
+
+            typeof(Queryable),
+
+            orderByMethod,
+
+            new[] { typeof(T), propertyInfo.PropertyType },
+
+            source.Expression,
+
+            Expression.Quote(orderByExp)
+
+        );
+
+        return source.Provider.CreateQuery<T>(resultExpression);
+
+    }
+
+}
+hh
+
+
+
