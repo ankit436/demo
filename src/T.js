@@ -137,4 +137,65 @@ public static class QueryableExtensions
 hh
 
 
+using System;
+
+using System.Linq;
+
+using System.Linq.Expressions;
+
+using System.Reflection;
+
+public static class QueryableExtensions
+
+{
+
+    public static IQueryable<T> OrderByProperty<T>(this IQueryable<T> source, string propertyName, bool isAscending)
+
+    {
+
+        var parameter = Expression.Parameter(typeof(T), "x");
+
+        var propertyAccess = GetInnerExpression(parameter, propertyName);
+
+        var orderByExp = Expression.Lambda(propertyAccess, parameter);
+
+        var orderByMethod = isAscending ? "OrderBy" : "OrderByDescending";
+
+        var resultExpression = Expression.Call(
+
+            typeof(Queryable),
+
+            orderByMethod,
+
+            new[] { typeof(T), propertyAccess.Type },
+
+            source.Expression,
+
+            Expression.Quote(orderByExp)
+
+        );
+
+        return source.Provider.CreateQuery<T>(resultExpression);
+
+    }
+
+    private static Expression GetInnerExpression(Expression expression, string propertyName)
+
+    {
+
+        foreach (var prop in propertyName.Split('.'))
+
+        {
+
+            expression = Expression.PropertyOrField(expression, prop);
+
+        }
+
+        return expression;
+
+    }
+
+}uffu
+
+
 
