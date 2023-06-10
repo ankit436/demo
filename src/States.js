@@ -65,5 +65,42 @@ function MyComponent() {
 }
 
 
+h
+
+import { useEffect } from 'react';
+
+import { useLocation, useNavigate } from 'react-router-dom';
+
+function MyComponent() {
+
+  const location = useLocation();
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+
+    const destroyState = () => {
+
+      navigate(location.pathname, { replace: true, state: {} });
+
+    };
+
+    // Listen for changes in the URL path
+
+    const unlisten = navigate(destroyState);
+
+    return () => {
+
+      unlisten(); // Cleanup the listener when the component unmounts
+
+    };
+
+  }, [navigate, location.pathname]);
+
+  // Rest of your component
+
+}
+
+
 
 
