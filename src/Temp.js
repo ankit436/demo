@@ -1,3 +1,45 @@
+
+WITH RECURSIVE manager_hierarchy AS (
+
+  SELECT employee_id, employee_name, manager_id, 0 AS level
+
+  FROM employees
+
+  WHERE employee_id = <employee_id> -- Replace <employee_id> with the ID of the employee you want to start from
+
+    AND is_active = true
+
+  
+
+  UNION ALL
+
+  
+
+  SELECT e.employee_id, e.employee_name, e.manager_id, mh.level + 1
+
+  FROM employees AS e
+
+  INNER JOIN manager_hierarchy AS mh ON e.employee_id = mh.manager_id
+
+  WHERE e.is_active = true -- Consider only active employees
+
+    AND e.employee_id <> e.manager_id -- Exclude self-manager
+
+    AND mh.level < <max_level> -- Replace <max_level> with the maximum level you want to reach
+
+)
+
+SELECT mh.employee_id, mh.employee_name, mh.level, m.employee_name AS manager_name
+
+FROM manager_hierarchy AS mh
+
+INNER JOIN employees AS m ON mh.manager_id = m.employee_id;
+
+
+
+
+
+
 import React from 'react';
 import React from 'react';
 
