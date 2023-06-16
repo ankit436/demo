@@ -172,7 +172,37 @@ const AsyncSearch = ({ apiUrl, placeholder }) => {
   );
 };
 
+
+
+
+
+hshsh
 export default AsyncSearch;
+hhssb
+bsbsn
+
+
+
+return (
+    <div>
+      <input
+        type="text"
+        value={searchTerm}
+        onChange={handleInputChange}
+        placeholder="Search..."
+      />
+      <div>
+        <select>
+          {options.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+      </div>
+    </div>
+  );
+}
 
 
   
