@@ -67,4 +67,26 @@ const AsyncSearch = ({ apiUrl, placeholder }) => {
 };
 
 export default AsyncSearch;
+
+
+
+
+/* AsyncSearch.css */
+
+.async-search-results {
+  list-style: none;
+  padding: 0;
+}
+
+.async-search-results li {
+  margin-bottom: 5px;
+  background-color: #f2f2f2;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.async-search-results li:hover {
+  background-color: #e0e0e0;
+}
+
   
