@@ -1,4 +1,26 @@
 
+{
+  "Cors": {
+    "PolicyName": "MyCorsPolicy",
+    "AllowedOrigins": [
+      "http://example.com",
+      "https://example.com"
+    ],
+    "AllowedMethods": [
+      "GET",
+      "POST",
+      "PUT",
+      "DELETE"
+    ],
+    "AllowedHeaders": [
+      "Content-Type",
+      "Authorization"
+    ]
+  }
+}
+
+
+
 WITH RECURSIVE manager_hierarchy AS (
 
   SELECT employee_id, employee_name, manager_id, 0 AS level
