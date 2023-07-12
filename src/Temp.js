@@ -1,3 +1,13 @@
+{
+  "error": {
+    "code": 500,
+    "message": "Internal Server Error",
+    "details": "An unexpected error occurred while processing the request."
+  }
+}
+
+
+
 const express = require('express');
 const app = express();
 
