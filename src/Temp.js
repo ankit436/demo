@@ -1,3 +1,30 @@
+import axios from 'axios';
+
+const api = axios.create();
+
+// Set up common error handling
+api.interceptors.response.use(
+  (response) => response.data,
+  (error) => {
+    console.error('API error:', error);
+    throw new Error('An error occurred during the API request');
+  }
+);
+
+const fetchPosts = async () => {
+  try {
+    const response = await api.get('https://api.example.com/posts');
+    return response;
+  } catch (error) {
+    throw new Error('Error fetching posts');
+  }
+};
+
+export { fetchPosts };
+
+
+
+
 
 public class CorsSettings
 {
