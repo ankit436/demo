@@ -1,3 +1,56 @@
+const express = require('express');
+const app = express();
+
+// Middleware to handle JSON parsing and error handling
+app.use(express.json());
+
+// Custom error class
+class CustomError extends Error {
+  constructor(message, code) {
+    super(message);
+    this.code = code;
+    this.name = this.constructor.name;
+  }
+}
+
+// Example API route
+app.get('/api/users/:id', (req, res) => {
+  const userId = req.params.id;
+  
+  // Simulating an error condition
+  if (userId === 'admin') {
+    const errorMessage = 'Admin user cannot be accessed.';
+    throw new CustomError(errorMessage, 403);
+  }
+
+  // Simulating a successful response
+  res.json({ id: userId, name: 'John Doe' });
+});
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+
+  // Handling the custom error
+  if (err instanceof CustomError) {
+    res.status(err.code).json({ error: { message: err.message } });
+  } else {
+    // Handling other errors
+    res.status(500).json({ error: { message: 'Internal Server Error' } });
+  }
+});
+
+// Start the server
+const port = 3000;
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
+});
+
+
+........
+
+
+
 import axios from 'axios';
 
 const api = axios.create();
