@@ -1,3 +1,63 @@
+
+import { makeStyles } from '@mui/styles';
+
+const useStyles = makeStyles(() => ({
+  container: {
+    overflow: 'auto',
+    scrollbarWidth: 'none', // Firefox
+    '&::-webkit-scrollbar': {
+      display: 'none', // Chrome, Safari, and Opera
+    },
+  },
+}));
+
+const MyComponent = () => {
+  const classes = useStyles();
+
+  return (
+    <div className={classes.container}>
+      {/* Content */}
+    </div>
+  );
+};
+
+
+
+import { makeStyles } from '@mui/styles';
+
+const useStyles = makeStyles(() => ({
+  container: {
+    overflow: 'auto',
+    scrollbarWidth: 'thin', // Firefox
+    '&::-webkit-scrollbar': {
+      width: '6px', // Chrome, Safari, and Opera
+    },
+    '&::-webkit-scrollbar-track': {
+      background: '#f1f1f1',
+    },
+    '&::-webkit-scrollbar-thumb': {
+      background: '#888',
+      borderRadius: '3px',
+    },
+    '&:hover::-webkit-scrollbar-thumb': {
+      background: '#555',
+    },
+  },
+}));
+
+const MyComponent = () => {
+  const classes = useStyles();
+
+  return (
+    <div className={classes.container}>
+      {/* Content */}
+    </div>
+  );
+};
+
+
+
+
 {
   "error": {
     "code": 500,
