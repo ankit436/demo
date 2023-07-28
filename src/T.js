@@ -1,4 +1,40 @@
 
+import React, { useEffect, useState } from 'react';
+import { useHistory } from 'react-router-dom';
+
+function NotFound() {
+  const [countdown, setCountdown] = useState(5); // Initial countdown value in seconds
+  const history = useHistory();
+
+  useEffect(() => {
+    // Redirect to home page when countdown reaches zero
+    if (countdown === 0) {
+      history.push('/');
+    }
+
+    // Decrease the countdown every second
+    const interval = setInterval(() => {
+      setCountdown((prevCountdown) => prevCountdown - 1);
+    }, 1000);
+
+    // Clean up the interval on component unmount
+    return () => clearInterval(interval);
+  }, [countdown, history]);
+
+  return (
+    <div>
+      <h1>404 - Page Not Found</h1>
+      <p>Redirecting to home page in {countdown} seconds...</p>
+    </div>
+  );
+}
+
+export default NotFound;
+
+
+
+
+
 using Microsoft.EntityFrameworkCore;
 
 using System;
