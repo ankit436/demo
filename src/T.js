@@ -1,3 +1,67 @@
+/* NotFound.css */
+.not-found-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Set the container height to fill the entire viewport */
+}
+
+h1 {
+  font-size: 2rem;
+  margin-bottom: 10px;
+}
+
+p {
+  font-size: 1rem;
+}
+
+
+
+
+import React, { useEffect, useState } from 'react';
+import { useLocation, useHistory } from 'react-router-dom';
+import './NotFound.css'; // Import the CSS file for styling
+
+function NotFound() {
+  const [countdown, setCountdown] = useState(5); // Initial countdown value in seconds
+  const location = useLocation();
+  const history = useHistory();
+
+  useEffect(() => {
+    // Redirect to home page when countdown reaches zero
+    if (countdown === 0) {
+      history.push('/');
+    }
+
+    // Decrease the countdown every second
+    const interval = setInterval(() => {
+      setCountdown((prevCountdown) => prevCountdown - 1);
+    }, 1000);
+
+    // Clean up the interval on component unmount
+    return () => clearInterval(interval);
+  }, [countdown, history]);
+
+  return (
+    <div className="not-found-container">
+      <h1>404 - Page Not Found</h1>
+      <p>
+        The page at "{location.pathname}" was not found. Redirecting to home page in {countdown}{' '}
+        seconds...
+      </p>
+    </div>
+  );
+}
+
+export default NotFound;
+
+
+
+
+
+
+
 
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
