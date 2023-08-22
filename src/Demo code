@@ -45,7 +45,7 @@ function ImageUpload() {
   return (
     <div>
       <h1>Image Upload Demo</h1>
-      <input type="file" onChange={handleImageUpload} />
+      <input type="file" accept="image/*" onChange={handleImageUpload} />
       
       {uploading && <p>Uploading...</p>}
       
