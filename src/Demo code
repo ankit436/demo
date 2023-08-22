@@ -60,3 +60,76 @@ function ImageUpload() {
 }
 
 export default ImageUpload;
+
+
+
+
+
+
+
+
+
+import React, { useState } from 'react';
+import axios from 'axios';
+
+function FileUpload() {
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [previewURL, setPreviewURL] = useState('');
+  const [uploading, setUploading] = useState(false);
+  const [uploadStatus, setUploadStatus] = useState('');
+
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    setSelectedFile(file);
+
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        setPreviewURL(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleUpload = async () => {
+    if (selectedFile) {
+      setUploading(true);
+
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+
+      try {
+        const response = await axios.post('/api/upload', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+
+        setUploadStatus('File uploaded successfully!');
+      } catch (error) {
+        console.error('Error uploading file:', error);
+        setUploadStatus('File upload failed.');
+      } finally {
+        setUploading(false);
+      }
+    }
+  };
+
+  return (
+    <div>
+      <h1>File Upload</h1>
+      <input
+        type="file"
+        accept=".jpg, .jpeg, .png, .gif"  {/* Specify the accepted file types here */}
+        onChange={handleFileChange}
+      />
+      {previewURL && <img src={previewURL} alt="Preview" style={{ maxWidth: '100%' }} />}
+      <button onClick={handleUpload} disabled={!selectedFile || uploading}>
+        Upload
+      </button>
+      <p>{uploadStatus}</p>
+    </div>
+  );
+}
+
+export default FileUpload;
