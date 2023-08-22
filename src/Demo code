@@ -8,3 +8,55 @@ I genuinely appreciate your consideration of this request and am grateful for yo
 
 Warm regards,
 [Your Name
+
+
+
+
+
+import React, { useState } from 'react';
+import axios from 'axios';
+
+function ImageUpload() {
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadedImageUrl, setUploadedImageUrl] = useState('');
+
+  const handleImageUpload = async (event) => {
+    const file = event.target.files[0];
+    setSelectedFile(file);
+
+    if (file) {
+      setUploading(true);
+
+      const formData = new FormData();
+      formData.append('image', file);
+
+      try {
+        const response = await axios.post('/upload', formData);
+        setUploadedImageUrl(response.data.imageUrl);
+      } catch (error) {
+        console.error('Error uploading image:', error);
+      } finally {
+        setUploading(false);
+      }
+    }
+  };
+
+  return (
+    <div>
+      <h1>Image Upload Demo</h1>
+      <input type="file" onChange={handleImageUpload} />
+      
+      {uploading && <p>Uploading...</p>}
+      
+      {uploadedImageUrl && (
+        <div>
+          <p>Image Uploaded:</p>
+          <img src={uploadedImageUrl} alt="Uploaded" />
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default ImageUpload;
