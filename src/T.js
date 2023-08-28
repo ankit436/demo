@@ -1,3 +1,26 @@
+const useStyles = makeStyles((theme) => ({
+  customDatePicker: {
+    '&::-webkit-calendar-picker-indicator': {
+      backgroundColor: '#ffcc00',
+      color: 'white',
+      // Other styles...
+    },
+    '&::-webkit-inner-spin-button': {
+      backgroundColor: '#333',
+      color: 'white',
+      // Other styles...
+    },
+    '&::-webkit-clear-button': {
+      backgroundColor: '#ff0000',
+      color: 'white',
+      // Other styles...
+    },
+    // Other custom styles for the TextField...
+  },
+}));
+
+
+
 /* NotFound.css */
 .not-found-container {
   display: flex;
