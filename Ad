@@ -1,0 +1,51 @@
+using System;
+using System.DirectoryServices;
+
+class Program
+{
+    static void Main()
+    {
+        // LDAP server details
+        string ldapPath = "LDAP://your-ldap-server-url:port"; // Replace with your LDAP server URL and port
+        string username = "cn=admin,dc=example,dc=com"; // Replace with your LDAP admin username
+        string password = "your_password"; // Replace with your LDAP admin password
+
+        // Create a DirectoryEntry object to connect to the LDAP server
+        using (DirectoryEntry entry = new DirectoryEntry(ldapPath, username, password))
+        {
+            try
+            {
+                // Create a DirectorySearcher to search for the user
+                using (DirectorySearcher searcher = new DirectorySearcher(entry))
+                {
+                    // Set the search filter to find the user by a unique identifier (e.g., username)
+                    searcher.Filter = "(uid=username)"; // Replace 'username' with the user you want to retrieve
+
+                    // Perform the search
+                    SearchResult result = searcher.FindOne();
+
+                    if (result != null)
+                    {
+                        // Retrieve user information from the SearchResult
+                        string cn = result.Properties["cn"][0].ToString();
+                        string email = result.Properties["mail"][0].ToString();
+                        string phone = result.Properties["telephoneNumber"][0].ToString();
+
+                        Console.WriteLine("User Information:");
+                        Console.WriteLine($"CN: {cn}");
+                        Console.WriteLine($"Email: {email}");
+                        Console.WriteLine($"Phone: {phone}");
+                    }
+                    else
+                    {
+                        Console.WriteLine("User not found.");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred: {ex.Message}");
+            }
+        }
+    }
+}
