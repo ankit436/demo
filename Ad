@@ -1,3 +1,37 @@
+
+
+
+
+
+from ldap3  import Server, Connection, ALL, NTLM, ALL_ATTRIBUTES,SUBTREE;
+
+
+ldapCredentials = {
+    'server': 'server',
+    'domain': 'domain',
+    'user': 'username',
+    'password': 'password',
+    'server': 'server',
+    'port': 389,
+    'baseDN': 'baseDN',
+    'searchFilter': 'searchFilter'
+}
+
+ldf_server = Server(ldapCredentials['server'], port=ldapCredentials['port'], get_info=ALL)
+ldf_connection = Connection(ldf_server, user=ldapCredentials['user'], password=ldapCredentials['password'], authentication=NTLM, auto_bind=True)
+
+
+if __name__ == '__main__':
+   print("LADF")
+   print(ldf_connection)
+
+   
+
+
+
+
+
+
 using System;
 using System.DirectoryServices;
 
