@@ -3,30 +3,24 @@ import xlwings as xw
 # Open the Excel file
 wb = xw.Book('your_excel_file.xlsx')
 
-# Specify the sheet and range to sort
+# Specify the sheet
 sheet = wb.sheets['Sheet1']
-data_range = sheet.range('A1:B10')  # Update with your actual range
 
-# Sort the data by a specific column (e.g., column 'A') with headers
-data_range.api.Sort(Key1=data_range.api.Columns(1), Order1=1, Header=1)
+# Get the header row values
+header_row = sheet.range('A1').expand('right').value
 
-# Save the changes
-wb.save()
+# Sort the data columns based on the values in the first row
+sorted_columns = sorted(header_row)
 
-# Close the Excel file
-wb.close()
+# Reorder the data based on the sorted columns
+sorted_data = [sheet.range((1, header_row.index(col_name) + 1), (sheet.cells.last_cell.row, header_row.index(col_name) + 1)).value for col_name in sorted_columns]
 
-import xlwings as xw
+# Clear the existing data
+sheet.range((1, 1), (sheet.cells.last_cell.row, len(header_row))).clear()
 
-# Open the Excel file
-wb = xw.Book('your_excel_file.xlsx')
-
-# Specify the sheet and range to sort
-sheet = wb.sheets['Sheet1']
-data_range = sheet.range('A1:B10')  # Replace with your actual range
-
-# Sort the data based on the values in the first row (header row)
-data_range.api.Sort(Key1=data_range.api.Rows(1), Order1=1, Header=1)
+# Write the sorted data back to the sheet
+for col_index, col_data in enumerate(sorted_data):
+    sheet.range((1, col_index + 1)).options(transpose=True).value = col_data
 
 # Save the changes
 wb.save()
