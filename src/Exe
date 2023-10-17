@@ -15,3 +15,21 @@ wb.save()
 
 # Close the Excel file
 wb.close()
+
+import xlwings as xw
+
+# Open the Excel file
+wb = xw.Book('your_excel_file.xlsx')
+
+# Specify the sheet and range to sort
+sheet = wb.sheets['Sheet1']
+data_range = sheet.range('A1:B10')  # Replace with your actual range
+
+# Sort the data based on the values in the first row (header row)
+data_range.api.Sort(Key1=data_range.api.Rows(1), Order1=1, Header=1)
+
+# Save the changes
+wb.save()
+
+# Close the Excel file
+wb.close()
