@@ -1,52 +1,28 @@
 import xlwings as xw
 
-# Open the Excel file
-wb = xw.Book('your_excel_file.xlsx')
-
-# Specify the sheet
-sheet = wb.sheets['Sheet1']
-
-# Get the header row values
-header_row = sheet.range('A1').expand('right').value
-
-# Sort the data columns based on the values in the first row
-sorted_columns = sorted(header_row)
-
-# Reorder the data based on the sorted columns
-sorted_data = [sheet.range((1, header_row.index(col_name) + 1), (sheet.cells.last_cell.row, header_row.index(col_name) + 1)).value for col_name in sorted_columns]
-
-# Clear the existing data
-sheet.range((1, 1), (sheet.cells.last_cell.row, len(header_row))).clear()
-
-# Write the sorted data back to the sheet
-for col_index, col_data in enumerate(sorted_data):
-    sheet.range((1, col_index + 1)).options(transpose=True).value = col_data
-
-# Save the changes
-wb.save()
-
-# Close the Excel file
-wb.close()
-
-
-
-
-import xlwings as xw
-
 # Assuming you've already opened a workbook and assigned it to a variable, wb
 # For example: wb = xw.Book('your_workbook.xlsx')
 
 # Set the column name you want to target
 column_name = "YourColumnName"  # Replace with your column name
 
-# Find the column with the specified name in the header row starting from index 7
+# Find the header row starting from index 7
 header_row_index = 7  # Change this to the appropriate index
 
 sheet = wb.sheets['Sheet1']  # Replace 'Sheet1' with your sheet name
 
-# Find the column index for the specified column name
-column_index = sheet.range(header_row_index, 1).expand('right').value.index(column_name) + 1
+# Find the column index that matches the specified column name
+header_range = sheet.range(header_row_index, 1).expand('right')
+column_index = None
 
-# Set the value in the cell with the specified column name
-value_to_insert = "YourValue"  # Replace with the value you want to insert
-sheet.range(header_row_index + 1, column_index).value = value_to_insert
+for cell in header_range:
+    if cell.value == column_name:
+        column_index = cell.column
+        break
+
+if column_index is not None:
+    # Set the value in the cell with the specified column name
+    value_to_insert = "YourValue"  # Replace with the value you want to insert
+    sheet.range(header_row_index + 1, column_index).value = value_to_insert
+else:
+    print(f"Column '{column_name}' not found in the header row.")
