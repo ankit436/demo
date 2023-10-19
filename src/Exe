@@ -27,3 +27,26 @@ wb.save()
 
 # Close the Excel file
 wb.close()
+
+
+
+
+import xlwings as xw
+
+# Assuming you've already opened a workbook and assigned it to a variable, wb
+# For example: wb = xw.Book('your_workbook.xlsx')
+
+# Set the column name you want to target
+column_name = "YourColumnName"  # Replace with your column name
+
+# Find the column with the specified name in the header row starting from index 7
+header_row_index = 7  # Change this to the appropriate index
+
+sheet = wb.sheets['Sheet1']  # Replace 'Sheet1' with your sheet name
+
+# Find the column index for the specified column name
+column_index = sheet.range(header_row_index, 1).expand('right').value.index(column_name) + 1
+
+# Set the value in the cell with the specified column name
+value_to_insert = "YourValue"  # Replace with the value you want to insert
+sheet.range(header_row_index + 1, column_index).value = value_to_insert
