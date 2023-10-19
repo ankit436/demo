@@ -6,13 +6,19 @@ import xlwings as xw
 # Set the column name you want to target
 column_name = "YourColumnName"  # Replace with your column name
 
-# Find the header row starting from index 7
-header_row_index = 7  # Change this to the appropriate index
-
-sheet = wb.sheets['Sheet1']  # Replace 'Sheet1' with your sheet name
+# Set the starting cell (e.g., cell C)
+start_cell = "C1"  # Replace with the desired cell reference
 
 # Find the column index that matches the specified column name
-header_range = sheet.range(header_row_index, 1).expand('right')
+header_row_index = 7  # Change this to the appropriate index
+sheet = wb.sheets['Sheet1']  # Replace 'Sheet1' with your sheet name
+
+# Get the starting cell as a range
+start_range = sheet.range(start_cell)
+
+# Find the header row starting from index 7
+header_range = start_range.offset(row_offset=header_row_index - 1, column_offset=0).expand('right')
+
 column_index = None
 
 for cell in header_range:
