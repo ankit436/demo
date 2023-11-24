@@ -1,0 +1,8 @@
+import re
+
+input_string = "!@#Hello, [world]!@#"
+
+# Remove regex special characters from the start and end
+result = re.sub('^[^A-Za-z0-9]+|[^A-Za-z0-9]+$', '', input_string)
+
+print(result)
