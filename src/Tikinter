@@ -20,7 +20,7 @@ class MyApp:
         self.frame1.grid(row=0, column=0, padx=10, pady=10, sticky="ew")
 
         # Radio buttons inside Frame 1
-        self.radio_var = tk.StringVar()
+        self.radio_var = tk.StringVar(value="option1")  # Set default value to "Option 1"
         self.radio_var.trace_add("write", self.update_file_choose_options)
 
         self.radio_button1 = ttk.Radiobutton(self.frame1, text="Option 1", variable=self.radio_var, value="option1")
