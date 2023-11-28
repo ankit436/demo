@@ -23,7 +23,7 @@ class MyApp:
 
         # Frame 1 as a LabelFrame, taking up the whole width
         self.frame1 = ttk.LabelFrame(root, text="Frame 1", padding=25)
-        self.frame1.grid(row=0, column=0, padx=10, pady=10, sticky="ew")
+        self.frame1.grid(row=0, column=0, padx=(25, 25), pady=10, sticky="ew")  # Added padx for left and right padding
 
         # Radio buttons inside Frame 1
         self.radio_var = tk.StringVar(value="option1")  # Set default value to "Option 1"
@@ -41,7 +41,7 @@ class MyApp:
 
         # Frame 2 as a LabelFrame, taking up the whole width
         self.frame2 = ttk.LabelFrame(root, text="Frame 2", padding=25)
-        self.frame2.grid(row=1, column=0, padx=10, pady=10, sticky="ew")
+        self.frame2.grid(row=1, column=0, padx=(25, 25), pady=10, sticky="ew")  # Added padx for left and right padding
 
         # Configure column weights for Frame 2
         for i in range(5):
@@ -108,5 +108,4 @@ class MyApp:
 
 if __name__ == "__main__":
     root = tk.Tk()
-    app = MyApp(root)
-    root.mainloop()
+   
