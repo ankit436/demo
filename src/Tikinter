@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk, filedialog
+from tkinter import ttk, filedialog, messagebox
 from ttkbootstrap import Style
 
 class MyApp:
@@ -36,10 +36,6 @@ class MyApp:
         self.radio_button2 = ttk.Radiobutton(self.frame1, text="Option 2", variable=self.radio_var, value=2)
         self.radio_button2.grid(row=0, column=1, padx=5)
 
-        # Button widget inside Frame 1
-        self.button1 = ttk.Button(self.frame1, text="Click Me 1", command=self.on_button1_click)
-        self.button1.grid(row=1, column=0, columnspan=2, pady=5)
-
         # Frame 2 inside the labeled frame as a LabelFrame
         self.frame2 = ttk.LabelFrame(self.label_frame, text="Frame 2")
         self.frame2.grid(row=1, column=0, padx=10, pady=10, sticky="ew")
@@ -55,17 +51,9 @@ class MyApp:
         self.file_entry = ttk.Entry(self.frame2, state="readonly", width=30)
         self.file_entry.grid(row=0, column=2, padx=5)
 
-        # Button widget inside Frame 2
-        self.button2 = ttk.Button(self.frame2, text="Click Me 2", command=self.on_button2_click)
-        self.button2.grid(row=1, column=0, columnspan=3, pady=5)
-
-        # Submit Button
-        self.submit_button = ttk.Button(self.label_frame, text="Submit", command=self.submit)
-        self.submit_button.pack(pady=10)
-
-    def on_button1_click(self):
-        selected_option = self.radio_var.get()
-        print(f"Button 1 clicked! Selected Option: {selected_option}")
+        # Submit Button outside of the labeled frame, positioned on the right side
+        self.submit_button = ttk.Button(root, text="Submit", command=self.submit)
+        self.submit_button.pack(pady=10, side="right")
 
     def choose_file(self):
         file_path = filedialog.askopenfilename()
@@ -75,18 +63,13 @@ class MyApp:
             self.file_entry.insert(tk.END, file_path)
             self.file_entry.configure(state='readonly')
 
-    def on_button2_click(self):
-        entry_text2 = self.entry_widget2.get()
-        print(f"Button 2 clicked! Entry text in Frame 2: {entry_text2}")
-
     def submit(self):
         file_path2 = self.entry_widget2.get()
 
         if file_path2:
-            print("Submission successful!")
-            print(f"File Path 2: {file_path2}")
+            messagebox.showinfo("Submission Successful", f"File Path 2: {file_path2}")
         else:
-            print("Please choose a valid file path before submitting.")
+            messagebox.showwarning("Validation Error", "Please choose a valid file path before submitting.")
 
 if __name__ == "__main__":
     root = tk.Tk()
