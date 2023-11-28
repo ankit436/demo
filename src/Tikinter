@@ -35,9 +35,9 @@ class MyApp:
         self.frame2 = ttk.LabelFrame(root, text="Frame 2", padding=25)
         self.frame2.grid(row=1, column=0, padx=10, pady=10, sticky="ew")
 
-        # Label to display the chosen file path in Frame 2 (labeled as "File 1")
-        self.file_path_label = ttk.Label(self.frame2, text="File 1 Chosen Path: ", wraplength=560)
-        self.file_path_label.grid(row=1, column=0, columnspan=3, pady=5, sticky="ew")
+        # Entry widget to display the chosen file path in Frame 2 (labeled as "File 1")
+        self.file_path_entry = ttk.Entry(self.frame2, state="disabled", width=50)
+        self.file_path_entry.grid(row=1, column=0, columnspan=3, pady=5, sticky="ew")
 
         # File Choose Button inside Frame 2, moved to the right side
         self.file_choose_button = ttk.Button(self.frame2, text="Choose File", command=self.choose_file)
@@ -54,7 +54,10 @@ class MyApp:
     def choose_file(self):
         file_path = filedialog.askopenfilename()
         if file_path:
-            self.file_path_label.config(text=f"File 1 Chosen Path: {file_path}")
+            self.file_path_entry.config(state="normal")
+            self.file_path_entry.delete(0, "end")
+            self.file_path_entry.insert(0, file_path)
+            self.file_path_entry.config(state="disabled")
 
     def submit(self):
         messagebox.showinfo("Submission Successful", "Data submitted successfully.")
