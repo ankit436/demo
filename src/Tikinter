@@ -21,9 +21,6 @@ class MyApp:
         # Set the window position to center
         root.geometry(f"{window_width}x{window_height}+{x_position}+{y_position}")
 
-        # Disable the minimize and maximize buttons
-        root.overrideredirect(True)
-
         # Frame 1 as a LabelFrame, taking up the whole width
         self.frame1 = ttk.LabelFrame(root, text="Frame 1", padding=25)
         self.frame1.grid(row=0, column=0, padx=10, pady=10, sticky="ew")
@@ -46,13 +43,9 @@ class MyApp:
         self.frame2 = ttk.LabelFrame(root, text="Frame 2", padding=25)
         self.frame2.grid(row=1, column=0, padx=10, pady=10, sticky="ew")
 
-        # Submit Button outside of the labeled frames, positioned on the right side
-        self.submit_button = ttk.Button(root, text="Submit", command=self.submit)
-        self.submit_button.pack(pady=10, side="right")
-
         # Configure column weights for Frame 2
-        self.frame2.columnconfigure(0, weight=1)
-        self.frame2.columnconfigure(4, weight=1)
+        for i in range(5):
+            self.frame2.columnconfigure(i, weight=1)
 
         # Call the update_file_choose_options method to initialize Frame 2
         self.update_file_choose_options()
@@ -66,9 +59,6 @@ class MyApp:
             elif file_number == 2:
                 self.file_path_entry2.delete(0, "end")
                 self.file_path_entry2.insert(0, file_path)
-
-    def submit(self):
-        messagebox.showinfo("Submission Successful", "Data submitted successfully.")
 
     def update_file_choose_options(self, *args):
         # Get the selected option
