@@ -40,7 +40,7 @@ class MyApp:
         self.frame1.columnconfigure(1, weight=1)
 
         # Frame 2 as a LabelFrame, taking up the whole width
-        self.frame2 = ttk.LabelFrame(root, text="Frame 2", padding=25)
+        self.frame2 = ttk.LabelFrame(root, text="Frame 2 (Option 1)", padding=25)  # Initial label text
         self.frame2.grid(row=1, column=0, padx=(25, 25), pady=10, sticky="ew")  # Added padx for left and right padding
 
         # Configure column weights for Frame 2
@@ -67,6 +67,9 @@ class MyApp:
     def update_file_choose_options(self, *args):
         # Get the selected option
         selected_option = self.radio_var.get()
+
+        # Update Frame 2 label text based on the selected option
+        self.frame2["text"] = f"Frame 2 ({selected_option.capitalize()})"
 
         # Remove existing widgets in Frame 2
         for widget in self.frame2.winfo_children():
@@ -104,13 +107,15 @@ class MyApp:
             # Entry widget for File 4
             ttk.Label(self.frame2, text="File 4:", anchor="w", padding=(5, 0)).grid(row=3, column=0, padx=5, sticky="w")
             self.file_path_entry4 = ttk.Entry(self.frame2, width=50)
-            self.file_path_entry4.grid(row=3, column=1, columnspan=3, pady=5, padx=5, sticky="ew)
-                        # File Choose Button for File 4
+            self.file_path_entry4.grid(row=3, column=1, columnspan=3, pady=5, padx=5, sticky="ew")
+
+            # File Choose Button for File 4
             self.file_choose_button4 = ttk.Button(self.frame2, text="Choose File", command=lambda: self.choose_file(4))
             self.file_choose_button4.grid(row=3, column=4, padx=5, sticky="e")
 
         elif selected_option == "option2":
             # Additional widgets for Option 2
+                        # Additional widgets for Option 2
             ttk.Label(self.frame2, text="Extra File:", anchor="w", padding=(5, 0)).grid(row=1, column=0, padx=5, sticky="w")
             self.extra_file_entry = ttk.Entry(self.frame2, width=50)
             self.extra_file_entry.grid(row=1, column=1, columnspan=3, pady=5, padx=5, sticky="ew")
