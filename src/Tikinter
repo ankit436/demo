@@ -50,6 +50,10 @@ class MyApp:
         # Call the update_file_choose_options method to initialize Frame 2
         self.update_file_choose_options()
 
+        # Submit button at the bottom right with equal padding
+        self.submit_button = ttk.Button(root, text="Submit", command=self.submit_action)
+        self.submit_button.grid(row=2, column=0, padx=(25, 25), pady=(10, 25), sticky="se")  # Added padx and pady
+
     def choose_file(self, file_number):
         file_path = filedialog.askopenfilename()
         if file_path:
@@ -77,17 +81,17 @@ class MyApp:
         self.file_choose_button1 = ttk.Button(self.frame2, text="Choose File", command=lambda: self.choose_file(1))
         self.file_choose_button1.grid(row=0, column=4, padx=5, sticky="e")
 
-        # Entry widget for File 2
-        ttk.Label(self.frame2, text="File 2:", anchor="w", padding=(5, 0)).grid(row=1, column=0, padx=5, sticky="w")
-        self.file_path_entry2 = ttk.Entry(self.frame2, width=50)
-        self.file_path_entry2.grid(row=1, column=1, columnspan=3, pady=5, padx=5, sticky="ew")
-
-        # File Choose Button for File 2
-        self.file_choose_button2 = ttk.Button(self.frame2, text="Choose File", command=lambda: self.choose_file(2))
-        self.file_choose_button2.grid(row=1, column=4, padx=5, sticky="e")
-
         # Check if Option 1 is selected
         if selected_option == "option1":
+            # Entry widget for File 2
+            ttk.Label(self.frame2, text="File 2:", anchor="w", padding=(5, 0)).grid(row=1, column=0, padx=5, sticky="w")
+            self.file_path_entry2 = ttk.Entry(self.frame2, width=50)
+            self.file_path_entry2.grid(row=1, column=1, columnspan=3, pady=5, padx=5, sticky="ew")
+
+            # File Choose Button for File 2
+            self.file_choose_button2 = ttk.Button(self.frame2, text="Choose File", command=lambda: self.choose_file(2))
+            self.file_choose_button2.grid(row=1, column=4, padx=5, sticky="e")
+
             # Entry widget for File 3
             ttk.Label(self.frame2, text="File 3:", anchor="w", padding=(5, 0)).grid(row=2, column=0, padx=5, sticky="w")
             self.file_path_entry3 = ttk.Entry(self.frame2, width=50)
@@ -100,12 +104,30 @@ class MyApp:
             # Entry widget for File 4
             ttk.Label(self.frame2, text="File 4:", anchor="w", padding=(5, 0)).grid(row=3, column=0, padx=5, sticky="w")
             self.file_path_entry4 = ttk.Entry(self.frame2, width=50)
-            self.file_path_entry4.grid(row=3, column=1, columnspan=3, pady=5, padx=5, sticky="ew")
-
-            # File Choose Button for File 4
+            self.file_path_entry4.grid(row=3, column=1, columnspan=3, pady=5, padx=5, sticky="ew)
+                        # File Choose Button for File 4
             self.file_choose_button4 = ttk.Button(self.frame2, text="Choose File", command=lambda: self.choose_file(4))
             self.file_choose_button4.grid(row=3, column=4, padx=5, sticky="e")
 
+        elif selected_option == "option2":
+            # Additional widgets for Option 2
+            ttk.Label(self.frame2, text="Extra File:", anchor="w", padding=(5, 0)).grid(row=1, column=0, padx=5, sticky="w")
+            self.extra_file_entry = ttk.Entry(self.frame2, width=50)
+            self.extra_file_entry.grid(row=1, column=1, columnspan=3, pady=5, padx=5, sticky="ew")
+
+            # Choose Button for Extra File
+            self.extra_file_choose_button = ttk.Button(self.frame2, text="Choose File", command=lambda: self.choose_file("extra"))
+            self.extra_file_choose_button.grid(row=1, column=4, padx=5, sticky="e")
+
+        # Configure column weights for Frame 2
+        for i in range(5):
+            self.frame2.columnconfigure(i, weight=1)
+
+    def submit_action(self):
+        # Add the action you want to perform on submit
+        messagebox.showinfo("Submit", "Form Submitted!")
+
 if __name__ == "__main__":
     root = tk.Tk()
-   
+    app = MyApp(root)
+    root.mainloop()
