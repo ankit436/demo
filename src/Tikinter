@@ -35,46 +35,49 @@ class MyApp:
         self.frame2 = ttk.LabelFrame(root, text="Frame 2", padding=25)
         self.frame2.grid(row=1, column=0, padx=10, pady=10, sticky="ew")
 
-        # Entry widget to display the chosen file path in Frame 2 (labeled as "File 1")
-        self.file_path_entry1 = ttk.Entry(self.frame2, state="disabled", width=50)
+        # Entry widget for File 1
+        self.file_path_entry1 = ttk.Entry(self.frame2, width=50)
         self.file_path_entry1.grid(row=0, column=0, columnspan=3, pady=5, sticky="ew")
 
-        # File Choose Button inside Frame 2, moved to the right side
+        # File Choose Button for File 1
         self.file_choose_button1 = ttk.Button(self.frame2, text="Choose File", command=lambda: self.choose_file(1))
         self.file_choose_button1.grid(row=0, column=3, padx=5, sticky="e")
 
-        # Label for File 2
-        ttk.Label(self.frame2, text="File 1:").grid(row=0, column=4, padx=5, sticky="w")
-
         # Entry widget for File 2
-        self.file_path_entry2 = ttk.Entry(self.frame2, state="disabled", width=50)
-        self.file_path_entry2.grid(row=0, column=5, columnspan=3, pady=5, sticky="ew")
+        self.file_path_entry2 = ttk.Entry(self.frame2, width=50)
+        self.file_path_entry2.grid(row=1, column=0, columnspan=3, pady=5, sticky="ew")
 
         # File Choose Button for File 2
         self.file_choose_button2 = ttk.Button(self.frame2, text="Choose File", command=lambda: self.choose_file(2))
-        self.file_choose_button2.grid(row=0, column=8, padx=5, sticky="e")
-
-        # Label for File 3
-        ttk.Label(self.frame2, text="File 2:").grid(row=1, column=0, padx=5, sticky="w")
+        self.file_choose_button2.grid(row=1, column=3, padx=5, sticky="e")
 
         # Entry widget for File 3
-        self.file_path_entry3 = ttk.Entry(self.frame2, state="disabled", width=50)
-        self.file_path_entry3.grid(row=1, column=1, columnspan=3, pady=5, sticky="ew")
+        self.file_path_entry3 = ttk.Entry(self.frame2, width=50)
+        self.file_path_entry3.grid(row=2, column=0, columnspan=3, pady=5, sticky="ew")
 
         # File Choose Button for File 3
         self.file_choose_button3 = ttk.Button(self.frame2, text="Choose File", command=lambda: self.choose_file(3))
-        self.file_choose_button3.grid(row=1, column=4, padx=5, sticky="e")
-
-        # Label for File 4
-        ttk.Label(self.frame2, text="File 3:").grid(row=1, column=5, padx=5, sticky="w")
+        self.file_choose_button3.grid(row=2, column=3, padx=5, sticky="e")
 
         # Entry widget for File 4
-        self.file_path_entry4 = ttk.Entry(self.frame2, state="disabled", width=50)
-        self.file_path_entry4.grid(row=1, column=6, columnspan=3, pady=5, sticky="ew")
+        self.file_path_entry4 = ttk.Entry(self.frame2, width=50)
+        self.file_path_entry4.grid(row=3, column=0, columnspan=3, pady=5, sticky="ew")
 
         # File Choose Button for File 4
         self.file_choose_button4 = ttk.Button(self.frame2, text="Choose File", command=lambda: self.choose_file(4))
-        self.file_choose_button4.grid(row=1, column=9, padx=5, sticky="e")
+        self.file_choose_button4.grid(row=3, column=3, padx=5, sticky="e")
+
+        # Label for File 1
+        ttk.Label(self.frame2, text="File 1:").grid(row=0, column=4, padx=5, sticky="w")
+
+        # Label for File 2
+        ttk.Label(self.frame2, text="File 2:").grid(row=1, column=4, padx=5, sticky="w")
+
+        # Label for File 3
+        ttk.Label(self.frame2, text="File 3:").grid(row=2, column=4, padx=5, sticky="w")
+
+        # Label for File 4
+        ttk.Label(self.frame2, text="File 4:").grid(row=3, column=4, padx=5, sticky="w")
 
         # Submit Button outside of the labeled frames, positioned on the right side
         self.submit_button = ttk.Button(root, text="Submit", command=self.submit)
@@ -83,32 +86,22 @@ class MyApp:
         # Configure column weights for Frame 2
         self.frame2.columnconfigure(0, weight=1)
         self.frame2.columnconfigure(3, weight=1)
-        self.frame2.columnconfigure(6, weight=1)
-        self.frame2.columnconfigure(9, weight=1)
 
     def choose_file(self, file_number):
         file_path = filedialog.askopenfilename()
         if file_path:
             if file_number == 1:
-                self.file_path_entry1.config(state="normal")
                 self.file_path_entry1.delete(0, "end")
                 self.file_path_entry1.insert(0, file_path)
-                self.file_path_entry1.config(state="disabled")
             elif file_number == 2:
-                self.file_path_entry2.config(state="normal")
                 self.file_path_entry2.delete(0, "end")
                 self.file_path_entry2.insert(0, file_path)
-                self.file_path_entry2.config(state="disabled")
             elif file_number == 3:
-                self.file_path_entry3.config(state="normal")
                 self.file_path_entry3.delete(0, "end")
                 self.file_path_entry3.insert(0, file_path)
-                self.file_path_entry3.config(state="disabled")
             elif file_number == 4:
-                self.file_path_entry4.config(state="normal")
                 self.file_path_entry4.delete(0, "end")
                 self.file_path_entry4.insert(0, file_path)
-                self.file_path_entry4.config(state="disabled")
 
     def submit(self):
         messagebox.showinfo("Submission Successful", "Data submitted successfully.")
