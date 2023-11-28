@@ -31,10 +31,10 @@ class MyApp:
         # Radio buttons inside Frame 1
         self.radio_var = tk.IntVar()
         self.radio_button1 = ttk.Radiobutton(self.frame1, text="Option 1", variable=self.radio_var, value=1)
-        self.radio_button1.grid(row=0, column=0, padx=(0, 5))
+        self.radio_button1.grid(row=0, column=0, padx=5)
 
         self.radio_button2 = ttk.Radiobutton(self.frame1, text="Option 2", variable=self.radio_var, value=2)
-        self.radio_button2.grid(row=0, column=1, padx=(5, 0))
+        self.radio_button2.grid(row=0, column=1, padx=5)
 
         # Configure column weights for Frame 1
         self.frame1.columnconfigure(0, weight=1)
