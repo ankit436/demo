@@ -64,6 +64,21 @@ class MyApp:
                 self.file_path_entry2.delete(0, "end")
                 self.file_path_entry2.insert(0, file_path)
 
+    def validate_files(self):
+        selected_option = self.radio_var.get()
+
+        # Check if required files are chosen based on the selected option
+        if selected_option == "option1":
+            if not self.file_path_entry1.get() or not self.file_path_entry2.get() or not self.file_path_entry3.get() or not self.file_path_entry4.get():
+                messagebox.showerror("Error", "All files are required for Option 1.")
+                return False
+        elif selected_option == "option2":
+            if not self.file_path_entry1.get() or not self.file_path_entry2.get() or not self.extra_file_entry.get():
+                messagebox.showerror("Error", "All files are required for Option 2.")
+                return False
+
+        return True
+
     def update_file_choose_options(self, *args):
         # Get the selected option
         selected_option = self.radio_var.get()
@@ -105,7 +120,8 @@ class MyApp:
             self.file_choose_button3.grid(row=2, column=4, padx=5, sticky="e")
 
             # Entry widget for File 4
-            ttk.Label(self.frame2, text="File 4:", anchor="w", padding=(5, 0)).grid(row=3, column=0, padx=5, sticky="w")
+            ttk.Label(self.frame2, text="File 4:", anchor="w", padding=(
+                        5, 0)).grid(row=3, column=0, padx=5, sticky="w")
             self.file_path_entry4 = ttk.Entry(self.frame2, width=50)
             self.file_path_entry4.grid(row=3, column=1, columnspan=3, pady=5, padx=5, sticky="ew")
 
@@ -115,7 +131,6 @@ class MyApp:
 
         elif selected_option == "option2":
             # Additional widgets for Option 2
-                        # Additional widgets for Option 2
             ttk.Label(self.frame2, text="Extra File:", anchor="w", padding=(5, 0)).grid(row=1, column=0, padx=5, sticky="w")
             self.extra_file_entry = ttk.Entry(self.frame2, width=50)
             self.extra_file_entry.grid(row=1, column=1, columnspan=3, pady=5, padx=5, sticky="ew")
@@ -129,6 +144,10 @@ class MyApp:
             self.frame2.columnconfigure(i, weight=1)
 
     def submit_action(self):
+        # Validate files before performing the action
+        if not self.validate_files():
+            return
+
         # Add the action you want to perform on submit
         messagebox.showinfo("Submit", "Form Submitted!")
 
