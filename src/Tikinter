@@ -41,15 +41,19 @@ class MyApp:
 
         # Label to display the chosen file path in Frame 2
         self.file_path_label = ttk.Label(self.frame2, text="Chosen File Path: ")
-        self.file_path_label.grid(row=1, column=0, columnspan=2, pady=5, sticky="w")
+        self.file_path_label.grid(row=1, column=0, columnspan=3, pady=5, sticky="ew")
 
         # File Choose Button inside Frame 2, moved to the right side
         self.file_choose_button = ttk.Button(self.frame2, text="Choose File", command=self.choose_file)
-        self.file_choose_button.grid(row=1, column=2, padx=5, sticky="e")
+        self.file_choose_button.grid(row=1, column=3, padx=5, sticky="e")
 
         # Submit Button outside of the labeled frame, positioned on the right side
         self.submit_button = ttk.Button(root, text="Submit", command=self.submit)
         self.submit_button.pack(pady=10, side="right")
+
+        # Configure column weights for Frame 2
+        self.frame2.columnconfigure(0, weight=1)
+        self.frame2.columnconfigure(3, weight=1)
 
     def choose_file(self):
         file_path = filedialog.askopenfilename()
