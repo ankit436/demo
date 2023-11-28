@@ -15,12 +15,8 @@ class MyApp:
         # Disable the minimize and maximize buttons
         root.overrideredirect(True)
 
-        # Create a labeled frame
-        self.label_frame = ttk.LabelFrame(root, text="My Labeled Frame")
-        self.label_frame.pack(padx=10, pady=10)
-
-        # Frame 1 inside the labeled frame as a LabelFrame
-        self.frame1 = ttk.LabelFrame(self.label_frame, text="Frame 1", height=30)
+        # Frame 1 as a LabelFrame, taking up the whole width
+        self.frame1 = ttk.LabelFrame(root, text="Frame 1", padding=25)
         self.frame1.grid(row=0, column=0, padx=10, pady=10, sticky="ew")
 
         # Radio buttons inside Frame 1
@@ -35,8 +31,8 @@ class MyApp:
         self.frame1.columnconfigure(0, weight=1)
         self.frame1.columnconfigure(1, weight=1)
 
-        # Frame 2 inside the labeled frame as a LabelFrame
-        self.frame2 = ttk.LabelFrame(self.label_frame, text="Frame 2")
+        # Frame 2 as a LabelFrame, taking up the whole width
+        self.frame2 = ttk.LabelFrame(root, text="Frame 2", padding=25)
         self.frame2.grid(row=1, column=0, padx=10, pady=10, sticky="ew")
 
         # Label to display the chosen file path in Frame 2
@@ -47,7 +43,7 @@ class MyApp:
         self.file_choose_button = ttk.Button(self.frame2, text="Choose File", command=self.choose_file)
         self.file_choose_button.grid(row=1, column=3, padx=5, sticky="e")
 
-        # Submit Button outside of the labeled frame, positioned on the right side
+        # Submit Button outside of the labeled frames, positioned on the right side
         self.submit_button = ttk.Button(root, text="Submit", command=self.submit)
         self.submit_button.pack(pady=10, side="right")
 
