@@ -1,89 +1,18 @@
-import tkinter as tk
-from tkinter import ttk, filedialog, messagebox
-from ttkbootstrap import Style
-import threading
-import time
+def simulate_processing(self, progress_bar, progress_window):
+    # Show the progress bar
+    progress_bar.start()
 
-class MyApp:
-    def __init__(self, root):
-        self.root = root
+    for i in range(101):
+        progress_bar["value"] = i
+        progress_window.update_idletasks()
+        time.sleep(0.1)
 
-        # Apply the 'superhero' theme from ttkbootstrap
-        self.style = Style(theme='superhero')
+    # Stop the progress bar
+    progress_bar.stop()
 
-        # Set the window size to 600x400
-        window_width = 600
-        window_height = 400
-        screen_width = root.winfo_screenwidth()
-        screen_height = root.winfo_screenheight()
+    # Close both the main UI and the progress window
+    progress_window.destroy()
+    self.root.destroy()
 
-        x_position = (screen_width - window_width) // 2
-        y_position = (screen_height - window_height) // 2
-
-        # Set the window position to center
-        root.geometry(f"{window_width}x{window_height}+{x_position}+{y_position}")
-
-        # Lock the window size
-        root.resizable(width=False, height=False)
-
-        # Frame 1 as a LabelFrame, taking up the whole width
-        self.frame1 = ttk.LabelFrame(root, text="Frame 1", padding=25)
-        self.frame1.grid(row=0, column=0, padx=(25, 25), pady=10, sticky="ew")  # Added padx for left and right padding
-
-        # ... (Rest of the code remains unchanged)
-
-        # Submit button at the bottom right with equal padding
-        self.submit_button = ttk.Button(root, text="Submit", command=self.submit_action)
-        self.submit_button.grid(row=2, column=0, padx=(25, 25), pady=(10, 25), sticky="se")  # Added padx and pady
-
-        # Bind the closing event to a method
-        root.protocol("WM_DELETE_WINDOW", self.on_close)
-
-    # ... (Rest of the code remains unchanged)
-
-    def submit_action(self):
-        # Validate files before performing the action
-        if not self.validate_files():
-            return
-
-        # Create a Toplevel window for the progress bar
-        progress_window = tk.Toplevel(self.root)
-        progress_window.title("Processing")
-
-        # Progress bar widget
-        progress_bar = ttk.Progressbar(progress_window, length=600, mode="indeterminate")
-        progress_bar.grid(row=0, column=0, padx=20, pady=20)
-
-        # Hide the main UI
-        self.root.iconify()
-
-        # Start a new thread for the progress bar
-        threading.Thread(target=self.simulate_processing, args=(progress_bar, progress_window)).start()
-
-    def simulate_processing(self, progress_bar, progress_window):
-        # Show the progress bar
-        progress_bar.start()
-
-        # Simulate a time-consuming task (you should replace this with your actual processing logic)
-        time.sleep(5)
-
-        # Stop the progress bar
-        progress_bar.stop()
-
-        # Close the progress window
-        progress_window.destroy()
-
-        # Show the main UI
-        self.root.deiconify()
-
-        # Add the action you want to perform on submit
-        messagebox.showinfo("Submit", "Form Submitted!")
-
-    def on_close(self):
-        # Destroy the Tkinter window
-        self.root.destroy()
-
-if __name__ == "__main__":
-    root = tk.Tk()
-    app = MyApp(root)
-    root.mainloop()
+    # Add the action you want to perform on submit
+    messagebox.showinfo("Submit", "Form Submitted!")
