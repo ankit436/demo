@@ -3,63 +3,41 @@ from tkinter import ttk
 import threading
 import time
 
-class MyApp:
-    def __init__(self, root):
-        self.root = root
+class ProgressBarLogic:
+    def __init__(self, total_count):
+        self.total_count = total_count
+        self.root = tk.Tk()
+        self.progress_bar = ttk.Progressbar(self.root, length=400, mode="determinate")
+        self.progress_bar.pack(padx=20, pady=20)
 
-        # Set the window size to 600x200
-        window_width = 600
-        window_height = 200
-        screen_width = root.winfo_screenwidth()
-        screen_height = root.winfo_screenheight()
+    def simulate_progress(self, progressing_count):
+        total_progress_length = (progressing_count / self.total_count) * 100
+        self.progress_bar["value"] = total_progress_length
+        self.root.update_idletasks()
+        time.sleep(0.1)
 
-        x_position = (screen_width - window_width) // 2
-        y_position = (screen_height - window_height) // 2
+    def start_progress(self):
+        threading.Thread(target=self._start_progress).start()
 
-        # Set the window position to center
-        root.geometry(f"{window_width}x{window_height}+{x_position}+{y_position}")
+    def _start_progress(self):
+        self.root.mainloop()
 
-        # Lock the window size
-        root.resizable(width=False, height=False)
+class AnotherClass:
+    def __init__(self, total_count):
+        self.progress_bar_logic = ProgressBarLogic(total_count)
 
-        # Create the main UI components
-        self.create_ui()
-
-    def create_ui(self):
-        # Frame 1 as a LabelFrame, taking up the whole width
-        frame1 = ttk.LabelFrame(self.root, text="Frame 1", padding=25)
-        frame1.grid(row=0, column=0, padx=(25, 25), pady=10, sticky="ew")  # Added padx for left and right padding
-
-        # Submit button at the bottom right with equal padding
-        submit_button = ttk.Button(self.root, text="Submit", command=self.file_copy_progress)
-        submit_button.grid(row=1, column=0, padx=(25, 25), pady=(10, 25), sticky="se")  # Added padx and pady
-
-    def simulate_file_copy(self, progress_bar, progress_window):
-        # Simulate file copy progress (adjust as needed)
-        for i in range(101):
-            progress_bar["value"] = i
-            progress_window.update_idletasks()
+    def do_something_with_progress(self):
+        for i in range(1, 101):
+            # Simulate some work
             time.sleep(0.1)
 
-        # Close the progress window
-        progress_window.destroy()
+            # Update progress bar
+            self.progress_bar_logic.simulate_progress(i)
 
-    def file_copy_progress(self):
-        # Create a Toplevel window for the progress bar
-        progress_window = tk.Toplevel(self.root)
-        progress_window.title("File Copy Progress")
-
-        # Progress bar widget
-        progress_bar = ttk.Progressbar(progress_window, length=400, mode="determinate")
-        progress_bar.pack(padx=20, pady=20)
-
-        # Start a new thread for the progress bar
-        threading.Thread(target=self.simulate_file_copy, args=(progress_bar, progress_window)).start()
-
-        # Hide the main UI
-        self.root.iconify()
+        # Close the progress bar window after completion
+        self.progress_bar_logic.root.destroy()
 
 if __name__ == "__main__":
-    root = tk.Tk()
-    app = MyApp(root)
-    root.mainloop()
+    total_count = 100
+    another_class_instance = AnotherClass(total_count)
+    another_class_instance.do_something_with_progress()
