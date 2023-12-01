@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 import threading
+import time
 
 class ProgressBarLogic:
     def __init__(self, total_count):
@@ -29,10 +30,11 @@ class AnotherClass:
         self.progress_bar_logic = ProgressBarLogic(total_count)
 
     def do_something_with_progress(self):
-        self.progress_bar_logic.start_progress()
+        # Start the Tkinter main loop in a separate thread
+        threading.Thread(target=self.progress_bar_logic.start_progress).start()
 
         # Start the progress updates
-        self.progress_bar_logic.simulate_progress(1)
+        threading.Thread(target=self.progress_bar_logic.simulate_progress, args=(1,)).start()
 
 if __name__ == "__main__":
     total_count = 100
