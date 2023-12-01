@@ -10,9 +10,30 @@ def simulate_processing(self, progress_bar, progress_window):
     # Stop the progress bar
     progress_bar.stop()
 
-    # Close both the main UI and the progress window
+    # Close the progress window
     progress_window.destroy()
-    self.root.destroy()
 
     # Add the action you want to perform on submit
     messagebox.showinfo("Submit", "Form Submitted!")
+
+def file_copy_progress(self):
+    # Create a Toplevel window for the file copy progress
+    file_copy_window = tk.Toplevel(self.root)
+    file_copy_window.title("File Copy Progress")
+
+    # Progress bar widget
+    file_copy_progress_bar = ttk.Progressbar(file_copy_window, length=400, mode="determinate")
+    file_copy_progress_bar.grid(row=0, column=0, padx=20, pady=20)
+
+    # Start a new thread for the file copy progress
+    threading.Thread(target=self.simulate_file_copy, args=(file_copy_progress_bar, file_copy_window)).start()
+
+def simulate_file_copy(self, file_copy_progress_bar, file_copy_window):
+    # Simulate file copy progress (adjust as needed)
+    for i in range(101):
+        file_copy_progress_bar["value"] = i
+        file_copy_window.update_idletasks()
+        time.sleep(0.1)
+
+    # Close the file copy window
+    file_copy_window.destroy()
