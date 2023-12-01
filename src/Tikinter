@@ -17,9 +17,6 @@ class ProgressBarLogic:
         time.sleep(0.1)
 
     def start_progress(self):
-        threading.Thread(target=self._start_progress).start()
-
-    def _start_progress(self):
         self.root.mainloop()
 
 class AnotherClass:
@@ -40,4 +37,9 @@ class AnotherClass:
 if __name__ == "__main__":
     total_count = 100
     another_class_instance = AnotherClass(total_count)
+    
+    # Start the progress bar in a separate thread
+    threading.Thread(target=another_class_instance.progress_bar_logic.start_progress).start()
+
+    # Perform work with progress updates
     another_class_instance.do_something_with_progress()
