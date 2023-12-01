@@ -1,76 +1,51 @@
-import tkinter as tk
-from tkinter import ttk, messagebox
-import threading
-import time
+def simulate_processing(self, progress_bar, remaining_progress_bar, progress_window):
+    # Show the running progress bar
+    progress_bar.start()
 
-class MyApp:
-    def __init__(self, root):
-        self.root = root
+    # Simulate running progress (adjust as needed)
+    for i in range(51):
+        progress_bar["value"] = i * 2
+        progress_window.update_idletasks()
+        time.sleep(0.1)
 
-        # Set the window size to 600x400
-        window_width = 600
-        window_height = 400
-        screen_width = root.winfo_screenwidth()
-        screen_height = root.winfo_screenheight()
+    # Stop the running progress bar
+    progress_bar.stop()
 
-        x_position = (screen_width - window_width) // 2
-        y_position = (screen_height - window_height) // 2
+    # Show the remaining progress bar
+    remaining_progress_bar.start()
 
-        # Set the window position to center
-        root.geometry(f"{window_width}x{window_height}+{x_position}+{y_position}")
+    # Simulate remaining progress (adjust as needed)
+    for i in range(50):
+        remaining_progress_bar["value"] = i * 2
+        progress_window.update_idletasks()
+        time.sleep(0.1)
 
-        # Lock the window size
-        root.resizable(width=False, height=False)
+    # Stop the remaining progress bar
+    remaining_progress_bar.stop()
 
-        # Create the main UI components
-        self.create_ui()
+    # Close the progress window
+    progress_window.destroy()
 
-    def create_ui(self):
-        # Frame 1 as a LabelFrame, taking up the whole width
-        frame1 = ttk.LabelFrame(self.root, text="Frame 1", padding=25)
-        frame1.grid(row=0, column=0, padx=(25, 25), pady=10, sticky="ew")  # Added padx for left and right padding
+    # Add the action you want to perform on submit
+    messagebox.showinfo("Submit", "Form Submitted!")
 
-        # Submit button at the bottom right with equal padding
-        submit_button = ttk.Button(self.root, text="Submit", command=self.file_copy_progress)
-        submit_button.grid(row=2, column=0, padx=(25, 25), pady=(10, 25), sticky="se")  # Added padx and pady
+def file_copy_progress(self):
+    # Create a Toplevel window for the progress bars
+    progress_window = tk.Toplevel(self.root)
+    progress_window.title("File Copy Progress")
 
-    def simulate_file_copy(self, progress_var, remaining_progress_var, file_copy_window):
-        # Simulate file copy progress (adjust as needed)
-        for i in range(101):
-            progress_var.set(i)
-            remaining_progress_var.set(100 - i)
-            file_copy_window.update_idletasks()
-            time.sleep(0.1)
+    # Progress bar widgets
+    progress_bar = ttk.Progressbar(progress_window, length=400, mode="indeterminate")
+    progress_bar.grid(row=0, column=0, padx=20, pady=20)
 
-        # Close the file copy window
-        file_copy_window.destroy()
+    remaining_progress_bar = ttk.Progressbar(progress_window, length=400, mode="indeterminate")
+    remaining_progress_bar.grid(row=1, column=0, padx=20, pady=10)
 
-        # Show the main UI
-        self.root.deiconify()
+    # Start a new thread for the progress bars
+    threading.Thread(target=self.simulate_processing, args=(progress_bar, remaining_progress_bar, progress_window)).start()
 
-        # Add the action you want to perform on submit
-        messagebox.showinfo("Submit", "Form Submitted!")
-
-    def file_copy_progress(self):
-        # Create a Toplevel window for the file copy progress
-        file_copy_window = tk.Toplevel(self.root)
-        file_copy_window.title("File Copy Progress")
-
-        # Progress bar widgets
-        progress_var = tk.DoubleVar()
-        remaining_progress_var = tk.DoubleVar()
-
-        progress_bar = ttk.Progressbar(file_copy_window, length=400, mode="determinate", variable=progress_var)
-        progress_bar.grid(row=0, column=0, padx=20, pady=20, sticky="ew")
-
-        remaining_progress_bar = ttk.Progressbar(file_copy_window, length=400, mode="determinate", variable=remaining_progress_var)
-        remaining_progress_bar.grid(row=1, column=0, padx=20, pady=10, sticky="ew")
-
-        # Start a new thread for the file copy progress
-        threading.Thread(target=self.simulate_file_copy, args=(progress_var, remaining_progress_var, file_copy_window)).start()
-
-        # Hide the main UI
-        self.root.iconify()
+    # Hide the main UI
+    self.root.iconify()
 
 if __name__ == "__main__":
     root = tk.Tk()
