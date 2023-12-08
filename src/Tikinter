@@ -22,6 +22,9 @@ class RootUI:
             # Make the alert window transient to the root window (modal)
             alert_window.transient(self.root)
 
+            # Hide the alert window initially
+            alert_window.withdraw()
+
             # Bind the close event to the on_cancel function
             alert_window.protocol("WM_DELETE_WINDOW", self.on_cancel)
 
@@ -34,6 +37,9 @@ class RootUI:
 
             cancel_button = ttk.Button(alert_window, text="Cancel", command=self.on_cancel)
             cancel_button.pack(pady=10)
+
+            # Show the alert window
+            alert_window.deiconify()
 
             # Wait for the alert window to close
             alert_window.wait_window()
