@@ -22,11 +22,19 @@ class RootUI:
         label = ttk.Label(alert_window, text="This is a continue alert.")
         label.pack(padx=20, pady=10)
 
-        continue_button = ttk.Button(alert_window, text="Continue", command=alert_window.destroy)
+        continue_button = ttk.Button(alert_window, text="Continue", command=self.on_continue)
         continue_button.pack(pady=10)
 
-        # Block the main program until the alert window is closed
-        alert_window.wait_window()
+        cancel_button = ttk.Button(alert_window, text="Cancel", command=self.on_cancel)
+        cancel_button.pack(pady=10)
+
+    def on_continue(self):
+        # Continue with your main program logic here
+        print("Continuing...")
+
+    def on_cancel(self):
+        # Close the main program when cancel is pressed
+        self.root.destroy()
 
 if __name__ == "__main__":
     root = tk.Tk()
