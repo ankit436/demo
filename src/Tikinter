@@ -6,30 +6,27 @@ class RootUI:
         self.root = root
         self.root.title("Root UI")
 
-        # Create a button to open the popup
-        open_popup_button = ttk.Button(self.root, text="Open Popup", command=self.open_popup)
-        open_popup_button.pack(pady=20)
+        # Create a button to trigger the alert
+        alert_button = ttk.Button(self.root, text="Show Alert", command=self.show_alert)
+        alert_button.pack(pady=20)
 
-    def open_popup(self):
-        popup_window = tk.Toplevel(self.root)
-        popup_window.title("Popup UI")
+    def show_alert(self):
+        # Create a Toplevel window for the alert
+        alert_window = tk.Toplevel(self.root)
+        alert_window.title("Alert")
 
-        # Create a frame in the popup
-        frame = ttk.Frame(popup_window, padding=20)
-        frame.pack()
+        # Make the alert window transient to the root window (modal)
+        alert_window.transient(self.root)
 
-        # Add content to the frame
-        label = ttk.Label(frame, text="Enter something:")
-        label.grid(row=0, column=0, pady=10)
+        # Add content to the alert window
+        label = ttk.Label(alert_window, text="This is a continue alert.")
+        label.pack(padx=20, pady=10)
 
-        entry = ttk.Entry(frame)
-        entry.grid(row=1, column=0, pady=10)
+        continue_button = ttk.Button(alert_window, text="Continue", command=alert_window.destroy)
+        continue_button.pack(pady=10)
 
-        submit_button = ttk.Button(frame, text="Submit", command=lambda: self.submit(entry.get()))
-        submit_button.grid(row=2, column=0, pady=10)
-
-    def submit(self, value):
-        print(f"Submitted: {value}")
+        # Block the main program until the alert window is closed
+        alert_window.wait_window()
 
 if __name__ == "__main__":
     root = tk.Tk()
