@@ -1,0 +1,16 @@
+from fastapi import FastAPI, UploadFile, Form
+
+app = FastAPI()
+
+class Data(BaseModel):
+    variable1: str
+    variable2: int
+
+@app.post("/upload/")
+async def upload_file(file: UploadFile = File(...), data: Data = Form(...)):
+    contents = await file.read()
+    # Save the file to a specific location
+    with open(f"uploads/{file.filename}", "wb") as f:
+        f.write(contents)
+    # Process the file and data as needed
+    return {"filename": file.filename, "data": data.dict()}
