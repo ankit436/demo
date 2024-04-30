@@ -1,0 +1,78 @@
+import React, { useState } from 'react';
+import { Layout, Row, Col, Checkbox, Collapse } from 'antd';
+import { FixedSizeList as List } from 'react-window';
+
+const { Content } = Layout;
+const { Panel } = Collapse;
+
+// Sample data for the virtualized list
+const data = Array.from({ length: 1000 }, (_, i) => `Item ${i}`);
+
+const VirtualizedPage = () => {
+  const [selectedFilters, setSelectedFilters] = useState([]);
+
+  const handleCheckboxChange = (value) => {
+    setSelectedFilters(value);
+  };
+
+  const RowRenderer = ({ index, style }) => (
+    <div style={style}>
+      {/* Each row contains a Collapse with a single Panel containing checkboxes */}
+      <Collapse bordered={false} defaultActiveKey={['1']}>
+        <Panel header={`Row ${index}`} key="1">
+          <Checkbox.Group style={{ width: '100%' }} onChange={handleCheckboxChange}>
+            <Row>
+              <Col span={24}>
+                <Checkbox value={`Filter${index + 1}`}>{`Filter${index + 1}`}</Checkbox>
+              </Col>
+              {/* Add more checkboxes as needed */}
+            </Row>
+          </Checkbox.Group>
+        </Panel>
+      </Collapse>
+    </div>
+  );
+
+  // Filter data based on selected filters
+  const filteredData = data.filter((item) =>
+    selectedFilters.every((filter) => item.includes(filter))
+  );
+
+  return (
+    <Layout style={{ minHeight: '100vh' }}>
+      <Content style={{ padding: '20px' }}>
+        <Row gutter={[16, 16]}>
+          <Col xs={24} sm={24} md={12} lg={6} xl={6}>
+            {/* Left side content with collapsible panels containing checkboxes */}
+            <div style={{ height: '600px', overflowY: 'auto', border: '1px solid #ccc', padding: '10px' }}>
+              <List
+                height={500}
+                itemCount={filteredData.length}
+                itemSize={100} // Height of each item in the list
+                width={300}
+              >
+                {RowRenderer}
+              </List>
+            </div>
+          </Col>
+          <Col xs={24} sm={24} md={12} lg={18} xl={18}>
+            {/* Right side content, filtered based on selected checkboxes */}
+            <div style={{ height: '600px', overflowY: 'auto', border: '1px solid #ccc', padding: '10px' }}>
+              {/* Filtered content */}
+              <List
+                height={500}
+                itemCount={filteredData.length}
+                itemSize={50} // Height of each item in the list
+                width={500}
+              >
+                {RowRenderer}
+              </List>
+            </div>
+          </Col>
+        </Row>
+      </Content>
+    </Layout>
+  );
+};
+
+export default VirtualizedPage;
