@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Layout, Row, Col, Checkbox, Collapse } from 'antd';
 import { FixedSizeList as List } from 'react-window';
 
@@ -10,13 +10,27 @@ const data = Array.from({ length: 1000 }, (_, i) => `Item ${i}`);
 
 const VirtualizedPage = () => {
   const [selectedFilters, setSelectedFilters] = useState([]);
+  const [maxHeight, setMaxHeight] = useState(window.innerHeight * 0.8); // Initial max height
+
+  useEffect(() => {
+    const handleResize = () => {
+      // Update max height when window is resized
+      setMaxHeight(window.innerHeight * 0.8);
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
   const handleCheckboxChange = (value) => {
     setSelectedFilters(value);
   };
 
   const RowRenderer = ({ index, style }) => (
-    <div style={style}>
+    <div style={{ ...style, maxHeight: `${maxHeight}px`, overflow: 'auto' }}>
       {/* Each row contains a Collapse with a single Panel containing checkboxes */}
       <Collapse bordered={false} defaultActiveKey={['1']}>
         <Panel header={`Row ${index}`} key="1">
@@ -44,9 +58,9 @@ const VirtualizedPage = () => {
         <Row gutter={[16, 16]}>
           <Col xs={24} sm={24} md={12} lg={6} xl={6}>
             {/* Left side content with collapsible panels containing checkboxes */}
-            <div style={{ height: '600px', overflowY: 'auto', border: '1px solid #ccc', padding: '10px' }}>
+            <div style={{ maxHeight: `${maxHeight}px`, overflow: 'auto', border: '1px solid #ccc', padding: '10px' }}>
               <List
-                height={500}
+                height={maxHeight}
                 itemCount={filteredData.length}
                 itemSize={100} // Height of each item in the list
                 width={300}
