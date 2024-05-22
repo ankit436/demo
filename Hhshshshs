@@ -1,0 +1,11 @@
+.sticky-sider {
+  position: -webkit-sticky; /* For Safari */
+  position: sticky;
+  top: 0;
+  height: 100vh; /* Make the sidebar take full viewport height */
+  overflow: auto; /* Add scrollbar if necessary */
+}
+
+.site-layout-background {
+  background: #fff;
+}
