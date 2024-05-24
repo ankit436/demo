@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button, Typography, message } from 'antd';
 import { CopyOutlined } from '@ant-design/icons';
 
@@ -6,21 +6,26 @@ const { Text } = Typography;
 
 const ClipboardComponent = () => {
   const textToCopy = "This is the text to copy";
+  const [messageKey, setMessageKey] = useState(null);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(textToCopy)
       .then(() => {
-        message.success('Text copied to clipboard!');
+        message.success({ content: 'Text copied to clipboard!', key: messageKey });
       })
       .catch(err => {
-        message.error('Failed to copy text: ', err);
+        message.error({ content: 'Failed to copy text: ' + err, key: messageKey });
       });
+  };
+
+  const showMessage = () => {
+    setMessageKey(new Date().getTime()); // Update key to override existing message
   };
 
   return (
     <div style={{ padding: '20px' }}>
       <Text>{textToCopy}</Text>
-      <Button type="primary" icon={<CopyOutlined />} onClick={handleCopy} style={{ marginLeft: '10px' }}>
+      <Button type="primary" icon={<CopyOutlined />} onClick={handleCopy} onClick={showMessage} style={{ marginLeft: '10px' }}>
         Copy to Clipboard
       </Button>
     </div>
