@@ -1,0 +1,39 @@
+import React from 'react';
+import { Steps, Card } from 'antd';
+
+const { Step } = Steps;
+
+const App = () => {
+  return (
+    <div style={{ padding: '24px' }}>
+      <Steps direction="vertical" size="small" current={0}>
+        <Step title="Step 1" description="Description for step 1">
+          <Card bordered={false}>
+            <Steps direction="vertical" size="small" current={0}>
+              <Step title="Sub-step 1.1" description="Description for sub-step 1.1" />
+              <Step title="Sub-step 1.2" description="Description for sub-step 1.2" />
+            </Steps>
+          </Card>
+        </Step>
+        <Step title="Step 2" description="Description for step 2">
+          <Card bordered={false}>
+            <Steps direction="vertical" size="small" current={0}>
+              <Step title="Sub-step 2.1" description="Description for sub-step 2.1" />
+              <Step title="Sub-step 2.2" description="Description for sub-step 2.2" />
+            </Steps>
+          </Card>
+        </Step>
+        <Step title="Step 3" description="Description for step 3">
+          <Card bordered={false}>
+            <Steps direction="vertical" size="small" current={0}>
+              <Step title="Sub-step 3.1" description="Description for sub-step 3.1" />
+              <Step title="Sub-step 3.2" description="Description for sub-step 3.2" />
+            </Steps>
+          </Card>
+        </Step>
+      </Steps>
+    </div>
+  );
+};
+
+export default App;
