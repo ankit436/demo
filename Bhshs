@@ -1,0 +1,59 @@
+import React, { useState, useEffect } from 'react';
+import { Modal, Button } from 'antd';
+import 'antd/dist/antd.css';
+
+const App = () => {
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [maxHeight, setMaxHeight] = useState(window.innerHeight);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setMaxHeight(window.innerHeight);
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    // Clean up the event listener on component unmount
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
+  const showModal = () => {
+    setIsModalVisible(true);
+  };
+
+  const handleOk = () => {
+    setIsModalVisible(false);
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+  };
+
+  return (
+    <div>
+      <Button type="primary" onClick={showModal}>
+        Open Modal
+      </Button>
+      <Modal
+        title="Max Height Modal"
+        visible={isModalVisible}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        bodyStyle={{ maxHeight: maxHeight - 100, overflowY: 'auto' }}
+        style={{ top: 20 }}
+      >
+        <div>
+          {/* Content that might need scrolling */}
+          <p>Content goes here...</p>
+          <p>Content goes here...</p>
+          <p>Content goes here...</p>
+          {/* Add more content to enable scrolling if necessary */}
+        </div>
+      </Modal>
+    </div>
+  );
+};
+
+export default App;
