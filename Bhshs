@@ -57,3 +57,26 @@ const App = () => {
 };
 
 export default App;
+
+import { useState, useEffect } from 'react';
+
+const useMaxHeight = () => {
+  const [maxHeight, setMaxHeight] = useState(window.innerHeight);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setMaxHeight(window.innerHeight);
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    // Clean up the event listener on component unmount
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
+  return maxHeight;
+};
+
+export default useMaxHeight;
