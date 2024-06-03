@@ -1,38 +1,50 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export const usePageSize = (initialCount = 20) => {
   const [pageSize, setPageSize] = useState(initialCount);
+  const contentRef = useRef(null);
 
   useEffect(() => {
-    const handleResize = () => {
-      if (window.innerHeight < 500) {
+    const handleResize = (height) => {
+      if (height < 500) {
         setPageSize(5);
-      } else if (window.innerHeight >= 500 && window.innerHeight < 600) {
+      } else if (height >= 500 && height < 600) {
         setPageSize(3);
-      } else if (window.innerHeight >= 600 && window.innerHeight < 700) {
+      } else if (height >= 600 && height < 700) {
         setPageSize(9);
-      } else if (window.innerHeight >= 700 && window.innerHeight < 750) {
+      } else if (height >= 700 && height < 750) {
         setPageSize(10);
-      } else if (window.innerHeight >= 750 && window.innerHeight < 800) {
+      } else if (height >= 750 && height < 800) {
         setPageSize(12);
-      } else if (window.innerHeight >= 800 && window.innerHeight < 900) {
+      } else if (height >= 800 && height < 900) {
         setPageSize(14);
-      } else if (window.innerHeight >= 900 && window.innerHeight < 950) {
+      } else if (height >= 900 && height < 950) {
         setPageSize(15);
-      } else if (window.innerHeight >= 950 && window.innerHeight < 1200) {
+      } else if (height >= 950 && height < 1200) {
         setPageSize(18);
       } else {
         setPageSize(20);
       }
     };
 
-    handleResize(); // Set the initial page size based on the current window height
-    window.addEventListener('resize', handleResize);
-    
+    const observer = new ResizeObserver((entries) => {
+      for (let entry of entries) {
+        handleResize(entry.contentRect.height);
+      }
+    });
+
+    if (contentRef.current) {
+      observer.observe(contentRef.current);
+      // Set initial size based on current content height
+      handleResize(contentRef.current.getBoundingClientRect().height);
+    }
+
     return () => {
-      window.removeEventListener('resize', handleResize);
+      if (contentRef.current) {
+        observer.unobserve(contentRef.current);
+      }
     };
   }, []);
 
-  return pageSize;
+  return [pageSize, contentRef];
 };
