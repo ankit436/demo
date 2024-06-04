@@ -1,0 +1,25 @@
+const MyForm = () => {
+  const [form] = Form.useForm();
+
+  const validateName = async (rule, value) => {
+    if (!value) {
+      return Promise.resolve(); // resolve if the field is empty (not required)
+    }
+
+    // Simulate an API call to check for existing name (replace with your actual logic)
+    const response = await fetch(`/api/check-name?name=${value}`);
+    const data = await response.json();
+
+    if (data.exists) {
+      return Promise.reject('Name already exists!');
+    }
+    return Promise.resolve();
+  };
+
+  const rules = [
+    { required: true, message: 'Please enter your name!' },
+    { validator: validateName, message: 'Name already exists!' },
+  ];
+
+  // Rest of the form code...
+};
