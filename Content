@@ -1,0 +1,51 @@
+import React, { useState, useRef, useEffect } from 'react';
+import { Modal, Button } from 'antd';
+
+const DynamicWidthModal = () => {
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [modalWidth, setModalWidth] = useState(520); // Default modal width
+  const contentRef = useRef(null);
+
+  const showModal = () => {
+    setIsModalVisible(true);
+  };
+
+  const handleOk = () => {
+    setIsModalVisible(false);
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+  };
+
+  useEffect(() => {
+    if (isModalVisible && contentRef.current) {
+      const contentWidth = contentRef.current.offsetWidth;
+      setModalWidth(contentWidth + 40); // Adding some padding
+    }
+  }, [isModalVisible]);
+
+  return (
+    <div>
+      <Button type="primary" onClick={showModal}>
+        Open Modal
+      </Button>
+      <Modal
+        title="Dynamic Width Modal"
+        visible={isModalVisible}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        style={{ maxWidth: '90vw', width: modalWidth }}
+      >
+        <div ref={contentRef} style={{ padding: '20px' }}>
+          {/* Your modal content here */}
+          <p>This is some dynamic content that determines the width of the modal.</p>
+          <p>It can be any content, and the modal width will adjust accordingly.</p>
+          <p>Make sure the content is properly measured to fit within the modal.</p>
+        </div>
+      </Modal>
+    </div>
+  );
+};
+
+export default DynamicWidthModal;
