@@ -1,0 +1,40 @@
+import React, { useState } from 'react';
+import { Table } from 'antd';
+import 'antd/dist/antd.css';
+import CustomPagination from './CustomPagination';
+import './CustomTable.css'; // Custom CSS file for table
+
+const CustomTable = ({ data, columns, ...props }) => {
+  const [current, setCurrent] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
+  const handlePageChange = (page, newPageSize) => {
+    setCurrent(page);
+    setPageSize(newPageSize);
+  };
+
+  const paginatedData = data.slice((current - 1) * pageSize, current * pageSize);
+
+  return (
+    <div className="custom-table">
+      <Table
+        dataSource={paginatedData}
+        columns={columns}
+        pagination={false}
+        rowKey="id" // Adjust according to your data
+        {...props} // Pass all other props to the Table
+      />
+      <div className="custom-pagination">
+        <CustomPagination
+          current={current}
+          total={data.length}
+          pageSize={pageSize}
+          onChange={handlePageChange}
+          onShowSizeChange={handlePageChange}
+        />
+      </div>
+    </div>
+  );
+};
+
+export default CustomTable;
