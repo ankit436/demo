@@ -1,0 +1,23 @@
+import React from 'react';
+import { Pagination } from 'antd';
+import 'antd/dist/antd.css';
+import './CustomPagination.css'; // Custom CSS file for pagination
+
+const CustomPagination = ({ current, total, pageSize, onChange, onShowSizeChange }) => {
+  return (
+    <div className="custom-pagination-container">
+      <Pagination
+        current={current}
+        total={total}
+        pageSize={pageSize}
+        onChange={onChange}
+        onShowSizeChange={onShowSizeChange}
+        showSizeChanger
+        showQuickJumper
+        pageSizeOptions={['10', '20', '30', '40']}
+      />
+    </div>
+  );
+};
+
+export default CustomPagination;
