@@ -1,0 +1,27 @@
+import React, { useState } from 'react';
+import { DatePicker } from 'antd';
+import 'antd/dist/antd.css'; // Import Ant Design styles
+import moment from 'moment';
+
+const MyDatePicker = () => {
+  // Define the list of enabled dates
+  const [enabledDates] = useState([
+    '2024-06-20',
+    '2024-06-21',
+    '2024-06-25'
+  ].map(date => moment(date)));
+
+  // Define the function to disable dates not in the enabled list
+  const disabledDate = (current) => {
+    // Check if the current date is not in the list of enabled dates
+    return !enabledDates.some(date => date.isSame(current, 'day'));
+  };
+
+  return (
+    <div style={{ width: '100%', height: '100%' }}>
+      <DatePicker disabledDate={disabledDate} />
+    </div>
+  );
+};
+
+export default MyDatePicker;
