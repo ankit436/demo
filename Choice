@@ -1,0 +1,20 @@
+import React from 'react';
+import { Button, Space } from 'antd';
+import { useNavigate } from 'react-router-dom';
+
+const ChoicePage = () => {
+  const navigate = useNavigate();
+
+  return (
+    <Space direction="vertical">
+      <Button type="primary" onClick={() => navigate('/new')}>
+        Go to New Website
+      </Button>
+      <Button onClick={() => navigate('/old')}>
+        Go to Old Website
+      </Button>
+    </Space>
+  );
+};
+
+export default ChoicePage;
