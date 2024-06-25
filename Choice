@@ -1,20 +1,37 @@
 import React from 'react';
-import { Button, Space } from 'antd';
+import { Modal, Button, Space } from 'antd';
 import { useNavigate } from 'react-router-dom';
 
-const ChoicePage = () => {
+const ChoiceModal = ({ isVisible, onClose }) => {
   const navigate = useNavigate();
 
+  const handleNewWebsite = () => {
+    navigate('/new');
+    onClose();
+  };
+
+  const handleOldWebsite = () => {
+    navigate('/old');
+    onClose();
+  };
+
   return (
-    <Space direction="vertical">
-      <Button type="primary" onClick={() => navigate('/new')}>
-        Go to New Website
-      </Button>
-      <Button onClick={() => navigate('/old')}>
-        Go to Old Website
-      </Button>
-    </Space>
+    <Modal
+      title="Choose a Website"
+      visible={isVisible}
+      onCancel={onClose}
+      footer={null}
+    >
+      <Space direction="vertical" style={{ width: '100%' }}>
+        <Button type="primary" onClick={handleNewWebsite} block>
+          Go to New Website
+        </Button>
+        <Button onClick={handleOldWebsite} block>
+          Go to Old Website
+        </Button>
+      </Space>
+    </Modal>
   );
 };
 
-export default ChoicePage;
+export default ChoiceModal;
