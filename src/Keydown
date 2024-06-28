@@ -1,0 +1,33 @@
+import React, { useEffect } from 'react';
+
+const BackspaceButton = () => {
+  const handleKeyDown = (event) => {
+    // Check if the key pressed is the Backspace key
+    if (event.key === 'Backspace' || event.keyCode === 8) {
+      // Trigger the button click
+      document.getElementById('myButton').click();
+    }
+  };
+
+  useEffect(() => {
+    // Add keydown event listener
+    window.addEventListener('keydown', handleKeyDown);
+
+    // Cleanup event listener on component unmount
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
+  const handleClick = () => {
+    alert('Backspace pressed!');
+  };
+
+  return (
+    <div>
+      <button id="myButton" onClick={handleClick}>Click Me</button>
+    </div>
+  );
+};
+
+export default BackspaceButton;
