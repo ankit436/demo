@@ -1,16 +1,28 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 
-const BackspaceButton = () => {
+const KeyPressHandler = () => {
+  const [message, setMessage] = useState('Press Backspace or Arrow keys');
+  const [position, setPosition] = useState(0);
+
   const handleKeyDown = (event) => {
-    // Check if the key pressed is the Backspace key
-    if (event.key === 'Backspace' || event.keyCode === 8) {
-      // Trigger the button click
-      document.getElementById('myButton').click();
+    switch (event.key) {
+      case 'Backspace':
+        setMessage('Backspace key pressed!');
+        break;
+      case 'ArrowLeft':
+        setPosition((prev) => Math.max(prev - 1, 0));
+        setMessage('Left arrow key pressed!');
+        break;
+      case 'ArrowRight':
+        setPosition((prev) => prev + 1);
+        setMessage('Right arrow key pressed!');
+        break;
+      default:
+        break;
     }
   };
 
   useEffect(() => {
-    // Add keydown event listener
     window.addEventListener('keydown', handleKeyDown);
 
     // Cleanup event listener on component unmount
@@ -19,15 +31,12 @@ const BackspaceButton = () => {
     };
   }, []);
 
-  const handleClick = () => {
-    alert('Backspace pressed!');
-  };
-
   return (
     <div>
-      <button id="myButton" onClick={handleClick}>Click Me</button>
+      <p>{message}</p>
+      <p>Position: {position}</p>
     </div>
   );
 };
 
-export default BackspaceButton;
+export default KeyPressHandler;
