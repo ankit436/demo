@@ -1,0 +1,104 @@
+import React, { useState, useEffect, useRef } from 'react';
+import styled, { keyframes } from 'styled-components';
+import { Typography } from 'antd';
+
+const { Text } = Typography;
+
+const blink = keyframes`
+  50% {
+    opacity: 0;
+  }
+`;
+
+const BlinkingCursor = styled.span`
+  &:after {
+    content: '|';
+    animation: ${blink} 1s step-start infinite;
+    font-size: 32px; /* Adjust for 2x scale */
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    line-height: 1;
+  }
+`;
+
+const ROIIntakeBg = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+`;
+
+const PatternItem = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-bottom: 4px;
+  padding: 8px;
+  position: relative;
+  cursor: default;
+  border: none;
+  flex: 0 1 auto;
+`;
+
+const LastElement = styled.div`
+  flex-grow: ${(props) => (props.isLast ? 1 : 0)};
+  min-width: 1px;
+  cursor: pointer;
+  background: rgba(0, 0, 0, 0.05); /* Optional: add a light background to visualize the filler */
+`;
+
+const App = ({ pattern, renderPattern }) => {
+  const [selected, setSelected] = useState(null);
+  const containerRef = useRef(null);
+  const [lastInRow, setLastInRow] = useState([]);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (container) {
+      const children = Array.from(container.children);
+      const lastInRowItems = [];
+      let previousTop = null;
+
+      children.forEach((child, index) => {
+        const { top } = child.getBoundingClientRect();
+        if (previousTop !== null && top > previousTop) {
+          lastInRowItems[lastInRowItems.length - 1].isLast = true;
+        }
+        lastInRowItems.push({ element: child, isLast: false });
+        previousTop = top;
+      });
+
+      if (lastInRowItems.length > 0) {
+        lastInRowItems[lastInRowItems.length - 1].isLast = true;
+      }
+
+      setLastInRow(lastInRowItems);
+    }
+  }, [pattern]);
+
+  const handleItemClick = (n) => {
+    setSelected(selected === n ? null : n);
+  };
+
+  const handleSpaceClick = (n) => {
+    setSelected(n);
+  };
+
+  return (
+    <ROIIntakeBg ref={containerRef}>
+      {pattern.map((it, n) => {
+        const isLast = lastInRow[n]?.isLast || false;
+        return (
+          <PatternItem key={n} onClick={() => handleItemClick(n)} style={{ flexGrow: isLast ? 1 : 0 }}>
+            <span className={selected === n ? 'blinking-cursor' : ''}>
+              &nbsp;&nbsp;
+            </span>
+            {renderPattern(it, n)}
+          </PatternItem>
+        );
+      })}
+    </ROIIntakeBg>
+  );
+};
+
+export default App;
