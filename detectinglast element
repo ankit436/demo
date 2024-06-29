@@ -52,29 +52,41 @@ const App = ({ pattern, renderPattern }) => {
   const containerRef = useRef(null);
   const [lastInRow, setLastInRow] = useState([]);
 
-  useEffect(() => {
-    const container = containerRef.current;
-    if (container) {
-      const children = Array.from(container.children);
-      const lastInRowItems = [];
-      let previousTop = null;
+const containerRef = useRef(null);
+  const [lastInRow, setLastInRow] = useState([]);
 
-      children.forEach((child, index) => {
-        const { top } = child.getBoundingClientRect();
-        if (previousTop !== null && top > previousTop) {
+  useEffect(() => {
+    const updateLastInRow = () => {
+      const container = containerRef.current;
+      if (container) {
+        const children = Array.from(container.children);
+        const lastInRowItems = [];
+        let previousTop = null;
+
+        children.forEach((child, index) => {
+          const { top } = child.getBoundingClientRect();
+          if (previousTop !== null && top > previousTop) {
+            lastInRowItems[lastInRowItems.length - 1].isLast = true;
+          }
+          lastInRowItems.push({ element: child, isLast: false });
+          previousTop = top;
+        });
+
+        if (lastInRowItems.length > 0) {
           lastInRowItems[lastInRowItems.length - 1].isLast = true;
         }
-        lastInRowItems.push({ element: child, isLast: false });
-        previousTop = top;
-      });
 
-      if (lastInRowItems.length > 0) {
-        lastInRowItems[lastInRowItems.length - 1].isLast = true;
+        setLastInRow(lastInRowItems);
       }
+    };
 
-      setLastInRow(lastInRowItems);
-    }
+    updateLastInRow();
+    window.addEventListener("resize", updateLastInRow);
+    return () => window.removeEventListener("resize", updateLastInRow);
   }, [pattern]);
+
+
+
 
   const handleItemClick = (n) => {
     setSelected(selected === n ? null : n);
