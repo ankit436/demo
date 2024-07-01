@@ -1,17 +1,17 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useCallback } from 'react';
 
 const useNumberInput = () => {
   const inputRef = useRef(null);
 
-  useEffect(() => {
-    const handleInput = (event) => {
-      const value = event.target.value;
-      const newValue = value.replace(/[^0-9]/g, '');
-      if (newValue !== value) {
-        event.target.value = newValue;
-      }
-    };
+  const handleInput = useCallback((event) => {
+    const value = event.target.value;
+    const newValue = value.replace(/[^0-9]/g, '');
+    if (newValue !== value) {
+      event.target.value = newValue;
+    }
+  }, []);
 
+  useEffect(() => {
     const inputElement = inputRef.current;
     if (inputElement) {
       inputElement.addEventListener('input', handleInput);
@@ -22,7 +22,7 @@ const useNumberInput = () => {
         inputElement.removeEventListener('input', handleInput);
       }
     };
-  }, [inputRef.current]);
+  }, [handleInput]);
 
   return inputRef;
 };
