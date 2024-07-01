@@ -1,0 +1,30 @@
+import { useRef, useEffect } from 'react';
+
+const useNumberInput = () => {
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    const handleInput = (event) => {
+      const value = event.target.value;
+      const newValue = value.replace(/[^0-9]/g, '');
+      if (newValue !== value) {
+        event.target.value = newValue;
+      }
+    };
+
+    const inputElement = inputRef.current;
+    if (inputElement) {
+      inputElement.addEventListener('input', handleInput);
+    }
+
+    return () => {
+      if (inputElement) {
+        inputElement.removeEventListener('input', handleInput);
+      }
+    };
+  }, []);
+
+  return inputRef;
+};
+
+export default useNumberInput;
