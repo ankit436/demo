@@ -22,7 +22,7 @@ const useNumberInput = () => {
         inputElement.removeEventListener('input', handleInput);
       }
     };
-  }, []);
+  }, [inputRef.current]);
 
   return inputRef;
 };
