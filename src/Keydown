@@ -48,7 +48,7 @@ const LastElement = styled.div`
 `;
 
 const App = ({ pattern, renderPattern }) => {
-  const [selected, setSelected] = useState(null);
+  const [selected, setSelected] = useState(-1); // Initialize selected to -1
   const containerRef = useRef(null);
   const [lastInRow, setLastInRow] = useState([]);
 
@@ -78,33 +78,42 @@ const App = ({ pattern, renderPattern }) => {
 
   useEffect(() => {
     const handleKeyDown = (event) => {
-      if (selected !== null) {
-        let newSelected = selected;
-        const container = containerRef.current;
-        const children = Array.from(container.children);
+      let newSelected = selected;
+      const container = containerRef.current;
+      const children = Array.from(container.children);
 
-        if (event.key === 'ArrowRight') {
-          newSelected = (selected + 1) % children.length;
-        } else if (event.key === 'ArrowLeft') {
+      if (event.key === 'ArrowRight') {
+        newSelected = (selected + 1) % children.length;
+      } else if (event.key === 'ArrowLeft') {
+        if (selected !== -1) {
           newSelected = (selected - 1 + children.length) % children.length;
-        } else if (event.key === 'ArrowDown') {
+        }
+      } else if (event.key === 'ArrowDown') {
+        if (selected !== -1) {
           const { top } = children[selected].getBoundingClientRect();
           newSelected = children.findIndex((child, index) => index > selected && child.getBoundingClientRect().top > top);
           if (newSelected === -1) {
             newSelected = selected; // No item found, stay on the same item
           }
-        } else if (event.key === 'ArrowUp') {
+        } else {
+          newSelected = 0; // If nothing is selected, select the first item
+        }
+      } else if (event.key === 'ArrowUp') {
+        if (selected !== -1) {
           const { top } = children[selected].getBoundingClientRect();
-          newSelected = [...children].reverse().findIndex((child, index) => children.length - 1 - index < selected && child.getBoundingClientRect().top < top);
+          const itemsAbove = children.slice(0, selected).reverse();
+          newSelected = itemsAbove.findIndex((child) => child.getBoundingClientRect().top < top);
           if (newSelected !== -1) {
-            newSelected = children.length - 1 - newSelected;
+            newSelected = selected - (newSelected + 1);
           } else {
             newSelected = selected; // No item found, stay on the same item
           }
+        } else {
+          newSelected = 0; // If nothing is selected, select the first item
         }
-
-        setSelected(newSelected);
       }
+
+      setSelected(newSelected);
     };
 
     window.addEventListener('keydown', handleKeyDown);
@@ -114,7 +123,7 @@ const App = ({ pattern, renderPattern }) => {
   }, [selected]);
 
   const handleItemClick = (n) => {
-    setSelected(selected === n ? null : n);
+    setSelected(selected === n ? -1 : n);
   };
 
   const handleSpaceClick = (n) => {
