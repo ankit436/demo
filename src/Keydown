@@ -1,42 +1,141 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import styled, { keyframes } from 'styled-components';
+import { Typography } from 'antd';
 
-const KeyPressHandler = () => {
-  const [message, setMessage] = useState('Press Backspace or Arrow keys');
-  const [position, setPosition] = useState(0);
+const { Text } = Typography;
 
-  const handleKeyDown = (event) => {
-    switch (event.key) {
-      case 'Backspace':
-        setMessage('Backspace key pressed!');
-        break;
-      case 'ArrowLeft':
-        setPosition((prev) => Math.max(prev - 1, 0));
-        setMessage('Left arrow key pressed!');
-        break;
-      case 'ArrowRight':
-        setPosition((prev) => prev + 1);
-        setMessage('Right arrow key pressed!');
-        break;
-      default:
-        break;
-    }
-  };
+const blink = keyframes`
+  50% {
+    opacity: 0;
+  }
+`;
+
+const BlinkingCursor = styled.span`
+  &:after {
+    content: '|';
+    animation: ${blink} 1s step-start infinite;
+    font-size: 32px; /* Adjust for 2x scale */
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    line-height: 1;
+  }
+`;
+
+const ROIIntakeBg = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+`;
+
+const PatternItem = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-bottom: 4px;
+  padding: 8px;
+  position: relative;
+  cursor: default;
+  border: none;
+  flex: 0 1 auto;
+`;
+
+const LastElement = styled.div`
+  flex-grow: ${(props) => (props.isLast ? 1 : 0)};
+  min-width: 1px;
+  cursor: pointer;
+  background: rgba(0, 0, 0, 0.05); /* Optional: add a light background to visualize the filler */
+`;
+
+const App = ({ pattern, renderPattern }) => {
+  const [selected, setSelected] = useState(null);
+  const containerRef = useRef(null);
+  const [lastInRow, setLastInRow] = useState([]);
 
   useEffect(() => {
-    window.addEventListener('keydown', handleKeyDown);
+    const container = containerRef.current;
+    if (container) {
+      const children = Array.from(container.children);
+      const lastInRowItems = [];
+      let previousTop = null;
 
-    // Cleanup event listener on component unmount
+      children.forEach((child, index) => {
+        const { top } = child.getBoundingClientRect();
+        if (previousTop !== null && top > previousTop) {
+          lastInRowItems[lastInRowItems.length - 1].isLast = true;
+        }
+        lastInRowItems.push({ element: child, isLast: false });
+        previousTop = top;
+      });
+
+      if (lastInRowItems.length > 0) {
+        lastInRowItems[lastInRowItems.length - 1].isLast = true;
+      }
+
+      setLastInRow(lastInRowItems);
+    }
+  }, [pattern]);
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (selected !== null) {
+        let newSelected = selected;
+        const container = containerRef.current;
+        const children = Array.from(container.children);
+
+        if (event.key === 'ArrowRight') {
+          newSelected = (selected + 1) % children.length;
+        } else if (event.key === 'ArrowLeft') {
+          newSelected = (selected - 1 + children.length) % children.length;
+        } else if (event.key === 'ArrowDown') {
+          const { top } = children[selected].getBoundingClientRect();
+          newSelected = children.findIndex((child, index) => index > selected && child.getBoundingClientRect().top > top);
+          if (newSelected === -1) {
+            newSelected = selected; // No item found, stay on the same item
+          }
+        } else if (event.key === 'ArrowUp') {
+          const { top } = children[selected].getBoundingClientRect();
+          newSelected = [...children].reverse().findIndex((child, index) => children.length - 1 - index < selected && child.getBoundingClientRect().top < top);
+          if (newSelected !== -1) {
+            newSelected = children.length - 1 - newSelected;
+          } else {
+            newSelected = selected; // No item found, stay on the same item
+          }
+        }
+
+        setSelected(newSelected);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, []);
+  }, [selected]);
+
+  const handleItemClick = (n) => {
+    setSelected(selected === n ? null : n);
+  };
+
+  const handleSpaceClick = (n) => {
+    setSelected(n);
+  };
 
   return (
-    <div>
-      <p>{message}</p>
-      <p>Position: {position}</p>
-    </div>
+    <ROIIntakeBg ref={containerRef}>
+      {pattern.map((it, n) => {
+        const isLast = lastInRow[n]?.isLast || false;
+        return (
+          <PatternItem key={n} onClick={() => handleItemClick(n)} style={{ flexGrow: isLast ? 1 : 0 }}>
+            <span className={selected === n ? 'blinking-cursor' : ''}>
+              &nbsp;&nbsp;
+            </span>
+            {renderPattern(it, n)}
+          </PatternItem>
+        );
+      })}
+    </ROIIntakeBg>
   );
 };
 
-export default KeyPressHandler;
+export default App;
