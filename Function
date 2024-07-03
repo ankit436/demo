@@ -1,0 +1,50 @@
+def temp(param):
+    print(f"Executing temp function with param: {param}")
+    # Add your function logic here
+
+# Function dictionary to map function names to actual function references
+function_dict = {
+    'temp()': temp,
+}
+
+delApi_dict = {
+    '/projects/report_type/del': {'key': 'REPORT', 'jsonPath': 'oldData', 'function': 'temp()'},
+    '/projects/expression/del': {'key': 'CASH REPORT', 'jsonPath': '', 'function': 'temp()'},
+    '/mgmt/file/del': {'key': 'FILE', 'jsonPath': '', 'function': 'temp()'},
+    '/mgmt/programs/del': {'key': 'PROGRAM', 'jsonPath': '', 'function': 'temp()'},
+    '/bu/del': {'key': 'BU', 'jsonPath': '', 'function': 'temp()'},
+    '/mgmt/entitlement/delete': {'key': 'ENTITLEMENT', 'jsonPath': '', 'function': 'temp()'},
+    '/metrics/del': {'key': 'METRIC', 'jsonPath': 'oldData', 'function': 'temp()'},
+    '/projects/del': {'key': 'PROJECT', 'jsonPath': '', 'function': 'temp()'},
+    '/mgmt/deleteTable': {'key': 'TABLE', 'jsonPath': '', 'function': 'temp()'},
+    '/projects/metrics/report/del': {'key': 'METRIC REPORT', 'jsonPath': 'oldData', 'function': 'temp()'},
+    '/projects/status/del': {'key': 'PROJECT STATUS', 'jsonPath': 'oldData', 'function': 'temp()'},
+    '/temp/function': {'key': 'TEMP FUNCTION', 'jsonPath': '', 'function': 'temp()'}
+}
+
+addApi_dict = {
+    '/mgmt/entitlement/add': {'key': 'ENTITLEMENT', 'jsonPath': '', 'function': 'temp()'},
+    '/metrics/add': {'key': 'METRIC', 'jsonPath': '', 'function': 'temp()'},
+    '/projects/metrics/report/add': {'key': 'METRIC REPORT', 'jsonPath': '', 'function': 'temp()'},
+    '/projects/status/add': {'key': 'PROJECT STATUS', 'jsonPath': '', 'function': 'temp()'},
+    '/projects/report_type/add': {'key': 'REPORT', 'jsonPath': '', 'function': 'temp()'},
+    '/projects/expression/add': {'key': 'CASH REPORT', 'jsonPath': '', 'function': 'temp()'},
+    '/bu/add': {'key': 'BU', 'jsonPath': '', 'function': 'temp()'},
+    '/mgmt/programs/add': {'key': 'PROGRAM', 'jsonPath': '', 'function': 'temp()'},
+    '/mgmt/file/upload': {'key': 'FILE UPLOAD', 'jsonPath': '', 'function': 'temp()'},
+    '/temp/function': {'key': 'TEMP FUNCTION', 'jsonPath': '', 'function': 'temp()'}
+}
+
+UpdateApi_dict = {
+    '/projects/update': {'key': 'PROJECT', 'jsonPath': '', 'function': 'temp()'},
+    '/projects/hidden/update': {'key': 'HIDDEN PROJECT', 'jsonPath': '', 'function': 'temp()'},
+    '/projects/metrics/report/update': {'key': 'PROJECT METRIC REPORT', 'jsonPath': '', 'function': 'temp()'},
+    '/projects/status/update': {'key': 'PROJECT STATUS', 'jsonPath': 'content', 'function': 'temp()'},
+    '/projects/report_type/update': {'key': 'REPORT', 'jsonPath': '', 'function': 'temp()'},
+    '/projects/expression/update': {'key': 'CASH REPORT', 'jsonPath': 'content', 'function': 'temp()'},
+    '/projects/intake/update': {'key': 'PROJECT INTAKE', 'jsonPath': '', 'function': 'temp()'},
+    '/projects/intake/update_clob': {'key': 'PROJECT INTAKE CLOB', 'jsonPath': '', 'function': 'temp()'},
+    '/bu/update': {'key': 'BU', 'jsonPath': '', 'function': 'temp()'},
+    '/metrics/update': {'key': 'METRIC', 'jsonPath': '', 'function': 'temp()'},
+    '/temp/function': {'key': 'TEMP FUNCTION', 'jsonPath': '', 'function': 'temp()'}
+}
