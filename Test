@@ -1,0 +1,29 @@
+CREATE MATERIALIZED VIEW PROJECT_MV AS
+SELECT
+    id,
+    atrack_id,
+    name,
+    start_date,
+    end_date,
+    type,
+    sponsor,
+    it_owner,
+    business_owner,
+    status,
+    data_steward,
+    business_evp,
+    fund,
+    program,
+    phase,
+    security_group,
+    bu_id,
+    hidden,
+    beneficiary_client_count,
+    beneficiary_client_name,
+    region,
+    benefit_type,
+    standardized_benefit_type,
+    project_description,
+    opportunity_id
+FROM
+    RNDATA_ROI_PROJECT;
