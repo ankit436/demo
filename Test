@@ -306,3 +306,104 @@ def list_projects(bu_id, program, phase, projectId=""):
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+
+
+
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import text
+
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'oracle://username:password@host:port/dbname'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
+
+@app.before_first_request
+def create_partitioned_materialized_view():
+    create_mv_sql = """
+    CREATE MATERIALIZED VIEW PROJECT_MV
+    PARTITION BY HASH (id)
+    PARTITIONS 8
+    AS
+    SELECT
+        id,
+        atrack_id,
+        name,
+        start_date,
+        end_date,
+        type,
+        sponsor,
+        it_owner,
+        business_owner,
+        status,
+        data_steward,
+        business_evp,
+        fund,
+        program,
+        phase,
+        security_group,
+        bu_id,
+        hidden,
+        beneficiary_client_count,
+        beneficiary_client_name,
+        region,
+        benefit_type,
+        standardized_benefit_type,
+        project_description,
+        opportunity_id
+    FROM
+        RNDATA_ROI_PROJECT;
+    """
+    db.engine.execute(text(create_mv_sql))
+
+@app.route('/refresh_materialized_view')
+def refresh_materialized_view():
+    refresh_mv_sql = "REFRESH MATERIALIZED VIEW PROJECT_MV"
+    db.engine.execute(text(refresh_mv_sql))
+    return "Materialized view refreshed!"
+
+def list_projects(bu_id, program, phase, projectId=""):
+    with db.session() as session:
+        rows = session.execute(
+            text("""
+            SELECT 
+                id,
+                atrack_id,
+                name,
+                start_date,
+                end_date,
+                type,
+                sponsor,
+                it_owner,
+                business_owner,
+                status,
+                data_steward,
+                business_evp,
+                fund,
+                program,
+                phase,
+                security_group,
+                bu_id,
+                hidden,
+                beneficiary_client_count,
+                beneficiary_client_name,
+                region,
+                benefit_type,
+                standardized_benefit_type,
+                project_description,
+                opportunity_id
+            FROM 
+                PROJECT_MV
+            WHERE 
+                (:bu_id IS NULL OR bu_id = :bu_id) AND
+                (:program IS NULL OR program = :program) AND
+                (:phase IS NULL OR phase = :phase) AND
+                (:projectId IS NULL OR id = :projectId)
+            """),
+            {'bu_id': bu_id, 'program': program, 'phase': phase, 'projectId': projectId}
+        ).fetchall()
+        return [dict(row) for row in rows]
+
+if __name__ == '__main__':
+    app.run(debug=True)
