@@ -515,3 +515,17 @@ def main():
     show_contact_list()
 
 main()
+
+
+
+from org.transcrypt.stubs.browser import window, console
+
+url = '/api/contacts'
+
+window.fetch(url).then(
+    lambda response: response.json() if response.ok else Promise.reject(response)
+).then(
+    lambda data: console.log("Data received:", data)
+).catch(
+    lambda error: console.error("Fetch error:", error)
+)
