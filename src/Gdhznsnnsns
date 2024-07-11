@@ -666,3 +666,108 @@ def main():
     show_contact_list()
 
 main()
+
+
+
+from flask import Flask, render_template, request, jsonify, g
+from sqlalchemy import create_engine, Column, Integer, String
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker, scoped_session
+
+app = Flask(__name__)
+DATABASE_URL = "sqlite:///contacts.db"
+
+engine = create_engine(DATABASE_URL)
+Base = declarative_base()
+# Use scoped_session for thread-safe session management
+Session = scoped_session(sessionmaker(bind=engine))
+
+class Contact(Base):
+    __tablename__ = 'contacts'
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
+    surname = Column(String, nullable=False)
+    phone = Column(String, nullable=False)
+    email = Column(String, nullable=False)
+
+Base.metadata.create_all(engine)
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/api/contacts', methods=['GET', 'POST', 'PUT', 'DELETE'])
+def manage_contacts():
+    session = Session()
+
+    if request.method == 'GET':
+        contacts = session.query(Contact).all()
+        return jsonify([contact_to_dict(contact) for contact in contacts])
+    
+    elif request.method == 'POST':
+        try:
+            data = request.get_json()
+            print("POST data received:", data)  # Debugging log
+            new_contact = Contact(
+                name=data['name'],
+                surname=data['surname'],
+                phone=data['phone'],
+                email=data['email']
+            )
+            session.add(new_contact)
+            session.commit()
+            return jsonify(contact_to_dict(new_contact)), 201
+        except Exception as e:
+            print("Error in POST:", str(e))  # Debugging log
+            return jsonify({'error': str(e)}), 400
+    
+    elif request.method == 'PUT':
+        try:
+            data = request.get_json()
+            print("PUT data received:", data)  # Debugging log
+            contact = session.query(Contact).get(data['id'])
+            if contact:
+                contact.name = data['name']
+                contact.surname = data['surname']
+                contact.phone = data['phone']
+                contact.email = data['email']
+                session.commit()
+                return jsonify(contact_to_dict(contact))
+            else:
+                return jsonify({'error': 'Contact not found'}), 404
+        except Exception as e:
+            print("Error in PUT:", str(e))  # Debugging log
+            return jsonify({'error': str(e)}), 400
+    
+    elif request.method == 'DELETE':
+        try:
+            data = request.get_json()
+            print("DELETE data received:", data)  # Debugging log
+            contact = session.query(Contact).get(data['id'])
+            if contact:
+                session.delete(contact)
+                session.commit()
+                return jsonify({'status': 'success'})
+            else:
+                return jsonify({'error': 'Contact not found'}), 404
+        except Exception as e:
+            print("Error in DELETE:", str(e))  # Debugging log
+            return jsonify({'error': str(e)}), 400
+        finally:
+            session.close()  # Always close the session after the request
+
+@app.teardown_appcontext
+def shutdown_session(exception=None):
+    Session.remove()
+
+def contact_to_dict(contact):
+    return {
+        'id': contact.id,
+        'name': contact.name,
+        'surname': contact.surname,
+        'phone': contact.phone,
+        'email': contact.email
+    }
+
+if __name__ == '__main__':
+    app.run(debug=True)
