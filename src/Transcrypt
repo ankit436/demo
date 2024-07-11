@@ -153,3 +153,181 @@ main()
     <script src="__javascript__/main.js"></script>
 </body>
 </html>
+
+
+
+
+from org.transcrypt.stubs.browser import document
+
+contacts = []
+
+def show_contact_list():
+    document.getElementById("contactList").style.display = "block"
+    document.getElementById("contactForm").style.display = "none"
+
+def show_contact_form(contact_id=None):
+    document.getElementById("contactList").style.display = "none"
+    document.getElementById("contactForm").style.display = "block"
+
+    if contact_id is not None:
+        contact = next(contact for contact in contacts if contact['id'] == contact_id)
+        document.getElementById("contactId").value = contact['id']
+        document.getElementById("contactName").value = contact['name']
+        document.getElementById("contactSurname").value = contact['surname']
+        document.getElementById("contactPhone").value = contact['phone']
+        document.getElementById("contactEmail").value = contact['email']
+    else:
+        document.getElementById("form").reset()
+
+def add_or_update_contact(event):
+    event.preventDefault()
+    contact_id = document.getElementById("contactId").value
+    name = document.getElementById("contactName").value
+    surname = document.getElementById("contactSurname").value
+    phone = document.getElementById("contactPhone").value
+    email = document.getElementById("contactEmail").value
+
+    if contact_id:
+        contact = next(contact for contact in contacts if contact['id'] == int(contact_id))
+        contact['name'] = name
+        contact['surname'] = surname
+        contact['phone'] = phone
+        contact['email'] = email
+    else:
+        new_id = len(contacts) + 1
+        contacts.append({
+            'id': new_id,
+            'name': name,
+            'surname': surname,
+            'phone': phone,
+            'email': email
+        })
+    update_contact_table()
+    show_contact_list()
+
+def update_contact_table():
+    table_body = document.getElementById("contactTableBody")
+    table_body.innerHTML = ''
+    for contact in contacts:
+        row = document.createElement("tr")
+
+        cell_id = document.createElement("td")
+        cell_id.innerHTML = contact['id']
+        row.appendChild(cell_id)
+
+        cell_name = document.createElement("td")
+        cell_name.innerHTML = contact['name']
+        row.appendChild(cell_name)
+
+        cell_surname = document.createElement("td")
+        cell_surname.innerHTML = contact['surname']
+        row.appendChild(cell_surname)
+
+        cell_phone = document.createElement("td")
+        cell_phone.innerHTML = contact['phone']
+        row.appendChild(cell_phone)
+
+        cell_email = document.createElement("td")
+        cell_email.innerHTML = contact['email']
+        row.appendChild(cell_email)
+
+        cell_actions = document.createElement("td")
+        edit_button = document.createElement("button")
+        edit_button.innerHTML = "Edit"
+        edit_button.onclick = lambda contact_id=contact['id']: show_contact_form(contact_id)
+        delete_button = document.createElement("button")
+        delete_button.innerHTML = "Delete"
+        delete_button.onclick = lambda contact_id=contact['id']: delete_contact(contact_id)
+        cell_actions.appendChild(edit_button)
+        cell_actions.appendChild(delete_button)
+        row.appendChild(cell_actions)
+
+        table_body.appendChild(row)
+
+def delete_contact(contact_id):
+    global contacts
+    contacts = [contact for contact in contacts if contact['id'] != contact_id]
+    update_contact_table()
+
+def main():
+    document.getElementById("addContactBtn").onclick = lambda: show_contact_form()
+    document.getElementById("form").onsubmit = add_or_update_contact
+    document.getElementById("backBtn").onclick = show_contact_list
+    # Example contact
+    contacts.append({'id': 1, 'name': 'Pavan', 'surname': 'K', 'phone': '6788990988', 'email': 'pavan@SS.com'})
+    update_contact_table()
+    show_contact_list()
+
+main()
+
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Contact List</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <div id="app">
+        <div id="contactList">
+            <h1>Contact List</h1>
+            <p>This component demonstrates showing data.</p>
+            <button id="addContactBtn">Add new Contact</button>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Surname</th>
+                        <th>Phone Number</th>
+                        <th>Email</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="contactTableBody">
+                    <!-- Contacts will be populated here -->
+                </tbody>
+            </table>
+        </div>
+        <div id="contactForm" style="display:none;">
+            <h1>Add/Update Contact Info</h1>
+            <form id="form">
+                <input type="hidden" id="contactId">
+                <input type="text" id="contactName" placeholder="Name" required>
+                <input type="text" id="contactSurname" placeholder="Surname" required>
+                <input type="text" id="contactPhone" placeholder="Phone Number" required>
+                <input type="email" id="contactEmail" placeholder="Email" required>
+                <button type="submit">Submit</button>
+                <button type="button" id="backBtn">Back</button>
+            </form>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='js/contacts.js') }}"></script>
+</body>
+</html>
+
+
+
+body {
+    font-family: Arial, sans-serif;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+button {
+    margin-right: 5px;
+}
