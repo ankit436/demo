@@ -250,3 +250,130 @@ def contact_to_dict(contact):
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+
+
+from org.transcrypt.stubs.browser import __pragma__, document, window, console
+
+contacts = []
+
+def show_contact_list():
+    document.getElementById("contactList").style.display = "block"
+    document.getElementById("contactForm").style.display = "none"
+
+def show_contact_form(contact_id=None):
+    document.getElementById("contactList").style.display = "none"
+    document.getElementById("contactForm").style.display = "block"
+    
+    if contact_id is not None:
+        contact = next(contact for contact in contacts if contact['id'] == contact_id)
+        document.getElementById("contactId").value = contact['id']
+        document.getElementById("contactName").value = contact['name']
+        document.getElementById("contactSurname").value = contact['surname']
+        document.getElementById("contactPhone").value = contact['phone']
+        document.getElementById("contactEmail").value = contact['email']
+    else:
+        document.getElementById("form").reset()
+
+def add_or_update_contact(event):
+    event.preventDefault()
+    contact_id = document.getElementById("contactId").value
+    name = document.getElementById("contactName").value
+    surname = document.getElementById("contactSurname").value
+    phone = document.getElementById("contactPhone").value
+    email = document.getElementById("contactEmail").value
+    
+    contact = {
+        'id': int(contact_id) if contact_id else None,
+        'name': name,
+        'surname': surname,
+        'phone': phone,
+        'email': email
+    }
+    
+    method = 'PUT' if contact_id else 'POST'
+    url = '/api/contacts'
+    
+    console.log(f"Sending {method} request to {url} with data:", contact)  # Debugging log
+    
+    window.fetch(url, {
+        'method': method,
+        'headers': {'Content-Type': 'application/json'},
+        'body': window.JSON.stringify(contact)
+    }).then(
+        lambda response: response.json() if response.ok else console.log(f"Error: {response.statusText}")
+    ).then(
+        lambda data: update_contact_table() if data else console.log("No data received")
+    ).catch(lambda error: console.log("Fetch error:", error))
+
+    show_contact_list()
+
+def update_contact_table():
+    window.fetch('/api/contacts').then(
+        lambda response: response.json()
+    ).then(
+        lambda data: render_contact_table(data)
+    ).catch(lambda error: console.log("Fetch error:", error))
+
+def render_contact_table(data):
+    global contacts
+    contacts = data
+    table_body = document.getElementById("contactTableBody")
+    table_body.innerHTML = ''
+    for contact in contacts:
+        row = document.createElement("tr")
+        
+        cell_id = document.createElement("td")
+        cell_id.innerHTML = contact['id']
+        row.appendChild(cell_id)
+        
+        cell_name = document.createElement("td")
+        cell_name.innerHTML = contact['name']
+        row.appendChild(cell_name)
+        
+        cell_surname = document.createElement("td")
+        cell_surname.innerHTML = contact['surname']
+        row.appendChild(cell_surname)
+        
+        cell_phone = document.createElement("td")
+        cell_phone.innerHTML = contact['phone']
+        row.appendChild(cell_phone)
+        
+        cell_email = document.createElement("td")
+        cell_email.innerHTML = contact['email']
+        row.appendChild(cell_email)
+        
+        cell_actions = document.createElement("td")
+        edit_button = document.createElement("button")
+        edit_button.innerHTML = "Edit"
+        edit_button.onclick = lambda contact_id=contact['id']: show_contact_form(contact_id)
+        delete_button = document.createElement("button")
+        delete_button.innerHTML = "Delete"
+        delete_button.onclick = lambda contact_id=contact['id']: delete_contact(contact_id)
+        cell_actions.appendChild(edit_button)
+        cell_actions.appendChild(delete_button)
+        row.appendChild(cell_actions)
+        
+        table_body.appendChild(row)
+
+def delete_contact(contact_id):
+    console.log(f"Sending DELETE request with contact ID: {contact_id}")  # Debugging log
+    
+    window.fetch('/api/contacts', {
+        'method': 'DELETE',
+        'headers': {'Content-Type': 'application/json'},
+        'body': window.JSON.stringify({'id': contact_id})
+    }).then(
+        lambda response: response.json() if response.ok else console.log(f"Error: {response.statusText}")
+    ).then(
+        lambda data: update_contact_table() if data else console.log("No data received")
+    ).catch(lambda error: console.log("Fetch error:", error))
+
+def main():
+    document.getElementById("addContactBtn").onclick = lambda: show_contact_form()
+    document.getElementById("form").onsubmit = lambda event: add_or_update_contact(event)
+    document.getElementById("backBtn").onclick = lambda: show_contact_list()
+    update_contact_table()
+    show_contact_list()
+
+main()
