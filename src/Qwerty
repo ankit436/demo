@@ -141,3 +141,184 @@ def main():
     show_contact_list()
 
 main()
+
+
+
+from org.transcrypt.stubs.browser import __pragma__, document, window
+
+contacts = []
+
+def show_contact_list():
+    document.getElementById("contactList").style.display = "block"
+    document.getElementById("contactForm").style.display = "none"
+
+def show_contact_form(contact_id=None):
+    document.getElementById("contactList").style.display = "none"
+    document.getElementById("contactForm").style.display = "block"
+    
+    if contact_id is not None:
+        contact = next((contact for contact in contacts if contact['id'] == contact_id), None)
+        if contact:
+            document.getElementById("contactId").value = str(contact['id'])
+            document.getElementById("contactName").value = contact['name']
+            document.getElementById("contactSurname").value = contact['surname']
+            document.getElementById("contactPhone").value = contact['phone']
+            document.getElementById("contactEmail").value = contact['email']
+    else:
+        reset_contact_form()
+
+def reset_contact_form():
+    document.getElementById("contactId").value = ''
+    document.getElementById("contactName").value = ''
+    document.getElementById("contactSurname").value = ''
+    document.getElementById("contactPhone").value = ''
+    document.getElementById("contactEmail").value = ''
+
+def validate_contact_form():
+    name = document.getElementById("contactName").value.strip()
+    surname = document.getElementById("contactSurname").value.strip()
+    phone = document.getElementById("contactPhone").value.strip()
+    email = document.getElementById("contactEmail").value.strip()
+    
+    if not name:
+        alert("Name is required.")
+        return False
+    
+    if not surname:
+        alert("Surname is required.")
+        return False
+    
+    if not phone:
+        alert("Phone is required.")
+        return False
+    
+    # Basic email format validation
+    if email and not validate_email(email):
+        alert("Invalid email format.")
+        return False
+    
+    return True
+
+def validate_email(email):
+    # Basic email format validation regex
+    email_regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+    return email_regex.test(email)
+
+def add_or_update_contact(event):
+    event.preventDefault()
+    
+    if not validate_contact_form():
+        return
+    
+    contact_id = document.getElementById("contactId").value
+    name = document.getElementById("contactName").value
+    surname = document.getElementById("contactSurname").value
+    phone = document.getElementById("contactPhone").value
+    email = document.getElementById("contactEmail").value
+    
+    contact = {
+        'id': contact_id,  # Assuming backend provides auto-incrementing string IDs
+        'name': name,
+        'surname': surname,
+        'phone': phone,
+        'email': email
+    }
+    
+    method = 'PUT' if contact_id else 'POST'  # Decide method based on presence of contact_id
+    
+    url = '/api/contacts'
+    
+    window.fetch(url, {
+        'method': method,
+        'headers': {'Content-Type': 'application/json'},
+        'body': window.JSON.stringify(contact)
+    }).then(
+        lambda response: response.json()
+    ).then(
+        lambda data: {
+            update_contact_table()
+            show_contact_list()
+            reset_contact_form()  # Reset form fields after successful update or addition
+        }
+    ).catch(
+        lambda error: console.error('Error:', error)  # Log and handle errors
+    )
+
+def update_contact_table():
+    window.fetch('/api/contacts').then(
+        lambda response: response.json()
+    ).then(
+        lambda data: {
+            contacts = data  # Update global contacts data
+            render_contact_table()
+        }
+    ).catch(
+        lambda error: console.error('Error:', error)  # Log and handle errors
+    )
+
+def render_contact_table():
+    table_body = document.getElementById("contactTableBody")
+    table_body.innerHTML = ''
+    for contact in contacts:
+        row = document.createElement("tr")
+        
+        cell_id = document.createElement("td")
+        cell_id.innerHTML = str(contact['id'])
+        row.appendChild(cell_id)
+        
+        cell_name = document.createElement("td")
+        cell_name.innerHTML = contact['name']
+        row.appendChild(cell_name)
+        
+        cell_surname = document.createElement("td")
+        cell_surname.innerHTML = contact['surname']
+        row.appendChild(cell_surname)
+        
+        cell_phone = document.createElement("td")
+        cell_phone.innerHTML = contact['phone']
+        row.appendChild(cell_phone)
+        
+        cell_email = document.createElement("td")
+        cell_email.innerHTML = contact['email']
+        row.appendChild(cell_email)
+        
+        cell_actions = document.createElement("td")
+        
+        # Edit button
+        edit_button = document.createElement("button")
+        edit_button.innerHTML = "Edit"
+        edit_button.onclick = lambda contact_id=contact['id']: show_contact_form(contact_id)
+        cell_actions.appendChild(edit_button)
+        
+        # Delete button
+        delete_button = document.createElement("button")
+        delete_button.innerHTML = "Delete"
+        delete_button.onclick = lambda contact_id=contact['id']: delete_contact(contact_id)
+        cell_actions.appendChild(delete_button)
+        
+        row.appendChild(cell_actions)
+        table_body.appendChild(row)
+
+def delete_contact(contact_id):
+    window.fetch('/api/contacts', {
+        'method': 'DELETE',
+        'headers': {'Content-Type': 'application/json'},
+        'body': window.JSON.stringify({'id': contact_id})
+    }).then(
+        lambda response: response.json()
+    ).then(
+        lambda data: {
+            update_contact_table()
+        }
+    ).catch(
+        lambda error: console.error('Error:', error)  # Log and handle errors
+    )
+
+def main():
+    document.getElementById("addContactBtn").onclick = lambda: show_contact_form()
+    document.getElementById("form").onsubmit = lambda event: add_or_update_contact(event)
+    document.getElementById("backBtn").onclick = lambda: show_contact_list()
+    update_contact_table()
+    show_contact_list()
+
+main()
