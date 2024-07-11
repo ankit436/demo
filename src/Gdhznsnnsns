@@ -1,0 +1,176 @@
+from flask import Flask, render_template, request, jsonify
+from flask_sqlalchemy import SQLAlchemy
+
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///contacts.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
+
+class Contact(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(80), nullable=False)
+    surname = db.Column(db.String(80), nullable=False)
+    phone = db.Column(db.String(20), nullable=False)
+    email = db.Column(db.String(120), nullable=False)
+
+db.create_all()
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/api/contacts', methods=['GET', 'POST', 'PUT', 'DELETE'])
+def manage_contacts():
+    if request.method == 'GET':
+        contacts = Contact.query.all()
+        return jsonify([contact_to_dict(contact) for contact in contacts])
+    
+    elif request.method == 'POST':
+        data = request.get_json()
+        new_contact = Contact(
+            name=data['name'],
+            surname=data['surname'],
+            phone=data['phone'],
+            email=data['email']
+        )
+        db.session.add(new_contact)
+        db.session.commit()
+        return jsonify(contact_to_dict(new_contact))
+    
+    elif request.method == 'PUT':
+        data = request.get_json()
+        contact = Contact.query.get(data['id'])
+        contact.name = data['name']
+        contact.surname = data['surname']
+        contact.phone = data['phone']
+        contact.email = data['email']
+        db.session.commit()
+        return jsonify(contact_to_dict(contact))
+    
+    elif request.method == 'DELETE':
+        data = request.get_json()
+        contact = Contact.query.get(data['id'])
+        db.session.delete(contact)
+        db.session.commit()
+        return jsonify({'status': 'success'})
+
+def contact_to_dict(contact):
+    return {
+        'id': contact.id,
+        'name': contact.name,
+        'surname': contact.surname,
+        'phone': contact.phone,
+        'email': contact.email
+    }
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
+
+
+from org.transcrypt.stubs.browser import __pragma__, document, window
+
+contacts = []
+
+def show_contact_list():
+    document.getElementById("contactList").style.display = "block"
+    document.getElementById("contactForm").style.display = "none"
+
+def show_contact_form(contact_id=None):
+    document.getElementById("contactList").style.display = "none"
+    document.getElementById("contactForm").style.display = "block"
+    
+    if contact_id is not None:
+        contact = next(contact for contact in contacts if contact['id'] == contact_id)
+        document.getElementById("contactId").value = contact['id']
+        document.getElementById("contactName").value = contact['name']
+        document.getElementById("contactSurname").value = contact['surname']
+        document.getElementById("contactPhone").value = contact['phone']
+        document.getElementById("contactEmail").value = contact['email']
+    else:
+        document.getElementById("form").reset()
+
+def add_or_update_contact(event):
+    event.preventDefault()
+    contact_id = document.getElementById("contactId").value
+    name = document.getElementById("contactName").value
+    surname = document.getElementById("contactSurname").value
+    phone = document.getElementById("contactPhone").value
+    email = document.getElementById("contactEmail").value
+    
+    contact = {
+        'id': int(contact_id) if contact_id else None,
+        'name': name,
+        'surname': surname,
+        'phone': phone,
+        'email': email
+    }
+    
+    method = 'PUT' if contact_id else 'POST'
+    window.fetch('/api/contacts', {
+        'method': method,
+        'headers': {'Content-Type': 'application/json'},
+        'body': window.JSON.stringify(contact)
+    }).then(lambda response: response.json()).then(lambda data: update_contact_table())
+
+    show_contact_list()
+
+def update_contact_table():
+    window.fetch('/api/contacts').then(lambda response: response.json()).then(lambda data: render_contact_table(data))
+
+def render_contact_table(data):
+    global contacts
+    contacts = data
+    table_body = document.getElementById("contactTableBody")
+    table_body.innerHTML = ''
+    for contact in contacts:
+        row = document.createElement("tr")
+        
+        cell_id = document.createElement("td")
+        cell_id.innerHTML = contact['id']
+        row.appendChild(cell_id)
+        
+        cell_name = document.createElement("td")
+        cell_name.innerHTML = contact['name']
+        row.appendChild(cell_name)
+        
+        cell_surname = document.createElement("td")
+        cell_surname.innerHTML = contact['surname']
+        row.appendChild(cell_surname)
+        
+        cell_phone = document.createElement("td")
+        cell_phone.innerHTML = contact['phone']
+        row.appendChild(cell_phone)
+        
+        cell_email = document.createElement("td")
+        cell_email.innerHTML = contact['email']
+        row.appendChild(cell_email)
+        
+        cell_actions = document.createElement("td")
+        edit_button = document.createElement("button")
+        edit_button.innerHTML = "Edit"
+        edit_button.onclick = lambda contact_id=contact['id']: show_contact_form(contact_id)
+        delete_button = document.createElement("button")
+        delete_button.innerHTML = "Delete"
+        delete_button.onclick = lambda contact_id=contact['id']: delete_contact(contact_id)
+        cell_actions.appendChild(edit_button)
+        cell_actions.appendChild(delete_button)
+        row.appendChild(cell_actions)
+        
+        table_body.appendChild(row)
+
+def delete_contact(contact_id):
+    window.fetch('/api/contacts', {
+        'method': 'DELETE',
+        'headers': {'Content-Type': 'application/json'},
+        'body': window.JSON.stringify({'id': contact_id})
+    }).then(lambda response: response.json()).then(lambda data: update_contact_table())
+
+def main():
+    document.getElementById("addContactBtn").onclick = lambda: show_contact_form()
+    document.getElementById("form").onsubmit = lambda event: add_or_update_contact(event)
+    document.getElementById("backBtn").onclick = lambda: show_contact_list()
+    update_contact_table()
+    show_contact_list()
+
+main()
