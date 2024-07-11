@@ -6,19 +6,16 @@ def show_contact_list():
     document.getElementById("contactList").style.display = "block"
     document.getElementById("contactForm").style.display = "none"
 
-def show_contact_form(contact_id=None):
+def show_contact_form(contact_id):
     document.getElementById("contactList").style.display = "none"
     document.getElementById("contactForm").style.display = "block"
     
-    if contact_id is not None:
-        contact = next(contact for contact in contacts if contact['id'] == contact_id)
-        document.getElementById("contactId").value = str(contact['id'])
-        document.getElementById("contactName").value = contact['name']
-        document.getElementById("contactSurname").value = contact['surname']
-        document.getElementById("contactPhone").value = contact['phone']
-        document.getElementById("contactEmail").value = contact['email']
-    else:
-        document.getElementById("form").reset()
+    contact = next(contact for contact in contacts if contact['id'] == contact_id)
+    document.getElementById("contactId").value = str(contact['id'])
+    document.getElementById("contactName").value = contact['name']
+    document.getElementById("contactSurname").value = contact['surname']
+    document.getElementById("contactPhone").value = contact['phone']
+    document.getElementById("contactEmail").value = contact['email']
 
 def add_or_update_contact(event):
     event.preventDefault()
@@ -28,7 +25,6 @@ def add_or_update_contact(event):
     phone = document.getElementById("contactPhone").value
     email = document.getElementById("contactEmail").value
     
-    # Create the contact object
     contact = {
         'id': int(contact_id) if contact_id else None,
         'name': name,
@@ -42,11 +38,10 @@ def add_or_update_contact(event):
     
     console.log(f"Sending {method} request to {url} with data:", contact)  # Debugging log
     
-    # Send the fetch request with JSON content
     window.fetch(url, {
         'method': method,
         'headers': {'Content-Type': 'application/json'},
-        'body': JSON.stringify(contact)  # Ensure proper JSON serialization here
+        'body': JSON.stringify(contact)
     }).then(
         lambda response: response.json() if response.ok else Promise.reject(response.statusText)
     ).then(
@@ -64,20 +59,19 @@ def update_contact_table():
     ).then(
         lambda data: {
             console.log("Contacts data received:", data);  // Debugging log
-            render_contact_table(data);
+            contacts = data  # Update global contacts data
+            render_contact_table();
         }
     ).catch(lambda error: console.log("Fetch error:", error))
 
-def render_contact_table(data):
-    global contacts
-    contacts = data
+def render_contact_table():
     table_body = document.getElementById("contactTableBody")
     table_body.innerHTML = ''
     for contact in contacts:
         row = document.createElement("tr")
         
         cell_id = document.createElement("td")
-        cell_id.innerHTML = str(contact['id'])  # Ensure ID is converted to string for display
+        cell_id.innerHTML = str(contact['id'])
         row.appendChild(cell_id)
         
         cell_name = document.createElement("td")
@@ -97,17 +91,31 @@ def render_contact_table(data):
         row.appendChild(cell_email)
         
         cell_actions = document.createElement("td")
+        
+        # Edit button
         edit_button = document.createElement("button")
         edit_button.innerHTML = "Edit"
-        edit_button.onclick = lambda contact_id=str(contact['id']): show_contact_form(contact_id)
+        edit_button.setAttribute("data-contact-id", str(contact['id']))  # Set contact id as data attribute
+        edit_button.onclick = on_edit_button_click  # Assign event handler
+        cell_actions.appendChild(edit_button)
+        
+        # Delete button
         delete_button = document.createElement("button")
         delete_button.innerHTML = "Delete"
-        delete_button.onclick = lambda contact_id=str(contact['id']): delete_contact(contact_id)
-        cell_actions.appendChild(edit_button)
+        delete_button.setAttribute("data-contact-id", str(contact['id']))  # Set contact id as data attribute
+        delete_button.onclick = on_delete_button_click  # Assign event handler
         cell_actions.appendChild(delete_button)
-        row.appendChild(cell_actions)
         
+        row.appendChild(cell_actions)
         table_body.appendChild(row)
+
+def on_edit_button_click(event):
+    contact_id = event.target.getAttribute("data-contact-id")
+    show_contact_form(contact_id)
+
+def on_delete_button_click(event):
+    contact_id = event.target.getAttribute("data-contact-id")
+    delete_contact(contact_id)
 
 def delete_contact(contact_id):
     console.log(f"Sending DELETE request with contact ID: {contact_id}")  # Debugging log
@@ -115,7 +123,7 @@ def delete_contact(contact_id):
     window.fetch('/api/contacts', {
         'method': 'DELETE',
         'headers': {'Content-Type': 'application/json'},
-        'body': JSON.stringify({'id': contact_id})  # Ensure proper JSON serialization here
+        'body': JSON.stringify({'id': contact_id})
     }).then(
         lambda response: response.json() if response.ok else Promise.reject(response.statusText)
     ).then(
@@ -126,9 +134,9 @@ def delete_contact(contact_id):
     ).catch(lambda error: console.log("Fetch error:", error))
 
 def main():
-    document.getElementById("addContactBtn").onclick = lambda: show_contact_form()
-    document.getElementById("form").onsubmit = lambda event: add_or_update_contact(event)
-    document.getElementById("backBtn").onclick = lambda: show_contact_list()
+    document.getElementById("addContactBtn").onclick = lambda: show_contact_form(None)
+    document.getElementById("form").onsubmit = add_or_update_contact
+    document.getElementById("backBtn").onclick = show_contact_list
     update_contact_table()
     show_contact_list()
 
