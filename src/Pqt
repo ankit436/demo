@@ -98,3 +98,71 @@ if __name__ == '__main__':
     window = MainWindow()
     window.show()
     sys.exit(qt_app.exec_())
+
+
+
+
+import sys
+import threading
+import time
+from PyQt5.QtWidgets import QApplication, QMainWindow, QMenu
+from PyQt5.QtWebEngineWidgets import QWebEngineView, QWebEngineSettings, QWebEnginePage
+from PyQt5.QtCore import QUrl, QTimer
+from flask import Flask, render_template
+
+# Define the Flask app
+app = Flask(__name__)
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+# Function to run the Flask app
+def run_flask():
+    app.run(port=5000, debug=True)
+
+# Custom QWebEnginePage to include Developer Tools
+class WebEnginePage(QWebEnginePage):
+    def javaScriptConsoleMessage(self, level, message, lineNumber, sourceID):
+        print(f"JS: {message} (line: {lineNumber}, source: {sourceID})")
+
+# Define the PyQt application
+class MainWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.browser = QWebEngineView()
+        self.browser.setPage(WebEnginePage(self.browser))  # Set custom page
+        self.setCentralWidget(self.browser)
+
+        # Enable developer tools
+        self.browser.settings().setAttribute(QWebEngineSettings.LocalStorageEnabled, True)
+        self.browser.settings().setAttribute(QWebEngineSettings.LocalContentCanAccessRemoteUrls, True)
+        self.browser.settings().setAttribute(QWebEngineSettings.LocalContentCanAccessFileUrls, True)
+
+        # Load the URL after a short delay to ensure Flask is ready
+        QTimer.singleShot(1000, self.load_page)
+
+    def load_page(self):
+        self.browser.setUrl(QUrl("http://127.0.0.1:5000"))  # Convert string URL to QUrl
+
+    def contextMenuEvent(self, event):
+        context_menu = QMenu(self)
+        inspect_action = context_menu.addAction("Inspect")
+        action = context_menu.exec_(self.mapToGlobal(event.pos()))
+        if action == inspect_action:
+            self.browser.page().triggerAction(QWebEnginePage.InspectElement)
+
+if __name__ == '__main__':
+    # Start the Flask server in a separate thread
+    flask_thread = threading.Thread(target=run_flask)
+    flask_thread.daemon = True
+    flask_thread.start()
+
+    # Wait for Flask to start
+    time.sleep(2)
+
+    # Start the PyQt application
+    qt_app = QApplication(sys.argv)
+    window = MainWindow()
+    window.show()
+    sys.exit(qt_app.exec_())
