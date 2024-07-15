@@ -1,174 +1,147 @@
 import sys
-from PyQt5.QtWidgets import (
-    QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
-    QPushButton, QLabel, QLineEdit, QTableWidget, QTableWidgetItem, QMessageBox
-)
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QFont
+from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QTableWidget, QTableWidgetItem, QPushButton, QLabel, QLineEdit, QMessageBox
 import contacts_db
 
-class ContactManager(QMainWindow):
+class ContactManager(QWidget):
     def __init__(self):
         super().__init__()
-        contacts_db.initialize_db()
-        self.init_ui()
-    
-    def init_ui(self):
-        self.setWindowTitle("Contact List")
-        self.setGeometry(100, 100, 800, 600)
 
-        self.main_widget = QWidget(self)
-        self.setCentralWidget(self.main_widget)
-        
-        self.layout = QVBoxLayout(self.main_widget)
-        
-        self.header = QLabel("Contact List")
-        self.header.setFont(QFont('Arial', 24))
-        self.layout.addWidget(self.header)
-        
-        self.description = QLabel("This component demonstrates showing data.")
-        self.description.setFont(QFont('Arial', 14))
-        self.layout.addWidget(self.description)
-        
-        self.add_contact_btn = QPushButton("Add new Contact")
-        self.add_contact_btn.setFont(QFont('Arial', 12))
-        self.add_contact_btn.setStyleSheet("background-color: green; color: white; padding: 10px;")
-        self.add_contact_btn.clicked.connect(self.show_contact_form)
-        self.layout.addWidget(self.add_contact_btn)
-        
-        self.table = QTableWidget(0, 6)
-        self.table.setHorizontalHeaderLabels(["ID", "Name", "Surname", "Phone Number", "Email", "Actions"])
-        self.layout.addWidget(self.table)
+        self.initUI()
+        self.loadContacts()
 
-        self.form_widget = QWidget(self)
-        self.form_layout = QVBoxLayout(self.form_widget)
+    def initUI(self):
+        self.setWindowTitle('Contact List')
+
+        self.layout = QVBoxLayout()
         
-        self.form_header = QLabel("Add/Update Contact Info")
-        self.form_header.setFont(QFont('Arial', 24))
-        self.form_layout.addWidget(self.form_header)
+        self.contactListWidget = QWidget()
+        self.contactListLayout = QVBoxLayout()
         
-        self.contact_id = QLineEdit(self.form_widget)
-        self.contact_id.setPlaceholderText("ID")
-        self.contact_id.setVisible(False)
-        self.form_layout.addWidget(self.contact_id)
+        self.table = QTableWidget()
+        self.table.setColumnCount(5)
+        self.table.setHorizontalHeaderLabels(['ID', 'Name', 'Surname', 'Phone', 'Email', 'Actions'])
+        self.contactListLayout.addWidget(self.table)
+
+        self.addContactBtn = QPushButton('Add new Contact')
+        self.addContactBtn.clicked.connect(self.showAddForm)
+        self.contactListLayout.addWidget(self.addContactBtn)
         
-        self.contact_name = QLineEdit(self.form_widget)
-        self.contact_name.setPlaceholderText("Name")
-        self.form_layout.addWidget(self.contact_name)
+        self.contactListWidget.setLayout(self.contactListLayout)
+        self.layout.addWidget(self.contactListWidget)
         
-        self.contact_surname = QLineEdit(self.form_widget)
-        self.contact_surname.setPlaceholderText("Surname")
-        self.form_layout.addWidget(self.contact_surname)
+        self.contactFormWidget = QWidget()
+        self.contactFormLayout = QVBoxLayout()
         
-        self.contact_phone = QLineEdit(self.form_widget)
-        self.contact_phone.setPlaceholderText("Phone Number")
-        self.form_layout.addWidget(self.contact_phone)
+        self.formTitle = QLabel('Add/Update Contact Info')
+        self.contactFormLayout.addWidget(self.formTitle)
         
-        self.contact_email = QLineEdit(self.form_widget)
-        self.contact_email.setPlaceholderText("Email")
-        self.form_layout.addWidget(self.contact_email)
+        self.contactId = QLineEdit()
+        self.contactId.setPlaceholderText('ID')
+        self.contactId.setReadOnly(True)
+        self.contactFormLayout.addWidget(self.contactId)
         
-        self.form_buttons = QHBoxLayout()
-        self.submit_btn = QPushButton("Submit")
-        self.submit_btn.setFont(QFont('Arial', 12))
-        self.submit_btn.setStyleSheet("background-color: green; color: white; padding: 10px;")
-        self.submit_btn.clicked.connect(self.add_or_update_contact)
-        self.form_buttons.addWidget(self.submit_btn)
+        self.contactName = QLineEdit()
+        self.contactName.setPlaceholderText('Name')
+        self.contactFormLayout.addWidget(self.contactName)
         
-        self.back_btn = QPushButton("Back")
-        self.back_btn.setFont(QFont('Arial', 12))
-        self.back_btn.setStyleSheet("background-color: blue; color: white; padding: 10px;")
-        self.back_btn.clicked.connect(self.show_contact_list)
-        self.form_buttons.addWidget(self.back_btn)
+        self.contactSurname = QLineEdit()
+        self.contactSurname.setPlaceholderText('Surname')
+        self.contactFormLayout.addWidget(self.contactSurname)
         
-        self.form_layout.addLayout(self.form_buttons)
-        self.form_widget.setLayout(self.form_layout)
+        self.contactPhone = QLineEdit()
+        self.contactPhone.setPlaceholderText('Phone Number')
+        self.contactFormLayout.addWidget(self.contactPhone)
         
-        self.layout.addWidget(self.form_widget)
+        self.contactEmail = QLineEdit()
+        self.contactEmail.setPlaceholderText('Email')
+        self.contactFormLayout.addWidget(self.contactEmail)
         
-        self.show_contact_list()
-    
-    def show_contact_list(self):
-        self.main_widget.setVisible(True)
-        self.form_widget.setVisible(False)
-        self.update_contact_table()
-    
-    def show_contact_form(self, contact_id=None):
-        self.main_widget.setVisible(False)
-        self.form_widget.setVisible(True)
+        self.submitBtn = QPushButton('Submit')
+        self.submitBtn.clicked.connect(self.submitForm)
+        self.contactFormLayout.addWidget(self.submitBtn)
         
-        if contact_id is not None:
-            contact = contacts_db.get_contact_by_id(contact_id)
-            if contact:
-                self.contact_id.setText(str(contact[0]))
-                self.contact_name.setText(contact[1])
-                self.contact_surname.setText(contact[2]))
-                self.contact_phone.setText(contact[3])
-                self.contact_email.setText(contact[4])
-        else:
-            self.contact_id.clear()
-            self.contact_name.clear()
-            self.contact_surname.clear()
-            self.contact_phone.clear()
-            self.contact_email.clear()
-    
-    def add_or_update_contact(self):
-        contact_id = self.contact_id.text()
-        name = self.contact_name.text()
-        surname = self.contact_surname.text()
-        phone = self.contact_phone.text()
-        email = self.contact_email.text()
+        self.backBtn = QPushButton('Back')
+        self.backBtn.clicked.connect(self.showContactList)
+        self.contactFormLayout.addWidget(self.backBtn)
         
+        self.contactFormWidget.setLayout(self.contactFormLayout)
+        self.layout.addWidget(self.contactFormWidget)
+        
+        self.setLayout(self.layout)
+        self.showContactList()
+        
+    def loadContacts(self):
+        self.table.setRowCount(0)
+        contacts = contacts_db.get_all_contacts()
+        for contact in contacts:
+            self.addContactToTable(contact)
+
+    def addContactToTable(self, contact):
+        rowPosition = self.table.rowCount()
+        self.table.insertRow(rowPosition)
+        
+        for i, value in enumerate(contact):
+            self.table.setItem(rowPosition, i, QTableWidgetItem(str(value)))
+
+        editButton = QPushButton('Edit')
+        editButton.clicked.connect(lambda checked, contact=contact: self.showEditForm(contact))
+        self.table.setCellWidget(rowPosition, 5, editButton)
+        
+        deleteButton = QPushButton('Delete')
+        deleteButton.clicked.connect(lambda checked, contact_id=contact[0]: self.deleteContact(contact_id))
+        self.table.setCellWidget(rowPosition, 6, deleteButton)
+
+    def showContactList(self):
+        self.contactFormWidget.hide()
+        self.contactListWidget.show()
+        self.loadContacts()
+
+    def showAddForm(self):
+        self.contactId.clear()
+        self.contactName.clear()
+        self.contactSurname.clear()
+        self.contactPhone.clear()
+        self.contactEmail.clear()
+        self.formTitle.setText('Add Contact')
+        self.contactListWidget.hide()
+        self.contactFormWidget.show()
+
+    def showEditForm(self, contact):
+        self.contactId.setText(str(contact[0]))
+        self.contactName.setText(contact[1])
+        self.contactSurname.setText(contact[2])
+        self.contactPhone.setText(contact[3])
+        self.contactEmail.setText(contact[4])
+        self.formTitle.setText('Edit Contact')
+        self.contactListWidget.hide()
+        self.contactFormWidget.show()
+
+    def submitForm(self):
+        contact_id = self.contactId.text()
+        name = self.contactName.text()
+        surname = self.contactSurname.text()
+        phone = self.contactPhone.text()
+        email = self.contactEmail.text()
+
         if not name or not surname or not phone or not email:
-            QMessageBox.warning(self, "Input Error", "All fields are required")
+            QMessageBox.warning(self, 'Error', 'Please fill in all fields')
             return
-        
+
         if contact_id:
-            contacts_db.update_contact(int(contact_id), name, surname, phone, email)
+            contacts_db.update_contact(contact_id, name, surname, phone, email)
         else:
             contacts_db.add_contact(name, surname, phone, email)
-        
-        self.show_contact_list()
-    
-    def update_contact_table(self):
-        contacts = contacts_db.get_all_contacts()
-        self.table.setRowCount(len(contacts))
-        for row, contact in enumerate(contacts):
-            self.table.setItem(row, 0, QTableWidgetItem(str(contact[0])))
-            self.table.setItem(row, 1, QTableWidgetItem(contact[1]))
-            self.table.setItem(row, 2, QTableWidgetItem(contact[2]))
-            self.table.setItem(row, 3, QTableWidgetItem(contact[3]))
-            self.table.setItem(row, 4, QTableWidgetItem(contact[4]))
-            
-            # Create a new widget for edit and delete buttons
-            action_widget = QWidget()
-            action_layout = QHBoxLayout(action_widget)
-            
-            edit_btn = QPushButton("Edit")
-            edit_btn.setFont(QFont('Arial', 12))
-            edit_btn.setStyleSheet("background-color: blue; color: white; padding: 5px;")
-            edit_btn.clicked.connect(lambda _, cid=contact[0]: self.show_contact_form(cid))
-            action_layout.addWidget(edit_btn)
-            
-            delete_btn = QPushButton("Delete")
-            delete_btn.setFont(QFont('Arial', 12))
-            delete_btn.setStyleSheet("background-color: red; color: white; padding: 5px;")
-            delete_btn.clicked.connect(lambda _, cid=contact[0]: self.delete_contact(cid))
-            action_layout.addWidget(delete_btn)
-            
-            action_layout.setAlignment(Qt.AlignCenter)
-            action_widget.setLayout(action_layout)
-            self.table.setCellWidget(row, 5, action_widget)
-    
-    def delete_contact(self, contact_id):
-        contacts_db.delete_contact(contact_id)
-        self.update_contact_table()
 
-def main():
-    app = QApplication(sys.argv)
-    manager = ContactManager()
-    manager.show()
-    sys.exit(app.exec_())
+        self.showContactList()
+
+    def deleteContact(self, contact_id):
+        contacts_db.delete_contact(contact_id)
+        self.showContactList()
 
 if __name__ == '__main__':
-    main()
+    contacts_db.initialize_db()
+
+    app = QApplication(sys.argv)
+    ex = ContactManager()
+    ex.show()
+    sys.exit(app.exec_())
