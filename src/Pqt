@@ -1,0 +1,44 @@
+import sys
+import threading
+from PyQt5.QtWidgets import QApplication, QMainWindow
+from PyQt5.QtWebEngineWidgets import QWebEngineView
+from flask import Flask, render_template_string
+
+# Define the Flask app
+app = Flask(__name__)
+
+@app.route('/')
+def index():
+    return render_template_string('''
+        <!doctype html>
+        <html>
+        <head><title>Hello</title></head>
+        <body>
+            <h1>Hello from Flask!</h1>
+        </body>
+        </html>
+    ''')
+
+# Function to run the Flask app
+def run_flask():
+    app.run(port=5000, debug=False)
+
+# Define the PyQt application
+class MainWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.browser = QWebEngineView()
+        self.setCentralWidget(self.browser)
+        self.browser.setUrl("http://127.0.0.1:5000")  # URL of the Flask server
+
+if __name__ == '__main__':
+    # Start the Flask server in a separate thread
+    flask_thread = threading.Thread(target=run_flask)
+    flask_thread.daemon = True
+    flask_thread.start()
+
+    # Start the PyQt application
+    qt_app = QApplication(sys.argv)
+    window = MainWindow()
+    window.show()
+    sys.exit(qt_app.exec_())
