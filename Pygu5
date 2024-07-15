@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import (
     QPushButton, QLabel, QLineEdit, QTableWidget, QTableWidgetItem, QMessageBox
 )
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QFont
 
 class ContactManager(QMainWindow):
     def __init__(self):
@@ -21,16 +22,20 @@ class ContactManager(QMainWindow):
         self.layout = QVBoxLayout(self.main_widget)
         
         self.header = QLabel("Contact List")
+        self.header.setFont(QFont('Arial', 24))
         self.layout.addWidget(self.header)
         
         self.description = QLabel("This component demonstrates showing data.")
+        self.description.setFont(QFont('Arial', 14))
         self.layout.addWidget(self.description)
         
         self.add_contact_btn = QPushButton("Add new Contact")
+        self.add_contact_btn.setFont(QFont('Arial', 12))
+        self.add_contact_btn.setStyleSheet("background-color: green; color: white; padding: 10px;")
         self.add_contact_btn.clicked.connect(self.show_contact_form)
         self.layout.addWidget(self.add_contact_btn)
         
-        self.table = QTableWidget(0, 6)
+        self.table = QTableWidget(0, 5)
         self.table.setHorizontalHeaderLabels(["ID", "Name", "Surname", "Phone Number", "Email", "Actions"])
         self.layout.addWidget(self.table)
 
@@ -38,6 +43,7 @@ class ContactManager(QMainWindow):
         self.form_layout = QVBoxLayout(self.form_widget)
         
         self.form_header = QLabel("Add/Update Contact Info")
+        self.form_header.setFont(QFont('Arial', 24))
         self.form_layout.addWidget(self.form_header)
         
         self.contact_id = QLineEdit(self.form_widget)
@@ -63,10 +69,14 @@ class ContactManager(QMainWindow):
         
         self.form_buttons = QHBoxLayout()
         self.submit_btn = QPushButton("Submit")
+        self.submit_btn.setFont(QFont('Arial', 12))
+        self.submit_btn.setStyleSheet("background-color: green; color: white; padding: 10px;")
         self.submit_btn.clicked.connect(self.add_or_update_contact)
         self.form_buttons.addWidget(self.submit_btn)
         
         self.back_btn = QPushButton("Back")
+        self.back_btn.setFont(QFont('Arial', 12))
+        self.back_btn.setStyleSheet("background-color: blue; color: white; padding: 10px;")
         self.back_btn.clicked.connect(self.show_contact_list)
         self.form_buttons.addWidget(self.back_btn)
         
@@ -140,8 +150,12 @@ class ContactManager(QMainWindow):
             
             action_layout = QHBoxLayout()
             edit_btn = QPushButton("Edit")
+            edit_btn.setFont(QFont('Arial', 12))
+            edit_btn.setStyleSheet("background-color: blue; color: white; padding: 5px;")
             edit_btn.clicked.connect(lambda _, cid=contact['id']: self.show_contact_form(cid))
             delete_btn = QPushButton("Delete")
+            delete_btn.setFont(QFont('Arial', 12))
+            delete_btn.setStyleSheet("background-color: red; color: white; padding: 5px;")
             delete_btn.clicked.connect(lambda _, cid=contact['id']: self.delete_contact(cid))
             
             action_widget = QWidget()
