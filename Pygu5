@@ -1,4 +1,32 @@
-import sys
+def update_contact_table(self):
+    contacts = contacts_db.get_all_contacts()
+    self.table.setRowCount(len(contacts))
+    for row, contact in enumerate(contacts):
+        self.table.setItem(row, 0, QTableWidgetItem(str(contact[0])))
+        self.table.setItem(row, 1, QTableWidgetItem(contact[1]))
+        self.table.setItem(row, 2, QTableWidgetItem(contact[2]))
+        self.table.setItem(row, 3, QTableWidgetItem(contact[3])))
+        self.table.setItem(row, 4, QTableWidgetItem(contact[4]))
+        
+        # Create a new widget for edit and delete buttons
+        action_widget = QWidget()
+        action_layout = QHBoxLayout(action_widget)
+        
+        edit_btn = QPushButton("Edit")
+        edit_btn.setFont(QFont('Arial', 12))
+        edit_btn.setStyleSheet("background-color: blue; color: white; padding: 5px;")
+        edit_btn.clicked.connect(lambda _, cid=contact[0]: self.show_contact_form(cid))
+        action_layout.addWidget(edit_btn)
+        
+        delete_btn = QPushButton("Delete")
+        delete_btn.setFont(QFont('Arial', 12))
+        delete_btn.setStyleSheet("background-color: red; color: white; padding: 5px;")
+        delete_btn.clicked.connect(lambda _, cid=contact[0]: self.delete_contact(cid))
+        action_layout.addWidget(delete_btn)
+        
+        action_layout.setAlignment(Qt.AlignCenter)
+        action_widget.setLayout(action_layout)
+        self.table.setCellWidget(row, 5, action_widget)import sys
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QPushButton, QLabel, QLineEdit, QTableWidget, QTableWidgetItem, QMessageBox
@@ -410,3 +438,64 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+
+
+
+
+
+
+def update_contact_table(self):
+    contacts = contacts_db.get_all_contacts()
+    self.table.setRowCount(len(contacts))
+    for row, contact in enumerate(contacts):
+        self.table.setItem(row, 0, QTableWidgetItem(str(contact[0])))
+        self.table.setItem(row, 1, QTableWidgetItem(contact[1]))
+        self.table.setItem(row, 2, QTableWidgetItem(contact[2]))
+        self.table.setItem(row, 3, QTableWidgetItem(contact[3])))
+        self.table.setItem(row, 4, QTableWidgetItem(contact[4]))
+        
+        # Create a new widget for edit and delete buttons
+        action_widget = QWidget()
+        action_layout = QHBoxLayout(action_widget)
+        
+        edit_btn = QPushButton("Edit")
+        edit_btn.setFont(QFont('Arial', 12))
+        edit_btn.setStyleSheet("background-color: blue; color: white; padding: 5px;")
+        edit_btn.clicked.connect(lambda _, cid=contact[0]: self.show_contact_form(cid))
+        action_layout.addWidget(edit_btn)
+        
+        delete_btn = QPushButton("Delete")
+        delete_btn.setFont(QFont('Arial', 12))
+        delete_btn.setStyleSheet("background-color: red; color: white; padding: 5px;")
+        delete_btn.clicked.connect(lambda _, cid=contact[0]: self.delete_contact(cid))
+        action_layout.addWidget(delete_btn)
+        
+        action_layout.setAlignment(Qt.AlignCenter)
+        action_widget.setLayout(action_layout)
+
+
+
+
+
+
+
+
+def add_or_update_contact(self):
+    contact_id = self.contact_id.text()
+    name = self.contact_name.text()
+    surname = self.contact_surname.text()
+    phone = self.contact_phone.text()
+    email = self.contact_email.text()
+    
+    if not name or not surname or not phone or not email:
+        QMessageBox.warning(self, "Input Error", "All fields are required")
+        return
+    
+    if contact_id:
+        contacts_db.update_contact(int(contact_id), name, surname, phone, email)
+    else:
+        contacts_db.add_contact(name, surname, phone, email)
+    
+    self.show_contact_list()
+        self.table.setCellWidget(row, 5, action_widget)
