@@ -267,3 +267,62 @@ class NewContactWindow(QDialog):
 
         if self.contact_id:
             database.update_contact(self.contact_id, name, surname,
+
+
+
+
+import sys
+from PyQt5.QtWidgets import QApplication, QWidget, QProgressBar
+from PyQt5.QtCore import Qt, QTimer, QPoint
+from PyQt5.QtGui import QPainter, QColor, QPen, QFont
+
+class CircularProgressBar(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setMinimumSize(200, 200)
+        self.progress = 0
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.update_progress)
+        self.timer.start(50)  # Update every 50 milliseconds
+        self.loading_complete = False
+
+    def paintEvent(self, event):
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.Antialiasing)
+
+        # Calculate center and radius
+        center = QPoint(self.width() // 2, self.height() // 2)
+        radius = min(self.width(), self.height()) // 2 - 10
+
+        # Draw outer circle
+        pen = QPen()
+        pen.setWidth(10)
+        pen.setColor(QColor('#c8d6e5'))  # Outer circle color
+        painter.setPen(pen)
+        painter.drawEllipse(center, radius, radius)
+
+        # Draw inner circle (progress)
+        pen.setWidth(12)
+        pen.setColor(QColor('#3498db'))  # Progress color
+        painter.setPen(pen)
+        painter.drawArc(center.x() - radius, center.y() - radius, radius * 2, radius * 2, 90 * 16, -self.progress * (360 * 16 / 100))
+
+        # Draw text
+        painter.setFont(QFont('Arial', 12))
+        painter.drawText(self.rect(), Qt.AlignCenter, f'{self.progress}%')
+
+    def update_progress(self):
+        if self.progress >= 100:
+            self.loading_complete = True
+            self.timer.stop()
+            self.close()
+        else:
+            self.progress += 1
+            self.update()
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    window = CircularProgressBar()
+    window.setWindowTitle('Circular Progress Bar')
+    window.show()
+    sys.exit(app.exec_())
