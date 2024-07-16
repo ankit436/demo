@@ -1,10 +1,6 @@
-
-
-
-
 import sys
 import sqlite3
-from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget, QPushButton, QLineEdit, QFormLayout, QDialog, QHBoxLayout, QMessageBox
+from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget, QPushButton, QLineEdit, QFormLayout, QDialog, QHBoxLayout, QMessageBox, QHeaderView
 
 
 class ContactListWindow(QMainWindow):
@@ -23,6 +19,17 @@ class ContactListWindow(QMainWindow):
         # Add New Contact Button
         self.new_contact_btn = QPushButton('Add New Contact')
         self.new_contact_btn.clicked.connect(self.open_new_contact_window)
+        self.new_contact_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #5cb85c;
+                color: white;
+                padding: 5px 10px;
+                border-radius: 5px;
+            }
+            QPushButton:hover {
+                background-color: #4cae4c;
+            }
+        """)
         self.layout.addWidget(self.new_contact_btn)
 
         # Container widget
@@ -47,8 +54,31 @@ class ContactListWindow(QMainWindow):
             # Edit and Delete buttons
             edit_button = QPushButton('Edit')
             edit_button.clicked.connect(lambda _, row=row_number: self.open_edit_contact_window(row))
+            edit_button.setStyleSheet("""
+                QPushButton {
+                    background-color: #5bc0de;
+                    color: white;
+                    padding: 5px 10px;
+                    border-radius: 5px;
+                }
+                QPushButton:hover {
+                    background-color: #31b0d5;
+                }
+            """)
+
             delete_button = QPushButton('Delete')
             delete_button.clicked.connect(lambda _, row=row_number: self.delete_contact(row))
+            delete_button.setStyleSheet("""
+                QPushButton {
+                    background-color: #d9534f;
+                    color: white;
+                    padding: 5px 10px;
+                    border-radius: 5px;
+                }
+                QPushButton:hover {
+                    background-color: #c9302c;
+                }
+            """)
 
             button_layout = QHBoxLayout()
             button_layout.addWidget(edit_button)
@@ -57,6 +87,8 @@ class ContactListWindow(QMainWindow):
             button_widget.setLayout(button_layout)
             self.table.setCellWidget(row_number, 5, button_widget)
 
+        self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
         connection.close()
 
     def open_new_contact_window(self):
@@ -112,8 +144,30 @@ class NewContactWindow(QDialog):
         self.button_layout = QHBoxLayout()
         self.submit_btn = QPushButton('Submit')
         self.submit_btn.clicked.connect(self.submit_contact)
+        self.submit_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #5cb85c;
+                color: white;
+                padding: 5px 10px;
+                border-radius: 5px;
+            }
+            QPushButton:hover {
+                background-color: #4cae4c;
+            }
+        """)
         self.back_btn = QPushButton('Back')
         self.back_btn.clicked.connect(self.close)
+        self.back_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #5bc0de;
+                color: white;
+                padding: 5px 10px;
+                border-radius: 5px;
+            }
+            QPushButton:hover {
+                background-color: #31b0d5;
+            }
+        """)
 
         self.button_layout.addWidget(self.submit_btn)
         self.button_layout.addWidget(self.back_btn)
@@ -171,27 +225,3 @@ if __name__ == '__main__':
     main_window = ContactListWindow()
     main_window.show()
     sys.exit(app.exec_())
-
-
-
-
-import sqlite3
-
-# Create a database or connect to one
-conn = sqlite3.connect('contacts.db')
-
-# Create a cursor
-c = conn.cursor()
-
-# Create a table
-c.execute("""CREATE TABLE IF NOT EXISTS contacts (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            surname TEXT,
-            phone_number TEXT NOT NULL,
-            email TEXT NOT NULL
-            )""")
-
-# Commit changes and close the connection
-conn.commit()
-conn.close()
