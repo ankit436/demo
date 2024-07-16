@@ -1,9 +1,10 @@
 import sys
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget,
-    QPushButton, QLineEdit, QFormLayout, QDialog, QHBoxLayout, QMessageBox, QHeaderView
+    QPushButton, QLineEdit, QFormLayout, QDialog, QHBoxLayout, QMessageBox, QHeaderView,
+    QProgressDialog
 )
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QGuiApplication
 import database  # Import the database module
 
@@ -20,8 +21,6 @@ class ContactListWindow(QMainWindow):
         self.table = QTableWidget()
         self.table.setSizeAdjustPolicy(QTableWidget.AdjustToContents)
         self.layout.addWidget(self.table, alignment=Qt.AlignLeft)
-
-        self.load_data()
 
         # Add New Contact Button
         self.new_contact_btn = QPushButton('Add New Contact')
@@ -45,11 +44,26 @@ class ContactListWindow(QMainWindow):
         self.container.setLayout(self.layout)
         self.setCentralWidget(self.container)
 
+        # Load Data with Progress
+        self.show_loading_dialog()
+
     def center_window(self):
         screen = QGuiApplication.primaryScreen().availableGeometry()
         window_geometry = self.frameGeometry()
         window_geometry.moveCenter(screen.center())
         self.move(window_geometry.topLeft())
+
+    def show_loading_dialog(self):
+        self.progress_dialog = QProgressDialog("Loading database...", None, 0, 0, self)
+        self.progress_dialog.setWindowTitle("Please Wait")
+        self.progress_dialog.setWindowModality(Qt.WindowModal)
+        self.progress_dialog.setCancelButton(None)
+        self.progress_dialog.setMinimumDuration(0)
+        self.progress_dialog.setRange(0, 0)
+        self.progress_dialog.setValue(0)
+        self.progress_dialog.show()
+
+        QTimer.singleShot(100, self.load_data)
 
     def load_data(self):
         contacts = database.get_all_contacts()
@@ -108,6 +122,8 @@ class ContactListWindow(QMainWindow):
         # Align header to left
         for col in range(self.table.columnCount()):
             self.table.horizontalHeaderItem(col).setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+
+        self.progress_dialog.close()
 
     def open_new_contact_window(self):
         self.new_contact_window = NewContactWindow()
@@ -211,6 +227,8 @@ class NewContactWindow(QDialog):
                 font-size: 14px;
                 border: 1px solid #ccc;
                 border-radius: 5px;
+                min-height: 30px;
+                max-height: 30px;
             }
         """
         self.id_input.setStyleSheet(input_style)
@@ -248,16 +266,4 @@ class NewContactWindow(QDialog):
             return
 
         if self.contact_id:
-            database.update_contact(self.contact_id, name, surname, phone, email)
-        else:
-            database.add_contact(name, surname, phone, email)
-        
-        self.close()
-
-
-if __name__ == '__main__':
-    database.initialize_database()
-    app = QApplication(sys.argv)
-    main_window = ContactListWindow()
-    main_window.show()
-    sys.exit(app.exec_())
+            database.update_contact(self.contact_id, name, surname,
