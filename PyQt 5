@@ -1,8 +1,12 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget, QPushButton, QLineEdit, QFormLayout, QDialog, QHBoxLayout, QMessageBox, QHeaderView
-from PyQt5.QtCore import Qt, QRect
+from PyQt5.QtWidgets import (
+    QApplication, QMainWindow, QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget,
+    QPushButton, QLineEdit, QFormLayout, QDialog, QHBoxLayout, QMessageBox, QHeaderView
+)
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QGuiApplication
 import database  # Import the database module
+
 
 class ContactListWindow(QMainWindow):
     def __init__(self):
@@ -14,7 +18,8 @@ class ContactListWindow(QMainWindow):
         # Layout and Table
         self.layout = QVBoxLayout()
         self.table = QTableWidget()
-        self.layout.addWidget(self.table)
+        self.table.setSizeAdjustPolicy(QTableWidget.AdjustToContents)
+        self.layout.addWidget(self.table, alignment=Qt.AlignLeft)
 
         self.load_data()
 
@@ -25,14 +30,15 @@ class ContactListWindow(QMainWindow):
             QPushButton {
                 background-color: #5cb85c;
                 color: white;
-                padding: 5px 10px;
+                padding: 10px 20px;
                 border-radius: 5px;
+                font-size: 16px;
             }
             QPushButton:hover {
                 background-color: #4cae4c;
             }
         """)
-        self.layout.addWidget(self.new_contact_btn)
+        self.layout.addWidget(self.new_contact_btn, alignment=Qt.AlignLeft)
 
         # Container widget
         self.container = QWidget()
@@ -55,7 +61,9 @@ class ContactListWindow(QMainWindow):
         for row_number, row_data in enumerate(contacts):
             self.table.insertRow(row_number)
             for column_number, data in enumerate(row_data):
-                self.table.setItem(row_number, column_number, QTableWidgetItem(str(data)))
+                item = QTableWidgetItem(str(data))
+                item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+                self.table.setItem(row_number, column_number, item)
 
             # Edit and Delete buttons
             edit_button = QPushButton('Edit')
@@ -95,6 +103,11 @@ class ContactListWindow(QMainWindow):
 
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+        self.table.verticalHeader().setVisible(False)  # Hide the vertical header to remove row numbers
+
+        # Align header to left
+        for col in range(self.table.columnCount()):
+            self.table.horizontalHeaderItem(col).setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
 
     def open_new_contact_window(self):
         self.new_contact_window = NewContactWindow()
@@ -136,6 +149,8 @@ class NewContactWindow(QDialog):
         self.phone_input = QLineEdit()
         self.email_input = QLineEdit()
 
+        self.setup_ui()
+
         self.layout.addRow('ID', self.id_input)
         self.layout.addRow('Name', self.name_input)
         self.layout.addRow('Surname', self.surname_input)
@@ -150,8 +165,9 @@ class NewContactWindow(QDialog):
             QPushButton {
                 background-color: #5cb85c;
                 color: white;
-                padding: 5px 10px;
+                padding: 10px 20px;
                 border-radius: 5px;
+                font-size: 16px;
             }
             QPushButton:hover {
                 background-color: #4cae4c;
@@ -163,8 +179,9 @@ class NewContactWindow(QDialog):
             QPushButton {
                 background-color: #5bc0de;
                 color: white;
-                padding: 5px 10px;
+                padding: 10px 20px;
                 border-radius: 5px;
+                font-size: 16px;
             }
             QPushButton:hover {
                 background-color: #31b0d5;
@@ -179,6 +196,28 @@ class NewContactWindow(QDialog):
 
         if self.contact_id:
             self.load_contact_data()
+
+    def setup_ui(self):
+        self.id_input.setPlaceholderText("Enter ID")
+        self.name_input.setPlaceholderText("Enter First Name")
+        self.surname_input.setPlaceholderText("Enter Surname")
+        self.phone_input.setPlaceholderText("Enter Phone Number")
+        self.email_input.setPlaceholderText("Enter Email Address")
+
+        # Style for the input fields
+        input_style = """
+            QLineEdit {
+                padding: 10px;
+                font-size: 14px;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+            }
+        """
+        self.id_input.setStyleSheet(input_style)
+        self.name_input.setStyleSheet(input_style)
+        self.surname_input.setStyleSheet(input_style)
+        self.phone_input.setStyleSheet(input_style)
+        self.email_input.setStyleSheet(input_style)
 
     def center_window(self):
         screen = QGuiApplication.primaryScreen().availableGeometry()
