@@ -272,19 +272,19 @@ class NewContactWindow(QDialog):
 
 
 import sys
-from PyQt5.QtWidgets import QApplication, QWidget, QProgressBar
+import sys
+from PyQt5.QtWidgets import QApplication, QWidget
 from PyQt5.QtCore import Qt, QTimer, QPoint
-from PyQt5.QtGui import QPainter, QColor, QPen, QFont
+from PyQt5.QtGui import QPainter, QColor, QPen
 
-class CircularProgressBar(QWidget):
+class IndeterminateSpinner(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setMinimumSize(200, 200)
-        self.progress = 0
+        self.setMinimumSize(100, 100)
+        self.angle = 0
         self.timer = QTimer(self)
-        self.timer.timeout.connect(self.update_progress)
+        self.timer.timeout.connect(self.update_spinner)
         self.timer.start(50)  # Update every 50 milliseconds
-        self.loading_complete = False
 
     def paintEvent(self, event):
         painter = QPainter(self)
@@ -301,28 +301,19 @@ class CircularProgressBar(QWidget):
         painter.setPen(pen)
         painter.drawEllipse(center, radius, radius)
 
-        # Draw inner circle (progress)
+        # Draw inner arc (spinner)
         pen.setWidth(12)
-        pen.setColor(QColor('#3498db'))  # Progress color
+        pen.setColor(QColor('#3498db'))  # Spinner color
         painter.setPen(pen)
-        painter.drawArc(center.x() - radius, center.y() - radius, radius * 2, radius * 2, 90 * 16, -self.progress * (360 * 16 / 100))
+        painter.drawArc(center.x() - radius, center.y() - radius, radius * 2, radius * 2, self.angle * 16, 120 * 16)
 
-        # Draw text
-        painter.setFont(QFont('Arial', 12))
-        painter.drawText(self.rect(), Qt.AlignCenter, f'{self.progress}%')
-
-    def update_progress(self):
-        if self.progress >= 100:
-            self.loading_complete = True
-            self.timer.stop()
-            self.close()
-        else:
-            self.progress += 1
-            self.update()
+    def update_spinner(self):
+        self.angle = (self.angle + 30) % 360  # Adjust speed here
+        self.update()
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    window = CircularProgressBar()
-    window.setWindowTitle('Circular Progress Bar')
+    window = IndeterminateSpinner()
+    window.setWindowTitle('Indeterminate Spinner')
     window.show()
     sys.exit(app.exec_())
