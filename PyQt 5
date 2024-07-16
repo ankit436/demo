@@ -1,58 +1,415 @@
-import sqlite3
+import sys
+from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget, QPushButton, QLineEdit, QFormLayout, QDialog, QHBoxLayout, QMessageBox, QHeaderView
+import database  # Import the database module
 
-def create_connection():
-    return sqlite3.connect('contacts.db')
+class ContactListWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle('Contact List')
+        self.setGeometry(100, 100, 800, 600)
 
-def initialize_database():
-    connection = create_connection()
-    cursor = connection.cursor()
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS contacts (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            surname TEXT,
-            phone_number TEXT NOT NULL,
-            email TEXT NOT NULL
-        )
-    """)
-    connection.commit()
-    connection.close()
+        # Layout and Table
+        self.layout = QVBoxLayout()
+        self.table = QTableWidget()
+        self.layout.addWidget(self.table)
 
-def get_all_contacts():
-    connection = create_connection()
-    cursor = connection.cursor()
-    cursor.execute("SELECT * FROM contacts")
-    contacts = cursor.fetchall()
-    connection.close()
-    return contacts
+        self.load_data()
 
-def get_contact(contact_id):
-    connection = create_connection()
-    cursor = connection.cursor()
-    cursor.execute("SELECT * FROM contacts WHERE id = ?", (contact_id,))
-    contact = cursor.fetchone()
-    connection.close()
-    return contact
+        # Add New Contact Button
+        self.new_contact_btn = QPushButton('Add New Contact')
+        self.new_contact_btn.clicked.connect(self.open_new_contact_window)
+        self.new_contact_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #5cb85c;
+                color: white;
+                padding: 5px 10px;
+                border-radius: 5px;
+            }
+            QPushButton:hover {
+                background-color: #4cae4c;
+            }
+        """)
+        self.layout.addWidget(self.new_contact_btn)
 
-def add_contact(name, surname, phone, email):
-    connection = create_connection()
-    cursor = connection.cursor()
-    cursor.execute("INSERT INTO contacts (name, surname, phone_number, email) VALUES (?, ?, ?, ?)",
-                   (name, surname, phone, email))
-    connection.commit()
-    connection.close()
+        # Container widget
+        self.container = QWidget()
+        self.container.setLayout(self.layout)
+        self.setCentralWidget(self.container)
 
-def update_contact(contact_id, name, surname, phone, email):
-    connection = create_connection()
-    cursor = connection.cursor()
-    cursor.execute("UPDATE contacts SET name = ?, surname = ?, phone_number = ?, email = ? WHERE id = ?",
-                   (name, surname, phone, email, contact_id))
-    connection.commit()
-    connection.close()
+    def load_data(self):
+        contacts = database.get_all_contacts()
 
-def delete_contact(contact_id):
-    connection = create_connection()
-    cursor = connection.cursor()
-    cursor.execute("DELETE FROM contacts WHERE id = ?", (contact_id,))
-    connection.commit()
-    connection.close()
+        self.table.setRowCount(0)
+        self.table.setColumnCount(6)
+        self.table.setHorizontalHeaderLabels(["ID", "Name", "Surname", "Phone Number", "Email", "Actions"])
+
+        for row_number, row_data in enumerate(contacts):
+            self.table.insertRow(row_number)
+            for column_number, data in enumerate(row_data):
+                self.table.setItem(row_number, column_number, QTableWidgetItem(str(data)))
+
+            # Edit and Delete buttons
+            edit_button = QPushButton('Edit')
+            edit_button.clicked.connect(lambda _, row=row_number: self.open_edit_contact_window(row))
+            edit_button.setStyleSheet("""
+                QPushButton {
+                    background-color: #5bc0de;
+                    color: white;
+                    padding: 5px 10px;
+                    border-radius: 5px;
+                }
+                QPushButton:hover {
+                    background-color: #31b0d5;
+                }
+            """)
+
+            delete_button = QPushButton('Delete')
+            delete_button.clicked.connect(lambda _, row=row_number: self.delete_contact(row))
+            delete_button.setStyleSheet("""
+                QPushButton {
+                    background-color: #d9534f;
+                    color: white;
+                    padding: 5px 10px;
+                    border-radius: 5px;
+                }
+                QPushButton:hover {
+                    background-color: #c9302c;
+                }
+            """)
+
+            button_layout = QHBoxLayout()
+            button_layout.addWidget(edit_button)
+            button_layout.addWidget(delete_button)
+            button_widget = QWidget()
+            button_widget.setLayout(button_layout)
+            self.table.setCellWidget(row_number, 5, button_widget)
+
+        self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+
+    def open_new_contact_window(self):
+        self.new_contact_window = NewContactWindow()
+        self.new_contact_window.exec_()
+        self.load_data()
+
+    def open_edit_contact_window(self, row):
+        id_item = self.table.item(row, 0)
+        if id_item:
+            contact_id = id_item.text()
+            self.edit_contact_window = NewContactWindow(contact_id)
+            self.edit_contact_window.exec_()
+            self.load_data()
+
+    def delete_contact(self, row):
+        id_item = self.table.item(row, 0)
+        if id_item:
+            contact_id = id_item.text()
+            confirm = QMessageBox.question(self, 'Confirm Delete', 'Are you sure you want to delete this contact?',
+                                           QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+            if confirm == QMessageBox.Yes:
+                database.delete_contact(contact_id)
+                self.load_data()
+
+
+class NewContactWindow(QDialog):
+    def __init__(self, contact_id=None):
+        super().__init__()
+        self.setWindowTitle('Add/Update Contact')
+        self.setGeometry(150, 150, 400, 300)
+
+        self.contact_id = contact_id
+
+        self.layout = QFormLayout()
+        self.id_input = QLineEdit()
+        self.name_input = QLineEdit()
+        self.surname_input = QLineEdit()
+        self.phone_input = QLineEdit()
+        self.email_input = QLineEdit()
+
+        self.layout.addRow('ID', self.id_input)
+        self.layout.addRow('Name', self.name_input)
+        self.layout.addRow('Surname', self.surname_input)
+        self.layout.addRow('Phone Number', self.phone_input)
+        self.layout.addRow('Email', self.email_input)
+
+        # Submit and Back Buttons
+        self.button_layout = QHBoxLayout()
+        self.submit_btn = QPushButton('Submit')
+        self.submit_btn.clicked.connect(self.submit_contact)
+        self.submit_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #5cb85c;
+                color: white;
+                padding: 5px 10px;
+                border-radius: 5px;
+            }
+            QPushButton:hover {
+                background-color: #4cae4c;
+            }
+        """)
+        self.back_btn = QPushButton('Back')
+        self.back_btn.clicked.connect(self.close)
+        self.back_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #5bc0de;
+                color: white;
+                padding: 5px 10px;
+                border-radius: 5px;
+            }
+            QPushButton:hover {
+                background-color: #31b0d5;
+            }
+        """)
+
+        self.button_layout.addWidget(self.submit_btn)
+        self.button_layout.addWidget(self.back_btn)
+
+        self.layout.addRow(self.button_layout)
+        self.setLayout(self.layout)
+
+        if self.contact_id:
+            self.load_contact_data()
+
+    def load_contact_data(self):
+        contact = database.get_contact(self.contact_id)
+
+        if contact:
+            self.id_input.setText(str(contact[0]))
+            self.name_input.setText(contact[1])
+            self.surname_input.setText(contact[2])
+            self.phone_input.setText(contact[3])
+            self.email_input.setText(contact[4])
+
+        self.id_input.setDisabled(True)
+
+    def submit_contact(self):
+        name = self.name_input.text().strip()
+        surname = self.surname_input.text().strip()
+        phone = self.phone_input.text().strip()
+        email = self.email_input.text().strip()
+
+        if not name or not phone or not email:
+            QMessageBox.warning(self, 'Input Error', 'Name, Phone Number, and Email are required.')
+            return
+
+        if self.contact_id:
+            database.update_contact(self.contact_id, name, surname, phone, email)
+        else:
+            database.add_contact(name, surname, phone, email)
+        
+        self.close()
+
+
+if __name__ == '__main__':
+    database.initialize_database()
+    app = QApplication(sys.argv)
+    main_window = ContactListWindow()
+    main_window.show()
+    sys.exit(app.exec_())import sys
+from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget, QPushButton, QLineEdit, QFormLayout, QDialog, QHBoxLayout, QMessageBox, QHeaderView
+import database  # Import the database module
+
+class ContactListWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle('Contact List')
+        self.setGeometry(100, 100, 800, 600)
+
+        # Layout and Table
+        self.layout = QVBoxLayout()
+        self.table = QTableWidget()
+        self.layout.addWidget(self.table)
+
+        self.load_data()
+
+        # Add New Contact Button
+        self.new_contact_btn = QPushButton('Add New Contact')
+        self.new_contact_btn.clicked.connect(self.open_new_contact_window)
+        self.new_contact_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #5cb85c;
+                color: white;
+                padding: 5px 10px;
+                border-radius: 5px;
+            }
+            QPushButton:hover {
+                background-color: #4cae4c;
+            }
+        """)
+        self.layout.addWidget(self.new_contact_btn)
+
+        # Container widget
+        self.container = QWidget()
+        self.container.setLayout(self.layout)
+        self.setCentralWidget(self.container)
+
+    def load_data(self):
+        contacts = database.get_all_contacts()
+
+        self.table.setRowCount(0)
+        self.table.setColumnCount(6)
+        self.table.setHorizontalHeaderLabels(["ID", "Name", "Surname", "Phone Number", "Email", "Actions"])
+
+        for row_number, row_data in enumerate(contacts):
+            self.table.insertRow(row_number)
+            for column_number, data in enumerate(row_data):
+                self.table.setItem(row_number, column_number, QTableWidgetItem(str(data)))
+
+            # Edit and Delete buttons
+            edit_button = QPushButton('Edit')
+            edit_button.clicked.connect(lambda _, row=row_number: self.open_edit_contact_window(row))
+            edit_button.setStyleSheet("""
+                QPushButton {
+                    background-color: #5bc0de;
+                    color: white;
+                    padding: 5px 10px;
+                    border-radius: 5px;
+                }
+                QPushButton:hover {
+                    background-color: #31b0d5;
+                }
+            """)
+
+            delete_button = QPushButton('Delete')
+            delete_button.clicked.connect(lambda _, row=row_number: self.delete_contact(row))
+            delete_button.setStyleSheet("""
+                QPushButton {
+                    background-color: #d9534f;
+                    color: white;
+                    padding: 5px 10px;
+                    border-radius: 5px;
+                }
+                QPushButton:hover {
+                    background-color: #c9302c;
+                }
+            """)
+
+            button_layout = QHBoxLayout()
+            button_layout.addWidget(edit_button)
+            button_layout.addWidget(delete_button)
+            button_widget = QWidget()
+            button_widget.setLayout(button_layout)
+            self.table.setCellWidget(row_number, 5, button_widget)
+
+        self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+
+    def open_new_contact_window(self):
+        self.new_contact_window = NewContactWindow()
+        self.new_contact_window.exec_()
+        self.load_data()
+
+    def open_edit_contact_window(self, row):
+        id_item = self.table.item(row, 0)
+        if id_item:
+            contact_id = id_item.text()
+            self.edit_contact_window = NewContactWindow(contact_id)
+            self.edit_contact_window.exec_()
+            self.load_data()
+
+    def delete_contact(self, row):
+        id_item = self.table.item(row, 0)
+        if id_item:
+            contact_id = id_item.text()
+            confirm = QMessageBox.question(self, 'Confirm Delete', 'Are you sure you want to delete this contact?',
+                                           QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+            if confirm == QMessageBox.Yes:
+                database.delete_contact(contact_id)
+                self.load_data()
+
+
+class NewContactWindow(QDialog):
+    def __init__(self, contact_id=None):
+        super().__init__()
+        self.setWindowTitle('Add/Update Contact')
+        self.setGeometry(150, 150, 400, 300)
+
+        self.contact_id = contact_id
+
+        self.layout = QFormLayout()
+        self.id_input = QLineEdit()
+        self.name_input = QLineEdit()
+        self.surname_input = QLineEdit()
+        self.phone_input = QLineEdit()
+        self.email_input = QLineEdit()
+
+        self.layout.addRow('ID', self.id_input)
+        self.layout.addRow('Name', self.name_input)
+        self.layout.addRow('Surname', self.surname_input)
+        self.layout.addRow('Phone Number', self.phone_input)
+        self.layout.addRow('Email', self.email_input)
+
+        # Submit and Back Buttons
+        self.button_layout = QHBoxLayout()
+        self.submit_btn = QPushButton('Submit')
+        self.submit_btn.clicked.connect(self.submit_contact)
+        self.submit_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #5cb85c;
+                color: white;
+                padding: 5px 10px;
+                border-radius: 5px;
+            }
+            QPushButton:hover {
+                background-color: #4cae4c;
+            }
+        """)
+        self.back_btn = QPushButton('Back')
+        self.back_btn.clicked.connect(self.close)
+        self.back_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #5bc0de;
+                color: white;
+                padding: 5px 10px;
+                border-radius: 5px;
+            }
+            QPushButton:hover {
+                background-color: #31b0d5;
+            }
+        """)
+
+        self.button_layout.addWidget(self.submit_btn)
+        self.button_layout.addWidget(self.back_btn)
+
+        self.layout.addRow(self.button_layout)
+        self.setLayout(self.layout)
+
+        if self.contact_id:
+            self.load_contact_data()
+
+    def load_contact_data(self):
+        contact = database.get_contact(self.contact_id)
+
+        if contact:
+            self.id_input.setText(str(contact[0]))
+            self.name_input.setText(contact[1])
+            self.surname_input.setText(contact[2])
+            self.phone_input.setText(contact[3])
+            self.email_input.setText(contact[4])
+
+        self.id_input.setDisabled(True)
+
+    def submit_contact(self):
+        name = self.name_input.text().strip()
+        surname = self.surname_input.text().strip()
+        phone = self.phone_input.text().strip()
+        email = self.email_input.text().strip()
+
+        if not name or not phone or not email:
+            QMessageBox.warning(self, 'Input Error', 'Name, Phone Number, and Email are required.')
+            return
+
+        if self.contact_id:
+            database.update_contact(self.contact_id, name, surname, phone, email)
+        else:
+            database.add_contact(name, surname, phone, email)
+        
+        self.close()
+
+
+if __name__ == '__main__':
+    database.initialize_database()
+    app = QApplication(sys.argv)
+    main_window = ContactListWindow()
+    main_window.show()
+    sys.exit(app.exec_())
