@@ -187,37 +187,4 @@ if __name__ == '__main__':
 
 
 
-import threading
 
-def list_projects():
-    bu_id = get_parameter('bu_id', request)
-    program = get_parameter('program', request)
-    phase = get_parameter('phase', request)
-
-    # Function to execute processor.list_projects
-    def fetch_projects():
-        nonlocal projects
-        projects = processor.list_projects("", "", "",)
-
-    # Function to execute processor.get_calc_list
-    def fetch_project_list():
-        nonlocal project_list
-        project_list = processor.get_calc_list()
-
-    # Create threads
-    project_thread = threading.Thread(target=fetch_projects)
-    project_list_thread = threading.Thread(target=fetch_project_list)
-
-    # Start threads
-    project_thread.start()
-    project_list_thread.start()
-
-    # Wait for threads to complete
-    project_thread.join()
-    project_list_thread.join()
-
-    # Perform post-processing
-    projects = post_calc_fields(projects, project_list)
-
-    # Returning the success response
-    return succ_resp(projects)
