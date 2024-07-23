@@ -1,0 +1,21 @@
+from concurrent.futures import ThreadPoolExecutor
+
+def list_projects():
+    bu_id = get_parameter('bu_id', request)
+    program = get_parameter('program', request)
+    phase = get_parameter('phase', request)
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        # Submitting tasks to the executor
+        future_project_list = executor.submit(processor.get_calc_list)
+        future_projects = executor.submit(processor.List_projects, bu_id, program, phase)
+
+        # Getting the results from futures
+        project_list = future_project_list.result()
+        projects = future_projects.result()
+
+    # Post-processing the fields
+    projects = post_calc_fields(projects, project_list)
+    
+    # Returning the success response
+    return succ_resp(projects)
