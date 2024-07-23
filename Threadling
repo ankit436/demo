@@ -70,3 +70,78 @@ def post_calc_fields(projects, project_list=None):
             project["formulae_created"] = False
 
     return projects
+
+
+
+In a scenario where an API needs to handle concurrent tasks and respond to requests reliably, you must ensure that the `ThreadPoolExecutor` is managed correctly throughout the application's lifecycle. Here’s how to manage it to avoid issues like **"cannot schedule new futures after interpreter shutdown"**:
+
+### Key Strategies:
+
+1. **Persistent Executor:**
+   - For a web API, where requests might come in at any time, you should create and manage the `ThreadPoolExecutor` at a higher level in your application, not within each API call. This way, the executor can handle requests throughout the application's lifetime.
+
+2. **Avoid Creating Executors in API Functions:**
+   - Instead of creating a new `ThreadPoolExecutor` in each API call, create a persistent executor instance that lives for the duration of your application's runtime. This approach avoids potential issues with shutting down the interpreter and keeps task scheduling consistent.
+
+3. **Graceful Shutdown Handling:**
+   - If your application is shutting down, ensure that the executor is properly shut down using `executor.shutdown(wait=True)` to finish all running tasks before the application exits.
+
+### Revised Approach
+
+Here’s how you might structure your application to handle the `ThreadPoolExecutor` correctly:
+
+1. **Initialize Executor Globally:**
+   - Create and initialize the executor at the start of your application.
+
+2. **Use the Executor in API Functions:**
+   - Use the globally initialized executor in your API functions.
+
+3. **Shutdown Executor Gracefully:**
+   - Implement shutdown handling to close the executor gracefully when the application is shutting down.
+
+### Example Implementation
+
+```python
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
+# Create a global executor instance
+executor = ThreadPoolExecutor(max_workers=2)
+
+def list_projects():
+    bu_id = get_parameter('bu_id', request)
+    program = get_parameter('program', request)
+    phase = get_parameter('phase', request)
+
+    try:
+        # Submit tasks to the global executor
+        future_project_list = executor.submit(processor.get_calc_list)
+        future_projects = executor.submit(processor.List_projects, bu_id, program, phase)
+        
+        # Wait and get results
+        project_list = future_project_list.result()
+        projects = future_projects.result()
+
+    except Exception as e:
+        # Handle exceptions and return an error response
+        return error_resp(f"An error occurred: {str(e)}")
+
+    # Post-process the fields
+    projects = post_calc_fields(projects, project_list)
+    
+    # Return the success response
+    return succ_resp(projects)
+
+def shutdown_executor():
+    # Function to shut down the global executor
+    executor.shutdown(wait=True)
+```
+
+### Key Points:
+
+- **Global Executor:** The `executor` is created globally and used in the API function to manage concurrent tasks.
+- **Task Management:** Tasks are submitted and managed by this global executor.
+- **Graceful Shutdown:** The `shutdown_executor()` function ensures that the executor is properly shut down when needed.
+
+### Handling Application Shutdown
+
+Ensure that you call `shutdown_executor()` appropriately, for example, when your application or server is shutting down. How you do this will depend on your specific web framework or server setup.
