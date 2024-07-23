@@ -47,3 +47,26 @@ def get_calc_list():
             }
 
     return report_project_ids, formulae_rows_dict
+
+
+
+def post_calc_fields(projects, project_list=None):
+    if project_list is None:
+        project_list = []
+
+    # Create a dictionary for quick lookup
+    project_dict = {proj["project_id"]: proj for proj in project_list}
+
+    # Process each project
+    for project in projects:
+        proj = project_dict.get(project['id'])
+
+        # Set default values for `ready_for_metrics` and `formulae_created`
+        if proj:
+            project["ready_for_metrics"] = proj.get("ready_for_metrics", False)
+            project["formulae_created"] = proj.get("formulae_created", False)
+        else:
+            project["ready_for_metrics"] = False
+            project["formulae_created"] = False
+
+    return projects
