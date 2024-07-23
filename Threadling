@@ -145,3 +145,42 @@ def shutdown_executor():
 ### Handling Application Shutdown
 
 Ensure that you call `shutdown_executor()` appropriately, for example, when your application or server is shutting down. How you do this will depend on your specific web framework or server setup.
+
+
+
+
+
+from flask import Flask, request, jsonify
+import threading
+
+app = Flask(__name__)
+
+def process_projects(bu_id, program, phase):
+    # Your processing logic here
+    # Simulate long-running task
+    import time
+    time.sleep(2)
+    return {"result": "processed"}
+
+@app.route('/projects')
+def list_projects():
+    bu_id = get_parameter('bu_id', request)
+    program = get_parameter('program', request)
+    phase = get_parameter('phase', request)
+
+    result = {"status": "processing"}
+    
+    # Define a worker thread
+    def worker():
+        nonlocal result
+        result = process_projects(bu_id, program, phase)
+    
+    # Start worker thread
+    thread = threading.Thread(target=worker)
+    thread.start()
+    thread.join()  # Wait for the thread to finish
+
+    return jsonify(result)
+
+if __name__ == '__main__':
+    app.run()
