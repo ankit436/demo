@@ -19,3 +19,31 @@ def list_projects():
     
     # Returning the success response
     return succ_resp(projects)
+
+
+
+
+
+from concurrent.futures import ThreadPoolExecutor
+import json
+
+def get_calc_list():
+    with session_scope() as session:
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            # Define the tasks to be executed concurrently
+            future_report_rows = executor.submit(
+                lambda: session.query(Report.project_id).distinct().all()
+            )
+            future_formulae_rows = executor.submit(
+                lambda: session.query(Expression.expression, Expression.name, ReportType.project_id)
+                .filter(Expression.report_type_id == ReportType.id)
+                .all()
+            )
+            
+            # Get the results from the futures
+            report_project_ids = {row.project_id for row in future_report_rows.result()}
+            formulae_rows_dict = {
+                row.project_id: json.loads(row.expression) for row in future_formulae_rows.result()
+            }
+
+    return report_project_ids, formulae_rows_dict
