@@ -150,41 +150,70 @@ Ensure that you call `shutdown_executor()` appropriately, for example, when your
 
 
 
-from flask import Flask, request, jsonify
 import threading
 
-app = Flask(__name__)
-
-def process_projects(bu_id, program, phase):
-    # Your processing logic here
-    # Simulate long-running task
-    import time
-    time.sleep(2)
-    return {"result": "processed"}
-
-@app.route('/projects')
 def list_projects():
     bu_id = get_parameter('bu_id', request)
     program = get_parameter('program', request)
     phase = get_parameter('phase', request)
 
-    result = {"status": "processing"}
-    
-    # Define a worker thread
-    def worker():
-        nonlocal result
-        result = process_projects(bu_id, program, phase)
-    
-    # Start worker thread
-    thread = threading.Thread(target=worker)
-    thread.start()
-    thread.join()  # Wait for the thread to finish
+    projects = None
+    project_list = None
+    errors = []
 
-    return jsonify(result)
+    # Function to execute processor.list_projects
+    def fetch_projects():
+        nonlocal projects
+        try:
+            projects = processor.list_projects("", "", "",)
+        except Exception as e:
+            errors.append(f"Error in fetch_projects: {str(e)}")
 
-if __name__ == '__main__':
-    app.run()
+    # Function to execute processor.get_calc_list
+    def fetch_project_list():
+        nonlocal project_list
+        try:
+            project_list = processor.get_calc_list()
+        except Exception as e:
+            errors.append(f"Error in fetch_project_list: {str(e)}")
 
+    # Create threads
+    project_thread = threading.Thread(target=fetch_projects)
+    project_list_thread = threading.Thread(target=fetch_project_list)
 
+    # Start threads
+    project_thread.start()
+    project_list_thread.start()
 
+    # Wait for threads to complete
+    project_thread.join()
+    project_list_thread.join()
 
+    # Check for errors
+    if errors:
+        return error_resp(errors)
+
+    # Ensure both projects and project_list are not None
+    if projects is None or project_list is None:
+        return error_resp("One or both threads did not complete successfully.")
+
+    # Perform post-processing
+    try:
+        projects = post_calc_fields(projects, project_list)
+    except Exception as e:
+        return error_resp(f"Error in post_calc_fields: {str(e)}")
+
+    # Returning the success response
+    return succ_resp(projects)
+
+def error_resp(message):
+    return {
+        "status": "error",
+        "message": message
+    }
+
+def succ_resp(data):
+    return {
+        "status": "success",
+        "data": data
+    }
