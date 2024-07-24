@@ -1,0 +1,69 @@
+import threading
+
+# Function to create a new session
+def get_session():
+    engine = create_engine('your_connection_string')
+    Session = sessionmaker(bind=engine)
+    return Session()
+
+def get_total_row_count():
+    query = '''
+        SELECT COUNT(*) as total_rows
+        FROM rindata.Benefits_Ado_Data
+    '''
+    session = get_session()
+    try:
+        total_rows = session.execute(query).scalar()
+    finally:
+        session.close()
+    return total_rows
+
+def get_ado_data_list_part(part_num, part_size, result, index):
+    offset = (part_num - 1) * part_size
+    query = f'''
+        SELECT id, project_name, BIONICS_TEAM, TITLE, STATE, PROGRAM, SOLUTION_PATH, 
+               DESCRIPTION, BUSINESS_FUNCTION_DETAIL, REGION, BENEFICIARY_CLIENT_COUNT, 
+               BUSINESS_EVP, SPONSOR, BU_FUNCTION_LEAD, DELIVERY_MANAGER, BENEFIT_DRIVER, AS_OF_DATE
+        FROM (
+            SELECT id, project_name, BIONICS_TEAM, TITLE, STATE, PROGRAM, SOLUTION_PATH, 
+                   DESCRIPTION, BUSINESS_FUNCTION_DETAIL, REGION, BENEFICIARY_CLIENT_COUNT, 
+                   BUSINESS_EVP, SPONSOR, BU_FUNCTION_LEAD, DELIVERY_MANAGER, BENEFIT_DRIVER, AS_OF_DATE, 
+                   RANK() OVER (PARTITION BY id ORDER BY as_of_date DESC) dest_rank
+            FROM rindata.Benefits_Ado_Data
+        ) ranked_data
+        WHERE dest_rank = 1
+        OFFSET {offset} ROWS
+        FETCH NEXT {part_size} ROWS ONLY
+    '''
+    
+    session = get_session()
+    try:
+        rows = session.execute(query)
+        ado_data_list = [{column: value for column, value in rowproxy.items()} for rowproxy in rows]
+        result[index] = ado_data_list
+    finally:
+        session.close()
+
+def load_data_concurrently():
+    total_rows = get_total_row_count()
+    part_size = total_rows // 4
+    threads = []
+    result = [None] * 4  # Placeholder for results from each thread
+
+    for i in range(4):
+        thread = threading.Thread(target=get_ado_data_list_part, args=(i + 1, part_size, result, i))
+        threads.append(thread)
+        thread.start()
+
+    for thread in threads:
+        thread.join()
+    
+    # Combine the results from all threads
+    ado_data_list = [item for sublist in result for item in sublist]
+    
+    return ado_data_list
+
+# Load data concurrently
+ado_data_list = load_data_concurrently()
+# Process the combined results
+print(ado_data_list)
