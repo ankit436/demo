@@ -1,4 +1,7 @@
 import threading
+from queue import Queue
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import create_engine
 
 # Function to create a new session
 def get_session():
@@ -18,7 +21,7 @@ def get_total_row_count():
         session.close()
     return total_rows
 
-def get_ado_data_list_part(part_num, part_size, result, index):
+def get_ado_data_list_part(part_num, part_size, queue):
     offset = (part_num - 1) * part_size
     query = f'''
         SELECT id, project_name, BIONICS_TEAM, TITLE, STATE, PROGRAM, SOLUTION_PATH, 
@@ -40,7 +43,7 @@ def get_ado_data_list_part(part_num, part_size, result, index):
     try:
         rows = session.execute(query)
         ado_data_list = [{column: value for column, value in rowproxy.items()} for rowproxy in rows]
-        result[index] = ado_data_list
+        queue.put(ado_data_list)  # Put the result in the queue
     finally:
         session.close()
 
@@ -48,18 +51,20 @@ def load_data_concurrently():
     total_rows = get_total_row_count()
     part_size = total_rows // 4
     threads = []
-    result = [None] * 4  # Placeholder for results from each thread
+    result_queue = Queue()
 
     for i in range(4):
-        thread = threading.Thread(target=get_ado_data_list_part, args=(i + 1, part_size, result, i))
+        thread = threading.Thread(target=get_ado_data_list_part, args=(i + 1, part_size, result_queue))
         threads.append(thread)
         thread.start()
 
     for thread in threads:
         thread.join()
     
-    # Combine the results from all threads
-    ado_data_list = [item for sublist in result for item in sublist]
+    # Combine the results from the queue
+    ado_data_list = []
+    while not result_queue.empty():
+        ado_data_list.extend(result_queue.get())
     
     return ado_data_list
 
