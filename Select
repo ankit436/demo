@@ -3,17 +3,16 @@ WITH RankedData AS (
         id, project_name, BIONICS_TEAM, TITLE, STATE, PROGRAM, SOLUTION_PATH, 
         DESCRIPTION, BUSINESS_FUNCTION_DETAIL, REGION, BENEFICIARY_CLIENT_COUNT, 
         BUSINESS_EVP, SPONSOR, BU_FUNCTION_LEAD, DELIVERY_MANAGER, BENEFIT_DRIVER, AS_OF_DATE, 
-        ROW_NUMBER() OVER (PARTITION BY id) AS row_num
+        ROW_NUMBER() OVER (ORDER BY id) AS row_num
     FROM rindata.Benefits_Ado_Data
 ),
 BatchedData AS (
     SELECT *,
-           CEIL(ROW_NUMBER() OVER () / 4.0) AS batch_number  -- 4 is the batch size
+           CEIL(row_num / 4.0) AS batch_number  -- 4 is the batch size
     FROM RankedData
-    WHERE row_num = 1
 )
 SELECT batch_number, COUNT(*) AS batch_size, 
-       MAX(id) as max_id, MAX(as_of_date) as max_as_of_date
+       MAX(id) as max_id, MAX(AS_OF_DATE) as max_as_of_date
 FROM BatchedData
 GROUP BY batch_number
 ORDER BY batch_number;
