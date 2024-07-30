@@ -1,23 +1,32 @@
-// ProtectedRoute.js
 import React from 'react';
 import { Route, Redirect } from 'react-router-dom';
-import { useStore } from './path-to-your-store'; // Adjust the path to your store
 
-const ProtectedRoute = ({ component: Component, ...rest }) => {
-    const { logined } = useStore(); // Adjust according to your store structure
-
-    return (
-        <Route
-            {...rest}
-            render={props =>
-                logined ? (
-                    <Component {...props} {...rest} />
-                ) : (
-                    <Redirect to="/login" />
-                )
-            }
-        />
-    );
+// Example authentication check function
+const isAuthenticated = () => {
+  // Implement your authentication logic here
+  return true; // Replace with actual authentication check
 };
 
+const ProtectedRoute = ({ component: Component, ...rest }) => (
+  <Route
+    {...rest}
+    render={props =>
+      isAuthenticated() ? (
+        <Component {...props} handleExtraComponents={handleExtraComponents} />
+      ) : (
+        <Redirect to="/login" />
+      )
+    }
+  />
+);
+
 export default ProtectedRoute;
+
+
+
+<ProtectedRoute
+  exact
+  path="/newroi/help"
+  component={New_roi_help}
+  handleExtraComponents={handleExtraComponents}
+/>
