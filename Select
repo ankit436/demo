@@ -26,4 +26,22 @@ FROM (
     FROM rindata.Benefits_Ado_Data
 ) AS BatchedData
 GROUP BY batch_number
-ORDER BY batch_number;
+ORDER BY batch_number
+
+from multiprocessing import Pool
+
+def process_row(rowproxy):
+    d = {}
+    for column, value in rowproxy.items():
+        d[column] = value
+    return d
+
+def process_rows_parallel(rows, num_processes=None):
+    with Pool(processes=num_processes) as pool:
+        ado_data_list = pool.map(process_row, rows)
+    return ado_data_list
+
+# Example usage
+rows = ...  # Your SQLAlchemy result set
+num_processes = 4  # Set this to the number of processes you want to use
+ado_data_list = process_rows_parallel(rows, num_processes)
