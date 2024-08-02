@@ -1,23 +1,22 @@
 // CardList.js
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Row, Col, Spin } from 'antd';
 import CardItem from './CardItem';
 
 const CardList = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [loadedPages, setLoadedPages] = useState(new Set());
-  const [preloading, setPreloading] = useState(false);
+  const loadingRef = useRef(false);
 
   useEffect(() => {
-    if (page === 1) {
-      setLoading(true);
-    }
+    // Initial data load
+    const loadData = async (page) => {
+      if (loadingRef.current || loadedPages.has(page) || !hasMore) return;
 
-    const loadData = async () => {
-      if (loadedPages.has(page) || !hasMore) return;
+      setLoading(true);
+      loadingRef.current = true;
 
       const newData = await fetchData(page);
       if (newData.length === 0) {
@@ -26,43 +25,40 @@ const CardList = () => {
         setData((prevData) => [...prevData, ...newData]);
         setLoadedPages((prev) => new Set(prev).add(page));
       }
+
       setLoading(false);
+      loadingRef.current = false;
     };
 
-    loadData();
-  }, [page, loadedPages, hasMore]);
+    // Load the first page initially
+    if (data.length === 0) {
+      loadData(1);
+    }
 
-  useEffect(() => {
-    // Preload next page if necessary
-    const preloadNextPage = async () => {
-      if (hasMore && !preloading && !loadedPages.has(page + 1)) {
-        setPreloading(true);
-        const newData = await fetchData(page + 1);
-        if (newData.length === 0) {
-          setHasMore(false);
-        } else {
-          setData((prevData) => [...prevData, ...newData]);
-          setLoadedPages((prev) => new Set(prev).add(page + 1));
-        }
-        setPreloading(false);
+    // Preload the next page if necessary
+    if (hasMore && !loading && !loadingRef.current) {
+      const nextPage = data.length / 3 + 1; // assuming 3 items per page
+      if (!loadedPages.has(nextPage)) {
+        loadData(nextPage);
       }
-    };
-
-    preloadNextPage();
-  }, [hasMore, page, preloading, loadedPages]);
+    }
+  }, [data.length, hasMore, loadedPages]);
 
   const handleScroll = () => {
     const scrolledToBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 300;
 
-    if (scrolledToBottom && hasMore && !loading && !preloading) {
-      setPage((prevPage) => prevPage + 1);
+    if (scrolledToBottom && hasMore && !loading && !loadingRef.current) {
+      const nextPage = data.length / 3 + 1; // assuming 3 items per page
+      if (!loadedPages.has(nextPage)) {
+        loadData(nextPage);
+      }
     }
   };
 
   useEffect(() => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [hasMore, loading, preloading]);
+  }, [data.length, hasMore, loading]);
 
   return (
     <div style={{ padding: '20px' }}>
@@ -73,7 +69,7 @@ const CardList = () => {
           </Col>
         ))}
       </Row>
-      {loading && page === 1 && (
+      {loading && (
         <div style={{ textAlign: 'center', padding: '20px' }}>
           <Spin />
         </div>
