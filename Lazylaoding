@@ -8,6 +8,7 @@ const CardList = () => {
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [loadedPages, setLoadedPages] = useState(new Set());
+  const abortController = useRef(null);
   const loadingRef = useRef(false);
 
   useEffect(() => {
@@ -18,16 +19,26 @@ const CardList = () => {
       setLoading(true);
       loadingRef.current = true;
 
-      const newData = await fetchData(page);
-      if (newData.length === 0) {
-        setHasMore(false);
-      } else {
-        setData((prevData) => [...prevData, ...newData]);
-        setLoadedPages((prev) => new Set(prev).add(page));
-      }
+      // AbortController to cancel ongoing requests if needed
+      abortController.current = new AbortController();
+      const signal = abortController.current.signal;
 
-      setLoading(false);
-      loadingRef.current = false;
+      try {
+        const newData = await fetchData(page, signal);
+        if (newData.length === 0) {
+          setHasMore(false);
+        } else {
+          setData((prevData) => [...prevData, ...newData]);
+          setLoadedPages((prev) => new Set(prev).add(page));
+        }
+      } catch (error) {
+        if (error.name !== 'AbortError') {
+          console.error('Fetch error:', error);
+        }
+      } finally {
+        setLoading(false);
+        loadingRef.current = false;
+      }
     };
 
     // Load the first page initially
@@ -37,7 +48,7 @@ const CardList = () => {
 
     // Preload the next page if necessary
     if (hasMore && !loading && !loadingRef.current) {
-      const nextPage = data.length / 3 + 1; // assuming 3 items per page
+      const nextPage = Math.floor(data.length / 15) + 1;
       if (!loadedPages.has(nextPage)) {
         loadData(nextPage);
       }
@@ -48,7 +59,7 @@ const CardList = () => {
     const scrolledToBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 300;
 
     if (scrolledToBottom && hasMore && !loading && !loadingRef.current) {
-      const nextPage = data.length / 3 + 1; // assuming 3 items per page
+      const nextPage = Math.floor(data.length / 15) + 1;
       if (!loadedPages.has(nextPage)) {
         loadData(nextPage);
       }
@@ -57,7 +68,13 @@ const CardList = () => {
 
   useEffect(() => {
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      // Cleanup: cancel ongoing fetch if the component unmounts
+      if (abortController.current) {
+        abortController.current.abort();
+      }
+    };
   }, [data.length, hasMore, loading]);
 
   return (
@@ -84,30 +101,27 @@ const CardList = () => {
 };
 
 // Mocked fetchData function
-const fetchData = async (page) => {
+const fetchData = async (page, signal) => {
   // Mocked data
-  const data = [
-    { id: 1, title: 'Item 1', description: 'Description of Item 1' },
-    { id: 2, title: 'Item 2', description: 'Description of Item 2' },
-    { id: 3, title: 'Item 3', description: 'Description of Item 3' },
-    { id: 4, title: 'Item 4', description: 'Description of Item 4' },
-    { id: 5, title: 'Item 5', description: 'Description of Item 5' },
-    { id: 6, title: 'Item 6', description: 'Description of Item 6' },
-    { id: 7, title: 'Item 7', description: 'Description of Item 7' },
-    { id: 8, title: 'Item 8', description: 'Description of Item 8' },
-    { id: 9, title: 'Item 9', description: 'Description of Item 9' },
-    { id: 10, title: 'Item 10', description: 'Description of Item 10' },
-    // Add more items if needed
-  ];
+  const data = Array.from({ length: 100 }, (_, i) => ({
+    id: i + 1,
+    title: `Item ${i + 1}`,
+    description: `Description of Item ${i + 1}`,
+  }));
 
-  const pageSize = 3;
+  const pageSize = 15;
   const start = (page - 1) * pageSize;
   const end = start + pageSize;
 
-  return new Promise((resolve) => {
-    setTimeout(() => {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => {
       resolve(data.slice(start, end));
     }, 1000); // Simulate network delay
+
+    signal?.addEventListener('abort', () => {
+      clearTimeout(timer);
+      reject(new DOMException('Request aborted', 'AbortError'));
+    });
   });
 };
 
