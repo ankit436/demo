@@ -1,0 +1,96 @@
+// CardList.js
+import React, { useState, useEffect } from 'react';
+import { Row, Col, Spin } from 'antd';
+import CardItem from './CardItem';
+
+const CardList = () => {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [nextData, setNextData] = useState([]);
+  const [loadedPages, setLoadedPages] = useState(new Set());
+  const maxPreloadPages = 3;
+
+  useEffect(() => {
+    // Initial data load
+    if (page === 1) {
+      setLoading(true);
+    }
+    const loadData = async () => {
+      if (!hasMore || loadedPages.has(page)) return;
+
+      const newData = await fetchData(page);
+      if (newData.length === 0) {
+        setHasMore(false);
+      } else {
+        setData((prevData) => [...prevData, ...newData]);
+        setLoadedPages((prevLoadedPages) => new Set(prevLoadedPages).add(page));
+      }
+      setLoading(false);
+    };
+
+    loadData();
+  }, [page, loadedPages, hasMore]);
+
+  useEffect(() => {
+    // Pre-load next page data
+    if (page < maxPreloadPages && hasMore && !loading && !loadedPages.has(page + 1)) {
+      const preloadNextPage = async () => {
+        const newData = await fetchData(page + 1);
+        if (newData.length === 0) {
+          setHasMore(false);
+        } else {
+          setNextData(newData);
+        }
+      };
+      preloadNextPage();
+    }
+  }, [page, hasMore, loading, loadedPages]);
+
+  const handleScroll = () => {
+    const scrolledToBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 300;
+
+    if (scrolledToBottom && hasMore && !loading && nextData.length > 0) {
+      setData((prevData) => [...prevData, ...nextData]);
+      setNextData([]);
+      setPage((prevPage) => prevPage + 1);
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [nextData, hasMore, loading]);
+
+  return (
+    <div style={{ padding: '20px' }}>
+      <Row gutter={[16, 16]}>
+        {data.map((item, index) => (
+          <Col key={index} xs={24} sm={12} md={8}>
+            <CardItem data={item} />
+          </Col>
+        ))}
+      </Row>
+      {loading && page === 1 && (
+        <div style={{ textAlign: 'center', padding: '20px' }}>
+          <Spin />
+        </div>
+      )}
+      {!hasMore && (
+        <div style={{ textAlign: 'center', padding: '20px', color: 'grey' }}>
+          No more data to load
+        </div>
+      )}
+    </div>
+  );
+};
+
+const fetchData = async (page) => {
+  // Replace this with your API call
+  const response = await fetch(`https://api.example.com/data?page=${page}`);
+  const result = await response.json();
+  return result.data;
+};
+
+export default CardList;
