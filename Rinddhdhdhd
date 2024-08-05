@@ -1,3 +1,32 @@
+WITH DistinctProjects AS (
+    SELECT DISTINCT p.ID
+    FROM RINDATA.ROI_PROJECT p
+    ORDER BY p.ID
+    OFFSET :offset ROWS FETCH NEXT 15 ROWS ONLY
+),
+FormulaeExpressions AS (
+    SELECT
+        r.project_id,
+        jt.benefitdriver
+    FROM RINDATA.ROI_EXPRESSION e
+    JOIN RINDATA.ROI_REPORT_TYPE r ON e.report_type_id = r.id
+    CROSS APPLY JSON_TABLE(
+        e.expression,
+        '$.formula[*]'
+        COLUMNS (
+            benefitdriver VARCHAR2(100) PATH '$.benefitdriver'
+        )
+    ) jt
+)
+SELECT
+    p.ID, p.PROJECT_NAME, p.OPPORTUNITY_ID,
+    CASE WHEN f.benefitdriver IS NOT NULL AND f.benefitdriver != '' THEN 1 ELSE 0 END AS formulae_created
+FROM DistinctProjects dp
+JOIN RINDATA.ROI_PROJECT p ON dp.ID = p.ID
+LEFT JOIN FormulaeExpressions f ON dp.ID = f.project_id
+ORDER BY p.ID;
+
+
 WITH ReportProjectIds AS (
     SELECT DISTINCT project_id
     FROM RINDATA.ROI_REPORT 
