@@ -9,9 +9,9 @@ const CardList = () => {
   const [hasMore, setHasMore] = useState(true);
   const [loadedPages, setLoadedPages] = useState(new Set());
   const [preloading, setPreloading] = useState(false);
-  const [shouldLoadNextPage, setShouldLoadNextPage] = useState(false); // New state to manage page increment
   const abortControllerRef = useRef(null); // UseRef for AbortController
 
+  // Function to load data for a specific page
   const loadData = useCallback(async (pageToLoad) => {
     if (loadedPages.has(pageToLoad) || !hasMore || loading) return;
 
@@ -40,13 +40,12 @@ const CardList = () => {
     }
   }, [hasMore, loadedPages, loading]);
 
+  // Effect to load data for the current page and handle scrolling
   useEffect(() => {
-    if (shouldLoadNextPage) {
-      loadData(page);
-      setShouldLoadNextPage(false); // Reset state after loading
-    }
-  }, [loadData, page, shouldLoadNextPage]);
+    loadData(page);
+  }, [loadData, page]);
 
+  // Effect to preload the next page
   useEffect(() => {
     const preloadNextPage = async () => {
       const nextPage = page + 1;
@@ -73,6 +72,7 @@ const CardList = () => {
     preloadNextPage();
   }, [hasMore, page, preloading, loadedPages]);
 
+  // Debounced scroll handler
   const debounce = (func, delay) => {
     let timeout;
     return (...args) => {
@@ -86,7 +86,7 @@ const CardList = () => {
       const scrolledToBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 300;
       console.log('Scrolled to bottom:', scrolledToBottom); // Debugging line
       if (scrolledToBottom && hasMore && !loading && !preloading) {
-        setShouldLoadNextPage(true); // Flag to load the next page
+        setPage((prevPage) => prevPage + 1); // Increment page
       }
     }, 200),
     [hasMore, loading, preloading]
@@ -143,14 +143,4 @@ const fetchData = async (page, signal) => {
 
   return new Promise((resolve, reject) => {
     const timeoutId = setTimeout(() => {
-      resolve(data.slice(start, end));
-    }, 1000); // Simulate network delay
-
-    signal?.addEventListener('abort', () => {
-      clearTimeout(timeoutId);
-      reject(new DOMException('Request was aborted', 'AbortError'));
-    });
-  });
-};
-
-export default CardList;
+      resolve(data
