@@ -4,20 +4,16 @@ import CardItem from './CardItem';
 
 const CardList = () => {
   const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true); // Initially true for the first load
+  const [preloading, setPreloading] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [loadedPages, setLoadedPages] = useState(new Set());
-  const [inProgressPages, setInProgressPages] = useState(new Set());
   const abortControllerRef = useRef(null);
 
-  // Function to load data for a specific page
   const loadData = useCallback(
-    async (pageToLoad) => {
-      if (loadedPages.has(pageToLoad) || inProgressPages.has(pageToLoad) || !hasMore) return;
-
-      // Mark page as in-progress
-      setInProgressPages((prev) => new Set(prev).add(pageToLoad));
+    async (pageToLoad, isPreload = false) => {
+      if (loadedPages.has(pageToLoad) || (isPreload ? preloading : loading) || !hasMore) return;
 
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
@@ -26,7 +22,9 @@ const CardList = () => {
       const controller = new AbortController();
       abortControllerRef.current = controller;
 
-      setLoading(true);
+      if (isPreload) setPreloading(true);
+      else setLoading(true);
+
       try {
         const newData = await fetchData(pageToLoad, controller.signal);
         if (newData.length === 0) {
@@ -40,26 +38,19 @@ const CardList = () => {
           console.error('Error fetching data:', error);
         }
       } finally {
-        // Remove page from in-progress set
-        setInProgressPages((prev) => {
-          const newSet = new Set(prev);
-          newSet.delete(pageToLoad);
-          return newSet;
-        });
-        setLoading(false);
+        if (isPreload) setPreloading(false);
+        else setLoading(false);
       }
     },
-    [hasMore, loadedPages, inProgressPages]
+    [hasMore, loadedPages, preloading, loading]
   );
 
-  // Effect to load data for the current page
   useEffect(() => {
-    if (!loadedPages.has(page) && !inProgressPages.has(page)) {
-      loadData(page);
+    if (!loadedPages.has(1)) {
+      loadData(1);
     }
-  }, [page, loadData, loadedPages, inProgressPages]);
+  }, [loadData, loadedPages]);
 
-  // Debounced scroll handler
   const debounce = (func, delay) => {
     let timeout;
     return (...args) => {
@@ -72,17 +63,23 @@ const CardList = () => {
     debounce(() => {
       const scrolledToBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 300;
 
-      if (scrolledToBottom && hasMore && !loading && !inProgressPages.has(page + 1)) {
+      if (scrolledToBottom && hasMore && !preloading && !loadedPages.has(page + 1)) {
         setPage((prevPage) => prevPage + 1);
       }
     }, 200),
-    [hasMore, loading, page, inProgressPages]
+    [hasMore, preloading, page, loadedPages]
   );
 
   useEffect(() => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, [handleScroll]);
+
+  useEffect(() => {
+    if (page > 1) {
+      loadData(page, true); // Preload for subsequent pages
+    }
+  }, [page, loadData]);
 
   return (
     <div style={{ padding: '20px' }}>
@@ -93,23 +90,10 @@ const CardList = () => {
           </Col>
         ))}
       </Row>
-      {loading && page === 1 && (
+      {loading && (
         <div style={{ textAlign: 'center', padding: '20px' }}>
           <Spin />
         </div>
       )}
-      {!hasMore && (
-        <div style={{ textAlign: 'center', padding: '20px', color: 'grey' }}>
-          No more data to load
-        </div>
-      )}
-    </div>
-  );
-};
-
-// Mocked fetchData function with support for AbortController
-const fetchData = async (page, signal) => {
-  // Mocked data
-  const data = [
-    { id: 1, title: 'Item 1', description: 'Description of Item 1' },
-    { id: 2, title: '
+      {!hasMore && !loading && (
+        <div style={{ textAlign: 'center', padding: '20px', color: '
