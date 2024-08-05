@@ -4,7 +4,7 @@ import CardItem from './CardItem';
 
 const CardList = () => {
   const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true); // Initially true for the first load
+  const [loading, setLoading] = useState(false);
   const [preloading, setPreloading] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -32,6 +32,7 @@ const CardList = () => {
         } else {
           setData((prevData) => [...prevData, ...newData]);
           setLoadedPages((prev) => new Set(prev).add(pageToLoad));
+          if (!isPreload) setPage(pageToLoad); // Update page state when not preloading
         }
       } catch (error) {
         if (error.name !== 'AbortError') {
@@ -47,7 +48,6 @@ const CardList = () => {
 
   useEffect(() => {
     const initialLoad = async () => {
-      // Load first 3 pages initially
       for (let i = 1; i <= 3; i++) {
         await loadData(i, i > 1); // Load page 1 with spinner, others as preload
         if (!hasMore) break;
@@ -71,11 +71,11 @@ const CardList = () => {
     debounce(() => {
       const scrolledToBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 300;
 
-      if (scrolledToBottom && hasMore && !preloading && !loading && !loadedPages.has(page + 1)) {
+      if (scrolledToBottom && hasMore && !preloading && !loading) {
         setPage((prevPage) => prevPage + 1);
       }
     }, 200),
-    [hasMore, preloading, loading, page, loadedPages]
+    [hasMore, preloading, loading]
   );
 
   useEffect(() => {
@@ -117,32 +117,4 @@ const fetchData = async (page, signal) => {
   // Mocked data
   const data = [
     { id: 1, title: 'Item 1', description: 'Description of Item 1' },
-    { id: 2, title: 'Item 2', description: 'Description of Item 2' },
-    { id: 3, title: 'Item 3', description: 'Description of Item 3' },
-    { id: 4, title: 'Item 4', description: 'Description of Item 4' },
-    { id: 5, title: 'Item 5', description: 'Description of Item 5' },
-    { id: 6, title: 'Item 6', description: 'Description of Item 6' },
-    { id: 7, title: 'Item 7', description: 'Description of Item 7' },
-    { id: 8, title: 'Item 8', description: 'Description of Item 8' },
-    { id: 9, title: 'Item 9', description: 'Description of Item 9' },
-    { id: 10, title: 'Item 10', description: 'Description of Item 10' },
-    // Add more items if needed
-  ];
-
-  const pageSize = 3;
-  const start = (page - 1) * pageSize;
-  const end = start + pageSize;
-
-  return new Promise((resolve, reject) => {
-    const timeoutId = setTimeout(() => {
-      resolve(data.slice(start, end));
-    }, 1000); // Simulate network delay
-
-    signal?.addEventListener('abort', () => {
-      clearTimeout(timeoutId);
-      reject(new DOMException('Request was aborted', 'AbortError'));
-    });
-  });
-};
-
-export default CardList;
+    { id: 2, title: 'Item 2', description: 'Description of Item
