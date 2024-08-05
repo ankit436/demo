@@ -1,0 +1,103 @@
+WITH ReportProjectIds AS (
+    SELECT DISTINCT project_id
+    FROM RINDATA.ROI_REPORT 
+    WHERE project_id > :last_project_id
+    ORDER BY project_id
+    FETCH FIRST :page_size ROWS ONLY
+),
+FormulaeExpressions AS (
+    SELECT
+        r.project_id,
+        jt.benefitdriver
+    FROM RINDATA.ROI_EXPRESSION e
+    JOIN RINDATA.ROI_REPORT_TYPE r ON e.report_type_id = r.id
+    CROSS APPLY JSON_TABLE(
+        e.expression,
+        '$.formula[*]'
+        COLUMNS (
+            benefitdriver VARCHAR2(100) PATH '$.benefitdriver'
+        )
+    ) jt
+    WHERE r.project_id > :last_project_id
+    ORDER BY r.project_id
+    FETCH FIRST :page_size ROWS ONLY
+),
+AllProjectIds AS (
+    SELECT project_id FROM ReportProjectIds
+    UNION
+    SELECT project_id FROM FormulaeExpressions
+),
+FinalList AS (
+    SELECT
+        a.project_id,
+        MAX(CASE WHEN r.project_id IS NOT NULL THEN 1 ELSE 0 END) AS ready_for_metrics,
+        MAX(CASE WHEN f.benefitdriver IS NOT NULL AND f.benefitdriver != '' THEN 1 ELSE 0 END) AS formulae_created
+    FROM AllProjectIds a
+    LEFT JOIN ReportProjectIds r ON a.project_id = r.project_id
+    LEFT JOIN FormulaeExpressions f ON a.project_id = f.project_id
+    GROUP BY a.project_id
+)
+SELECT 
+    p.ID,
+    p.OPPORTUNITY_ID,
+    p.PROJECT_NAME, -- Include only necessary columns
+    p.PROJECT_STATUS,
+    f.ready_for_metrics,
+    f.formulae_created
+FROM RINDATA.ROI_PROJECT p
+LEFT JOIN FinalList f ON p.ID = f.project_id
+WHERE p.ID IN (SELECT project_id FROM FinalList)
+ORDER BY p.ID
+FETCH FIRST :page_size ROWS ONLY;
+
+
+
+
+
+
+
+WITH ReportProjectIds AS (
+    SELECT DISTINCT project_id
+    FROM RINDATA.ROI_REPORT 
+),
+FormulaeExpressions AS (
+    SELECT
+        r.project_id,
+        jt.benefitdriver
+    FROM RINDATA.ROI_EXPRESSION e
+    JOIN RINDATA.ROI_REPORT_TYPE r ON e.report_type_id = r.id
+    CROSS APPLY JSON_TABLE(
+        e.expression,
+        '$.formula[*]'
+        COLUMNS (
+            benefitdriver VARCHAR2(100) PATH '$.benefitdriver'
+        )
+    ) jt
+),
+AllProjectIds AS (
+    SELECT project_id FROM ReportProjectIds
+    UNION
+    SELECT project_id FROM FormulaeExpressions
+),
+FinalList AS (
+    SELECT
+        a.project_id,
+        MAX(CASE WHEN r.project_id IS NOT NULL THEN 1 ELSE 0 END) AS ready_for_metrics,
+        MAX(CASE WHEN f.benefitdriver IS NOT NULL AND f.benefitdriver != '' THEN 1 ELSE 0 END) AS formulae_created
+    FROM AllProjectIds a
+    LEFT JOIN ReportProjectIds r ON a.project_id = r.project_id
+    LEFT JOIN FormulaeExpressions f ON a.project_id = f.project_id
+    GROUP BY a.project_id
+)
+SELECT 
+    p.ID,
+    p.OPPORTUNITY_ID,
+    p.PROJECT_NAME, -- Include only necessary columns
+    p.PROJECT_STATUS,
+    f.ready_for_metrics,
+    f.formulae_created
+FROM RINDATA.ROI_PROJECT p
+LEFT JOIN FinalList f ON p.ID = f.project_id
+WHERE p.ID > :last_project_id
+ORDER BY p.ID
+FETCH FIRST :page_size ROWS ONLY;
