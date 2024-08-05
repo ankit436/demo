@@ -11,8 +11,9 @@ const CardList = () => {
   const [preloading, setPreloading] = useState(false);
   const abortControllerRef = useRef(null); // UseRef for AbortController
 
-  const loadData = useCallback(async () => {
-    if (loadedPages.has(page) || !hasMore || loading) return;
+  const loadData = useCallback(async (pageToLoad) => {
+    // Prevent duplicate requests
+    if (loadedPages.has(pageToLoad) || !hasMore || loading) return;
 
     // Cancel the previous request
     if (abortControllerRef.current) {
@@ -24,12 +25,12 @@ const CardList = () => {
 
     setLoading(true);
     try {
-      const newData = await fetchData(page, controller.signal);
+      const newData = await fetchData(pageToLoad, controller.signal);
       if (newData.length === 0) {
         setHasMore(false);
       } else {
         setData((prevData) => [...prevData, ...newData]);
-        setLoadedPages((prev) => new Set(prev).add(page));
+        setLoadedPages((prev) => new Set(prev).add(pageToLoad));
       }
     } catch (error) {
       if (error.name !== 'AbortError') {
@@ -38,23 +39,24 @@ const CardList = () => {
     } finally {
       setLoading(false);
     }
-  }, [page, loadedPages, hasMore, loading]);
+  }, [hasMore, loadedPages, loading]);
 
   useEffect(() => {
-    loadData();
-  }, [loadData]);
+    loadData(page);
+  }, [loadData, page]);
 
   useEffect(() => {
     const preloadNextPage = async () => {
-      if (hasMore && !preloading && !loadedPages.has(page + 1)) {
+      const nextPage = page + 1;
+      if (hasMore && !preloading && !loadedPages.has(nextPage)) {
         setPreloading(true);
         try {
-          const newData = await fetchData(page + 1);
+          const newData = await fetchData(nextPage);
           if (newData.length === 0) {
             setHasMore(false);
           } else {
             setData((prevData) => [...prevData, ...newData]);
-            setLoadedPages((prev) => new Set(prev).add(page + 1));
+            setLoadedPages((prev) => new Set(prev).add(nextPage));
           }
         } catch (error) {
           if (error.name !== 'AbortError') {
@@ -82,10 +84,16 @@ const CardList = () => {
       const scrolledToBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 300;
 
       if (scrolledToBottom && hasMore && !loading && !preloading) {
-        setPage((prevPage) => prevPage + 1);
+        setPage((prevPage) => {
+          const nextPage = prevPage + 1;
+          if (!loadedPages.has(nextPage)) {
+            return nextPage;
+          }
+          return prevPage; // Don't increment if the next page is already loaded
+        });
       }
     }, 200), // Adjust debounce time as needed
-    [hasMore, loading, preloading]
+    [hasMore, loading, preloading, loadedPages]
   );
 
   useEffect(() => {
@@ -124,7 +132,4 @@ const fetchData = async (page, signal) => {
     { id: 2, title: 'Item 2', description: 'Description of Item 2' },
     { id: 3, title: 'Item 3', description: 'Description of Item 3' },
     { id: 4, title: 'Item 4', description: 'Description of Item 4' },
-    { id: 5, title: 'Item 5', description: 'Description of Item 5' },
-    { id: 6, title: 'Item 6', description: 'Description of Item 6' },
-    { id: 7, title: 'Item 7', description: 'Description of Item 7' },
-    { id: 8, title: 'Item
+    { id: 5, title:
