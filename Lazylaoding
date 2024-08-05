@@ -8,69 +8,56 @@ const CardList = () => {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [loadedPages, setLoadedPages] = useState(new Set());
-  const [preloading, setPreloading] = useState(false);
-  const abortControllerRef = useRef(null); // UseRef for AbortController
+  const [inProgressPages, setInProgressPages] = useState(new Set());
+  const abortControllerRef = useRef(null);
 
   // Function to load data for a specific page
-  const loadData = useCallback(async (pageToLoad) => {
-    if (loadedPages.has(pageToLoad) || !hasMore || loading) return;
+  const loadData = useCallback(
+    async (pageToLoad) => {
+      if (loadedPages.has(pageToLoad) || inProgressPages.has(pageToLoad) || !hasMore) return;
 
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-    }
+      // Mark page as in-progress
+      setInProgressPages((prev) => new Set(prev).add(pageToLoad));
 
-    const controller = new AbortController();
-    abortControllerRef.current = controller;
-
-    setLoading(true);
-    try {
-      const newData = await fetchData(pageToLoad, controller.signal);
-      if (newData.length === 0) {
-        setHasMore(false);
-      } else {
-        setData((prevData) => [...prevData, ...newData]);
-        setLoadedPages((prev) => new Set(prev).add(pageToLoad));
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
       }
-    } catch (error) {
-      if (error.name !== 'AbortError') {
-        console.error('Error fetching data:', error);
-      }
-    } finally {
-      setLoading(false);
-    }
-  }, [hasMore, loadedPages, loading]);
 
-  // Effect to load data for the current page and handle scrolling
-  useEffect(() => {
-    loadData(page);
-  }, [loadData, page]);
+      const controller = new AbortController();
+      abortControllerRef.current = controller;
 
-  // Effect to preload the next page
-  useEffect(() => {
-    const preloadNextPage = async () => {
-      const nextPage = page + 1;
-      if (hasMore && !preloading && !loadedPages.has(nextPage)) {
-        setPreloading(true);
-        try {
-          const newData = await fetchData(nextPage);
-          if (newData.length === 0) {
-            setHasMore(false);
-          } else {
-            setData((prevData) => [...prevData, ...newData]);
-            setLoadedPages((prev) => new Set(prev).add(nextPage));
-          }
-        } catch (error) {
-          if (error.name !== 'AbortError') {
-            console.error('Error preloading data:', error);
-          }
-        } finally {
-          setPreloading(false);
+      setLoading(true);
+      try {
+        const newData = await fetchData(pageToLoad, controller.signal);
+        if (newData.length === 0) {
+          setHasMore(false);
+        } else {
+          setData((prevData) => [...prevData, ...newData]);
+          setLoadedPages((prev) => new Set(prev).add(pageToLoad));
         }
+      } catch (error) {
+        if (error.name !== 'AbortError') {
+          console.error('Error fetching data:', error);
+        }
+      } finally {
+        // Remove page from in-progress set
+        setInProgressPages((prev) => {
+          const newSet = new Set(prev);
+          newSet.delete(pageToLoad);
+          return newSet;
+        });
+        setLoading(false);
       }
-    };
+    },
+    [hasMore, loadedPages, inProgressPages]
+  );
 
-    preloadNextPage();
-  }, [hasMore, page, preloading, loadedPages]);
+  // Effect to load data for the current page
+  useEffect(() => {
+    if (!loadedPages.has(page) && !inProgressPages.has(page)) {
+      loadData(page);
+    }
+  }, [page, loadData, loadedPages, inProgressPages]);
 
   // Debounced scroll handler
   const debounce = (func, delay) => {
@@ -84,12 +71,12 @@ const CardList = () => {
   const handleScroll = useCallback(
     debounce(() => {
       const scrolledToBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 300;
-      console.log('Scrolled to bottom:', scrolledToBottom); // Debugging line
-      if (scrolledToBottom && hasMore && !loading && !preloading) {
-        setPage((prevPage) => prevPage + 1); // Increment page
+
+      if (scrolledToBottom && hasMore && !loading && !inProgressPages.has(page + 1)) {
+        setPage((prevPage) => prevPage + 1);
       }
     }, 200),
-    [hasMore, loading, preloading]
+    [hasMore, loading, page, inProgressPages]
   );
 
   useEffect(() => {
@@ -125,22 +112,4 @@ const fetchData = async (page, signal) => {
   // Mocked data
   const data = [
     { id: 1, title: 'Item 1', description: 'Description of Item 1' },
-    { id: 2, title: 'Item 2', description: 'Description of Item 2' },
-    { id: 3, title: 'Item 3', description: 'Description of Item 3' },
-    { id: 4, title: 'Item 4', description: 'Description of Item 4' },
-    { id: 5, title: 'Item 5', description: 'Description of Item 5' },
-    { id: 6, title: 'Item 6', description: 'Description of Item 6' },
-    { id: 7, title: 'Item 7', description: 'Description of Item 7' },
-    { id: 8, title: 'Item 8', description: 'Description of Item 8' },
-    { id: 9, title: 'Item 9', description: 'Description of Item 9' },
-    { id: 10, title: 'Item 10', description: 'Description of Item 10' },
-    // Add more items if needed
-  ];
-
-  const pageSize = 3;
-  const start = (page - 1) * pageSize;
-  const end = start + pageSize;
-
-  return new Promise((resolve, reject) => {
-    const timeoutId = setTimeout(() => {
-      resolve(data
+    { id: 2, title: '
