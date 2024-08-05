@@ -9,6 +9,7 @@ const CardList = () => {
   const [hasMore, setHasMore] = useState(true);
   const [loadedPages, setLoadedPages] = useState(new Set());
   const [preloading, setPreloading] = useState(false);
+  const [shouldLoadNextPage, setShouldLoadNextPage] = useState(false); // New state to manage page increment
   const abortControllerRef = useRef(null); // UseRef for AbortController
 
   const loadData = useCallback(async (pageToLoad) => {
@@ -40,8 +41,11 @@ const CardList = () => {
   }, [hasMore, loadedPages, loading]);
 
   useEffect(() => {
-    loadData(page);
-  }, [loadData, page]);
+    if (shouldLoadNextPage) {
+      loadData(page);
+      setShouldLoadNextPage(false); // Reset state after loading
+    }
+  }, [loadData, page, shouldLoadNextPage]);
 
   useEffect(() => {
     const preloadNextPage = async () => {
@@ -82,16 +86,10 @@ const CardList = () => {
       const scrolledToBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 300;
       console.log('Scrolled to bottom:', scrolledToBottom); // Debugging line
       if (scrolledToBottom && hasMore && !loading && !preloading) {
-        setPage((prevPage) => {
-          const nextPage = prevPage + 1;
-          if (!loadedPages.has(nextPage)) {
-            return nextPage;
-          }
-          return prevPage;
-        });
+        setShouldLoadNextPage(true); // Flag to load the next page
       }
     }, 200),
-    [hasMore, loading, preloading, loadedPages]
+    [hasMore, loading, preloading]
   );
 
   useEffect(() => {
