@@ -204,3 +204,79 @@ FROM RINDATA.ROI_PROJECT p
 LEFT JOIN FinalList f ON p.ID = f.project_id
 ORDER BY p.project_id
 OFFSET :offset ROWS FETCH NEXT 15 ROWS ONLY;
+
+
+
+from sqlalchemy import text
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import create_engine
+
+# Replace 'your_database_url' with your actual database connection string
+engine = create_engine('your_database_url')
+Session = sessionmaker(bind=engine)
+session = Session()
+
+# Define the SQL query with pagination
+sql_query = text("""
+WITH ReportProjectIds AS ( \
+    SELECT DISTINCT project_id \
+    FROM RINDATA.ROI_REPORT \
+), \
+FormulaeExpressions AS ( \
+    SELECT \
+        r.project_id, \
+        jt.benefitdriver \
+    FROM RINDATA.ROI_EXPRESSION e \
+    JOIN RINDATA.ROI_REPORT_TYPE r ON e.report_type_id = r.id \
+    CROSS APPLY JSON_TABLE( \
+        e.expression, \
+        '$.formula[*]' \
+        COLUMNS ( \
+            benefitdriver VARCHAR2(100) PATH '$.benefitdriver' \
+        ) \
+    ) jt \
+), \
+AllProjectIds AS ( \
+    SELECT project_id FROM ReportProjectIds \
+    UNION \
+    SELECT project_id FROM FormulaeExpressions \
+), \
+FinalList AS ( \
+    SELECT \
+        a.project_id, \
+        CASE WHEN r.project_id IS NOT NULL THEN 1 ELSE 0 END AS ready_for_metrics, \
+        CASE WHEN EXISTS ( \
+            SELECT 1 \
+            FROM FormulaeExpressions f \
+            WHERE a.project_id = f.project_id \
+              AND f.benefitdriver IS NOT NULL \
+              AND f.benefitdriver != '' \
+        ) THEN 1 ELSE 0 END AS formulae_created \
+    FROM AllProjectIds a \
+    LEFT JOIN ReportProjectIds r ON a.project_id = r.project_id \
+) \
+SELECT \
+    p.*, \
+    CASE WHEN p.OPPORTUNITY_ID IS NOT NULL THEN f.ready_for_metrics ELSE 0 END AS ready_for_metrics, \
+    f.formulae_created AS formulae_created \
+FROM RINDATA.ROI_PROJECT p \
+LEFT JOIN FinalList f ON p.ID = f.project_id \
+ORDER BY p.project_id \
+OFFSET :offset ROWS FETCH NEXT 15 ROWS ONLY; \
+""")
+
+# Define the offset (e.g., skip first 30 rows)
+offset = 30
+
+# Execute the query
+result = session.execute(sql_query, {'offset': offset})
+
+# Fetch all results
+projects = result.fetchall()
+
+# Close the session
+session.close()
+
+# Process the results
+for project in projects:
+    print(dict(project))
