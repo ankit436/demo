@@ -1,63 +1,153 @@
- You're correct. In this code, page 2 is indeed being called twice. This is happening due to the structure of the initial load and the subsequent preloading mechanism. Let's break down why this is occurring:
-
-1. Initial Load:
-   In the first `useEffect` hook, there's an `initialLoad` function that loads the first two pages:
-
-   ```javascript
-   for (let i = 1; i <= 2; i++) {
-     await loadData(i, false);
-     setPage(i);
-     if (!hasMore) break;
-   }
-   ```
-
-   This loads page 1 and page 2.
-
-2. Preloading:
-   After the initial load, the page state is set to 2. Then, in another `useEffect` hook, there's a check for preloading:
-
-   ```javascript
-   if (shouldLoadNextPage && !preloading && hasMore) {
-     loadData(page + 1, true);
-   }
-   ```
-
-   Since `page` is 2 at this point, this will trigger a preload of page 3. However, it will also trigger a preload of page 2 again, because the `loadedPages` set doesn't prevent preloading of already loaded pages.
-
-To fix this issue and avoid loading page 2 twice, you could modify the `loadData` function to check if the page has already been loaded, even for preloading:
+ I understand you'd like to see the entire updated code. Here's the complete `CardList` component with all the modifications we've discussed:
 
 ```javascript
-const loadData = useCallback(
-  async (pageToLoad, isPreload = false) => {
-    if (loadedPages.has(pageToLoad)) return;
-    
-    if (isPreload) {
-      if (preloading) return;
-      setPreloading(true);
-    } else {
-      if (loading) return;
+const CARDS_PER_PAGE = 12;
+
+const CardList = () => {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [preloading, setPreloading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [page, setPage] = useState(1);
+  const [loadedPages, setLoadedPages] = useState(new Set());
+  const observerRef = useRef(null);
+  const lastCardRef = useRef(null);
+
+  const loadData = useCallback(
+    async (pageToLoad, isPreload = false) => {
+      if (loadedPages.has(pageToLoad)) return;
+      
+      if (isPreload) {
+        if (preloading) return;
+        setPreloading(true);
+      } else {
+        if (loading) return;
+        setLoading(true);
+      }
+
+      try {
+        console.log(`Loading page ${pageToLoad}, isPreload: ${isPreload}`);
+        const newData = await fetchData(pageToLoad);
+        if (newData.length === 0) {
+          setHasMore(false);
+        } else {
+          setData((prevData) => [...prevData, ...newData]);
+          setLoadedPages((prev) => new Set(prev).add(pageToLoad));
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        if (isPreload) setPreloading(false);
+        else setLoading(false);
+      }
+    },
+    [loadedPages, loading, preloading]
+  );
+
+  useEffect(() => {
+    const initialLoad = async () => {
       setLoading(true);
+      for (let i = 1; i <= 2; i++) {
+        await loadData(i, false);
+        if (!hasMore) break;
+      }
+      setPage(2); // Set page to 2 after loading initial pages
+      setLoading(false);
+    };
+
+    if (data.length === 0 && !loading && !preloading) {
+      initialLoad();
+    }
+  }, [loadData, data.length, hasMore, loading, preloading]);
+
+  useEffect(() => {
+    if (!loading && hasMore) {
+      const options = {
+        root: null,
+        rootMargin: '0px',
+        threshold: 0.1,
+      };
+
+      observerRef.current = new IntersectionObserver((entries) => {
+        const lastCard = entries[0];
+        if (lastCard.isIntersecting && !loadedPages.has(page + 1)) {
+          setPage((prevPage) => prevPage + 1);
+        }
+      }, options);
+
+      if (lastCardRef.current) {
+        observerRef.current.observe(lastCardRef.current);
+      }
     }
 
-    try {
-      const newData = await fetchData(pageToLoad);
-      if (newData.length === 0) {
-        setHasMore(false);
-      } else {
-        setData((prevData) => [...prevData, ...newData]);
-        setLoadedPages((prev) => new Set(prev).add(pageToLoad));
-      }
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    } finally {
-      if (isPreload) setPreloading(false);
-      else setLoading(false);
+    return () => observerRef.current?.disconnect();
+  }, [loading, hasMore, page, loadedPages]);
+
+  useEffect(() => {
+    const remainingCards = data.length % CARDS_PER_PAGE;
+    const shouldLoadNextPage = remainingCards === 0 || remainingCards >= CARDS_PER_PAGE / 2;
+
+    if (shouldLoadNextPage && !preloading && hasMore && !loadedPages.has(page + 1)) {
+      loadData(page + 1, true);
     }
-  },
-  [loadedPages, loading, preloading]
-);
+  }, [page, loadData, preloading, data.length, hasMore, loadedPages]);
+
+  useEffect(() => {
+    if (observerRef.current && lastCardRef.current) {
+      observerRef.current.observe(lastCardRef.current);
+    }
+  }, [data, observerRef, lastCardRef]);
+
+  return (
+    <div style={{ padding: '20px' }}>
+      <Row gutter={[16, 16]}>
+        {data.map((item, index) => (
+          <Col
+            key={index}
+            xs={24}
+            sm={12}
+            md={8}
+            ref={index === data.length - CARDS_PER_PAGE / 2 ? lastCardRef : null}
+          >
+            <CardItem data={item} />
+          </Col>
+        ))}
+      </Row>
+      {loading && data.length === 0 && (
+        <div style={{ textAlign: 'center', padding: '20px' }}>
+          <Spin />
+        </div>
+      )}
+      {!hasMore && !loading && (
+        <div style={{ textAlign: 'center', padding: '20px', color: 'grey' }}>
+          No more data to load
+        </div>
+      )}
+      {preloading && (
+        <div style={{ textAlign: 'center', padding: '20px', color: 'blue' }}>
+          Loading more data...
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default CardList;
 ```
 
-This modification ensures that a page is not loaded again, even during preloading, if it has already been loaded. This should prevent page 2 from being loaded twice.
+This updated version includes all the changes we've discussed:
 
-Would you like me to explain any other part of the code or suggest any further optimizations?
+1. The `loadData` function now checks if a page has already been loaded before fetching it.
+2. The initial load sets the page to 2 after loading the first two pages.
+3. The intersection observer effect checks if the next page has already been loaded before incrementing the page number.
+4. The preloading effect checks if the next page has already been loaded before triggering a preload.
+
+I've also added a console.log in the `loadData` function to help with debugging. This should help you track when pages are being loaded and whether they're being loaded as part of the initial load or as a preload.
+
+If you're still experiencing issues with this code, it would be helpful to:
+
+1. Check the console logs to see the order and frequency of page loads.
+2. Verify that the `fetchData` function is not returning duplicate data.
+3. Ensure that the `CARDS_PER_PAGE` constant matches the actual number of items returned by each `fetchData` call.
+
+Let me know if you need any further clarification or if you're still seeing unexpected behavior with this updated code.
