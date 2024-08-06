@@ -1,0 +1,119 @@
+// src/App.js
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import axios from 'axios';
+import { Card, Row, Col, Spin } from 'antd';
+import 'antd/dist/reset.css';
+
+const App = () => {
+  const [data, setData] = useState([]);
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(true);
+  const [hasMore, setHasMore] = useState(true);
+  const [preloadedPages, setPreloadedPages] = useState([]);
+  const fetchedPages = useRef(new Set());
+  const observer = useRef();
+  const controller = useRef(null);
+
+  const fetchItems = async (pageNum, signal) => {
+    if (fetchedPages.current.has(pageNum)) {
+      return [];
+    }
+
+    try {
+      const response = await axios.get(`https://api.example.com/items?page=${pageNum}`, { signal });
+      if (response.data.length > 0) {
+        fetchedPages.current.add(pageNum);
+      }
+      return response.data;
+    } catch (error) {
+      if (axios.isCancel(error)) {
+        console.log('Fetch cancelled');
+      } else {
+        console.error(error);
+      }
+      return [];
+    }
+  };
+
+  const loadPages = useCallback(async (pageNum) => {
+    if (data.length === 0) {
+      setLoading(true);
+    }
+    
+    if (controller.current) {
+      controller.current.abort();
+    }
+    controller.current = new AbortController();
+    
+    const fetchedItems = await fetchItems(pageNum, controller.current.signal);
+    setData((prevData) => [...prevData, ...fetchedItems]);
+
+    const preloaded = [];
+    for (let i = 1; i <= 3; i++) {
+      const preloadedItems = await fetchItems(pageNum + i, controller.current.signal);
+      if (preloadedItems.length > 0) {
+        preloaded.push(preloadedItems);
+      } else {
+        setHasMore(false);
+        break;
+      }
+    }
+    setPreloadedPages(preloaded);
+    setLoading(false);
+  }, [data]);
+
+  const lastItemRef = useCallback((node) => {
+    if (observer.current) observer.current.disconnect();
+    observer.current = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && hasMore) {
+        if (preloadedPages.length > 0) {
+          setData((prevData) => [...prevData, ...preloadedPages[0]]);
+          setPreloadedPages((prev) => prev.slice(1));
+        } else {
+          setPage((prevPage) => prevPage + 1);
+        }
+      }
+    });
+    if (node) observer.current.observe(node);
+  }, [hasMore, preloadedPages]);
+
+  useEffect(() => {
+    loadPages(page);
+    return () => {
+      if (controller.current) {
+        controller.current.abort();
+      }
+    };
+  }, [page, loadPages]);
+
+  return (
+    <div className="App">
+      <h1>Infinite Loading Cards</h1>
+      {loading && <Spin style={{ marginTop: 16 }} />}
+      <Row gutter={[16, 16]}>
+        {data.map((item, index) => {
+          const isSecondLastPageItem = index >= data.length - 24 && index < data.length - 12; // Adjust condition
+          if (isSecondLastPageItem) {
+            return (
+              <Col span={6} key={item.id}>
+                <Card ref={lastItemRef} title={item.title}>
+                  {item.content}
+                </Card>
+              </Col>
+            );
+          } else {
+            return (
+              <Col span={6} key={item.id}>
+                <Card title={item.title}>
+                  {item.content}
+                </Card>
+              </Col>
+            );
+          }
+        })}
+      </Row>
+    </div>
+  );
+};
+
+export default App;
