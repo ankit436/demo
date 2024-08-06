@@ -6,9 +6,10 @@ const CardList = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(1);
   const [loadedPages, setLoadedPages] = useState(new Set());
   const observerRef = useRef(null);
+  const lastCardRef = useRef(null);
 
   const loadData = useCallback(async (pageToLoad) => {
     if (loadedPages.has(pageToLoad) || loading || !hasMore) return;
@@ -48,7 +49,6 @@ const CardList = () => {
 
     const observerCallback = (entries) => {
       entries.forEach((entry) => {
-        // Check if the entry is intersecting or has been scrolled past
         if (entry.isIntersecting || entry.intersectionRatio > 0) {
           const nextPage = parseInt(entry.target.dataset.page, 10) + 1;
           loadData(nextPage);
@@ -59,14 +59,28 @@ const CardList = () => {
     observerRef.current = new IntersectionObserver(observerCallback, {
       root: null,
       rootMargin: '0px',
-      threshold: 0.2, // 20% visibility
+      threshold: 0.2, // Trigger when 20% of the target is visible
     });
 
-    const lastCards = document.querySelectorAll('[data-last-card]');
-    lastCards.forEach((card) => observerRef.current.observe(card));
+    if (lastCardRef.current) {
+      observerRef.current.observe(lastCardRef.current);
+    }
 
-    return () => observerRef.current?.disconnect();
+    return () => {
+      observerRef.current?.disconnect();
+    };
   }, [data, hasMore, loading, loadData]);
+
+  useEffect(() => {
+    if (lastCardRef.current) {
+      observerRef.current?.unobserve(lastCardRef.current);
+    }
+    const lastCard = document.querySelector('[data-last-card="true"]');
+    if (lastCard) {
+      lastCardRef.current = lastCard;
+      observerRef.current?.observe(lastCard);
+    }
+  }, [data]);
 
   return (
     <div style={{ padding: '20px' }}>
@@ -107,29 +121,4 @@ const fetchData = async (page) => {
     { id: 4, title: 'Item 4', description: 'Description of Item 4' },
     { id: 5, title: 'Item 5', description: 'Description of Item 5' },
     { id: 6, title: 'Item 6', description: 'Description of Item 6' },
-    { id: 7, title: 'Item 7', description: 'Description of Item 7' },
-    { id: 8, title: 'Item 8', description: 'Description of Item 8' },
-    { id: 9, title: 'Item 9', description: 'Description of Item 9' },
-    { id: 10, title: 'Item 10', description: 'Description of Item 10' },
-    { id: 11, title: 'Item 11', description: 'Description of Item 11' },
-    { id: 12, title: 'Item 12', description: 'Description of Item 12' },
-    { id: 13, title: 'Item 13', description: 'Description of Item 13' },
-    { id: 14, title: 'Item 14', description: 'Description of Item 14' },
-    { id: 15, title: 'Item 15', description: 'Description of Item 15' },
-    { id: 16, title: 'Item 16', description: 'Description of Item 16' },
-    { id: 17, title: 'Item 17', description: 'Description of Item 17' },
-    { id: 18, title: 'Item 18', description: 'Description of Item 18' },
-  ];
-
-  const pageSize = 12;
-  const start = (page - 1) * pageSize;
-  const end = start + pageSize;
-
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(data.slice(start, end));
-    }, 1000); // Simulate network delay
-  });
-};
-
-export default CardList;
+    { id: 7, title: 'Item 7
