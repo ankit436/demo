@@ -5,6 +5,7 @@ import CardItem from './CardItem';
 const CardList = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [preloading, setPreloading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(1);
   const [loadedPages, setLoadedPages] = useState(new Set());
@@ -12,10 +13,11 @@ const CardList = () => {
   const lastCardRef = useRef(null);
 
   const loadData = useCallback(
-    async (pageToLoad) => {
-      if (loadedPages.has(pageToLoad) || loading) return;
+    async (pageToLoad, isPreload = false) => {
+      if (loadedPages.has(pageToLoad) || (isPreload ? preloading : loading)) return;
 
-      setLoading(true);
+      if (isPreload) setPreloading(true);
+      else setLoading(true);
 
       try {
         const newData = await fetchData(pageToLoad);
@@ -23,24 +25,37 @@ const CardList = () => {
           setHasMore(false);
         } else {
           setData((prevData) => [...prevData, ...newData]);
-          setLoadedPages((prev) => new Set(prev).add(pageToLoad));
-          setPage((prevPage) => Math.max(prevPage, pageToLoad));
+          setLoadedPages((prev) => new Set(prev).add(pageToLoad)); // Mark this page as loaded
         }
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {
-        setLoading(false);
+        if (isPreload) setPreloading(false);
+        else setLoading(false);
       }
     },
-    [loadedPages, loading]
+    [loadedPages, loading, preloading]
   );
+
+  useEffect(() => {
+    const initialLoad = async () => {
+      for (let i = 1; i <= 3; i++) {
+        await loadData(i, false);
+        if (!hasMore) break;
+      }
+    };
+
+    if (data.length === 0 && !loading && !preloading) {
+      initialLoad();
+    }
+  }, [loadData, data.length, hasMore, loading, preloading]);
 
   useEffect(() => {
     if (!loading && hasMore) {
       const options = {
-        root: null, // Use the viewport as the root
+        root: null,
         rootMargin: '0px',
-        threshold: 0.1, // Trigger when 10% of the target is visible
+        threshold: 0.1,
       };
 
       observerRef.current = new IntersectionObserver((entries) => {
@@ -59,7 +74,9 @@ const CardList = () => {
   }, [loading, hasMore, data]);
 
   useEffect(() => {
-    loadData(page);
+    if (page > 3) {
+      loadData(page, true);
+    }
   }, [page, loadData]);
 
   return (
@@ -87,6 +104,11 @@ const CardList = () => {
           No more data to load
         </div>
       )}
+      {preloading && (
+        <div style={{ textAlign: 'center', padding: '20px', color: 'blue' }}>
+          Loading more data...
+        </div>
+      )}
     </div>
   );
 };
@@ -106,15 +128,4 @@ const fetchData = async (page) => {
     { id: 10, title: 'Item 10', description: 'Description of Item 10' },
   ];
 
-  const pageSize = 3;
-  const start = (page - 1) * pageSize;
-  const end = start + pageSize;
-
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(data.slice(start, end));
-    }, 1000); // Simulate network delay
-  });
-};
-
-export default CardList;
+  const pageSize =
