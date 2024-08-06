@@ -48,7 +48,8 @@ const CardList = () => {
 
     const observerCallback = (entries) => {
       entries.forEach((entry) => {
-        if (entry.isIntersecting) {
+        // Check if the entry is intersecting or has been scrolled past
+        if (entry.isIntersecting || entry.intersectionRatio > 0) {
           const nextPage = parseInt(entry.target.dataset.page, 10) + 1;
           loadData(nextPage);
         }
@@ -58,7 +59,7 @@ const CardList = () => {
     observerRef.current = new IntersectionObserver(observerCallback, {
       root: null,
       rootMargin: '0px',
-      threshold: 0.2, // Trigger when 20% of the target is visible
+      threshold: 0.2, // 20% visibility
     });
 
     const lastCards = document.querySelectorAll('[data-last-card]');
