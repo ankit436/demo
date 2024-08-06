@@ -1,119 +1,120 @@
-// src/App.js
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import axios from 'axios';
-import { Card, Row, Col, Spin } from 'antd';
-import 'antd/dist/reset.css';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { Row, Col, Spin } from 'antd';
+import CardItem from './CardItem';
 
-const App = () => {
+const CardList = () => {
   const [data, setData] = useState([]);
-  const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-  const [preloadedPages, setPreloadedPages] = useState([]);
-  const fetchedPages = useRef(new Set());
-  const observer = useRef();
-  const controller = useRef(null);
+  const [page, setPage] = useState(1);
+  const [loadedPages, setLoadedPages] = useState(new Set());
+  const observerRef = useRef(null);
+  const lastCardRef = useRef(null);
 
-  const fetchItems = async (pageNum, signal) => {
-    if (fetchedPages.current.has(pageNum)) {
-      return [];
-    }
+  const loadData = useCallback(
+    async (pageToLoad) => {
+      if (loadedPages.has(pageToLoad) || loading) return;
 
-    try {
-      const response = await axios.get(`https://api.example.com/items?page=${pageNum}`, { signal });
-      if (response.data.length > 0) {
-        fetchedPages.current.add(pageNum);
-      }
-      return response.data;
-    } catch (error) {
-      if (axios.isCancel(error)) {
-        console.log('Fetch cancelled');
-      } else {
-        console.error(error);
-      }
-      return [];
-    }
-  };
-
-  const loadPages = useCallback(async (pageNum) => {
-    if (data.length === 0) {
       setLoading(true);
-    }
-    
-    if (controller.current) {
-      controller.current.abort();
-    }
-    controller.current = new AbortController();
-    
-    const fetchedItems = await fetchItems(pageNum, controller.current.signal);
-    setData((prevData) => [...prevData, ...fetchedItems]);
 
-    const preloaded = [];
-    for (let i = 1; i <= 3; i++) {
-      const preloadedItems = await fetchItems(pageNum + i, controller.current.signal);
-      if (preloadedItems.length > 0) {
-        preloaded.push(preloadedItems);
-      } else {
-        setHasMore(false);
-        break;
-      }
-    }
-    setPreloadedPages(preloaded);
-    setLoading(false);
-  }, [data]);
-
-  const lastItemRef = useCallback((node) => {
-    if (observer.current) observer.current.disconnect();
-    observer.current = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting && hasMore) {
-        if (preloadedPages.length > 0) {
-          setData((prevData) => [...prevData, ...preloadedPages[0]]);
-          setPreloadedPages((prev) => prev.slice(1));
+      try {
+        const newData = await fetchData(pageToLoad);
+        if (newData.length === 0) {
+          setHasMore(false);
         } else {
-          setPage((prevPage) => prevPage + 1);
+          setData((prevData) => [...prevData, ...newData]);
+          setLoadedPages((prev) => new Set(prev).add(pageToLoad));
+          setPage((prevPage) => Math.max(prevPage, pageToLoad));
         }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false);
       }
-    });
-    if (node) observer.current.observe(node);
-  }, [hasMore, preloadedPages]);
+    },
+    [loadedPages, loading]
+  );
 
   useEffect(() => {
-    loadPages(page);
-    return () => {
-      if (controller.current) {
-        controller.current.abort();
+    if (!loading && hasMore) {
+      const options = {
+        root: null, // Use the viewport as the root
+        rootMargin: '0px',
+        threshold: 0.1, // Trigger when 10% of the target is visible
+      };
+
+      observerRef.current = new IntersectionObserver((entries) => {
+        const lastCard = entries[0];
+        if (lastCard.isIntersecting) {
+          setPage((prevPage) => prevPage + 1);
+        }
+      }, options);
+
+      if (lastCardRef.current) {
+        observerRef.current.observe(lastCardRef.current);
       }
-    };
-  }, [page, loadPages]);
+    }
+
+    return () => observerRef.current?.disconnect();
+  }, [loading, hasMore, data]);
+
+  useEffect(() => {
+    loadData(page);
+  }, [page, loadData]);
 
   return (
-    <div className="App">
-      <h1>Infinite Loading Cards</h1>
-      {loading && <Spin style={{ marginTop: 16 }} />}
+    <div style={{ padding: '20px' }}>
       <Row gutter={[16, 16]}>
-        {data.map((item, index) => {
-          const isSecondLastPageItem = index >= data.length - 24 && index < data.length - 12; // Adjust condition
-          if (isSecondLastPageItem) {
-            return (
-              <Col span={6} key={item.id}>
-                <Card ref={lastItemRef} title={item.title}>
-                  {item.content}
-                </Card>
-              </Col>
-            );
-          } else {
-            return (
-              <Col span={6} key={item.id}>
-                <Card title={item.title}>
-                  {item.content}
-                </Card>
-              </Col>
-            );
-          }
-        })}
+        {data.map((item, index) => (
+          <Col
+            key={index}
+            xs={24}
+            sm={12}
+            md={8}
+            ref={index === data.length - 1 ? lastCardRef : null}
+          >
+            <CardItem data={item} />
+          </Col>
+        ))}
       </Row>
+      {loading && data.length === 0 && (
+        <div style={{ textAlign: 'center', padding: '20px' }}>
+          <Spin />
+        </div>
+      )}
+      {!hasMore && !loading && (
+        <div style={{ textAlign: 'center', padding: '20px', color: 'grey' }}>
+          No more data to load
+        </div>
+      )}
     </div>
   );
 };
 
-export default App;
+// Mocked fetchData function with support for AbortController
+const fetchData = async (page) => {
+  const data = [
+    { id: 1, title: 'Item 1', description: 'Description of Item 1' },
+    { id: 2, title: 'Item 2', description: 'Description of Item 2' },
+    { id: 3, title: 'Item 3', description: 'Description of Item 3' },
+    { id: 4, title: 'Item 4', description: 'Description of Item 4' },
+    { id: 5, title: 'Item 5', description: 'Description of Item 5' },
+    { id: 6, title: 'Item 6', description: 'Description of Item 6' },
+    { id: 7, title: 'Item 7', description: 'Description of Item 7' },
+    { id: 8, title: 'Item 8', description: 'Description of Item 8' },
+    { id: 9, title: 'Item 9', description: 'Description of Item 9' },
+    { id: 10, title: 'Item 10', description: 'Description of Item 10' },
+  ];
+
+  const pageSize = 3;
+  const start = (page - 1) * pageSize;
+  const end = start + pageSize;
+
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(data.slice(start, end));
+    }, 1000); // Simulate network delay
+  });
+};
+
+export default CardList;
