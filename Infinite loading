@@ -1,4 +1,4 @@
- I understand your concern. You're right that we need to prevent multiple calls to the same page. Let's modify the code to address this issue and ensure each page is only loaded once. Here's an updated version of the `CardList` component:
+ I apologize for the oversight. You're right that there's an issue with the first page not being called. Let's fix this and ensure the pagination starts correctly from page 1. Here's the corrected version of the `CardList` component:
 
 ```jsx
 import React, { useState, useEffect, useCallback, useRef } from 'react';
@@ -13,7 +13,7 @@ const CardList = () => {
   const [preloading, setPreloading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(1);
-  const [loadedPages, setLoadedPages] = useState(new Set([1]));
+  const [loadedPages, setLoadedPages] = useState(new Set());
   const observerRef = useRef(null);
   const lastCardRef = useRef(null);
   const loadingRef = useRef(false);
@@ -33,7 +33,7 @@ const CardList = () => {
         } else {
           setData((prevData) => [...prevData, ...newData]);
           setLoadedPages((prev) => new Set(prev).add(pageToLoad));
-          setPage(pageToLoad);
+          setPage(Math.max(page, pageToLoad));
         }
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -43,19 +43,18 @@ const CardList = () => {
         loadingRef.current = false;
       }
     },
-    [loadedPages]
+    [loadedPages, page]
   );
 
   useEffect(() => {
     const initialLoad = async () => {
       await loadData(1, false);
-      if (hasMore) await loadData(2, true);
     };
 
     if (data.length === 0 && !loading && !preloading) {
       initialLoad();
     }
-  }, [loadData, data.length, hasMore, loading, preloading]);
+  }, [loadData, data.length, loading, preloading]);
 
   useEffect(() => {
     if (!loading && hasMore) {
@@ -82,6 +81,15 @@ const CardList = () => {
 
     return () => observerRef.current?.disconnect();
   }, [loading, hasMore, data, loadData, loadedPages]);
+
+  useEffect(() => {
+    if (hasMore && !loading && !preloading) {
+      const nextPage = Math.floor(data.length / CARDS_PER_PAGE) + 1;
+      if (!loadedPages.has(nextPage)) {
+        loadData(nextPage, true);
+      }
+    }
+  }, [data.length, hasMore, loading, preloading, loadData, loadedPages]);
 
   return (
     <div style={{ padding: '20px' }}>
@@ -120,56 +128,45 @@ const CardList = () => {
 export default CardList;
 ```
 
-Key changes to prevent multiple calls to the same page:
+Key changes to fix the pagination issue:
 
-1. Added a `loadingRef` to track the loading state across renders:
-
-```jsx
-const loadingRef = useRef(false);
-```
-
-2. Modified the `loadData` function to use `loadingRef`:
+1. Updated the initial `loadedPages` state to be an empty set:
 
 ```jsx
-if (loadedPages.has(pageToLoad) || loadingRef.current) return;
-
-loadingRef.current = true;
-// ... (loading logic)
-loadingRef.current = false;
+const [loadedPages, setLoadedPages] = useState(new Set());
 ```
 
-3. Updated the intersection observer logic:
+2. Modified the `loadData` function to update the page correctly:
 
 ```jsx
-if (lastCard.isIntersecting && !loadingRef.current) {
-  const nextPage = Math.floor(data.length / CARDS_PER_PAGE) + 1;
-  if (!loadedPages.has(nextPage)) {
-    loadData(nextPage, true);
-  }
-}
+setPage(Math.max(page, pageToLoad));
 ```
 
-4. Simplified the initial load to fetch only the first page, then preload the second:
+3. Simplified the initial load to only fetch the first page:
 
 ```jsx
 const initialLoad = async () => {
   await loadData(1, false);
-  if (hasMore) await loadData(2, true);
 };
 ```
 
-5. Removed the separate useEffect for preloading, as it's now handled by the intersection observer.
-
-6. Updated the `setPage` call to happen after successful data loading:
+4. Added a new `useEffect` to handle preloading the next page:
 
 ```jsx
-setPage(pageToLoad);
+useEffect(() => {
+  if (hasMore && !loading && !preloading) {
+    const nextPage = Math.floor(data.length / CARDS_PER_PAGE) + 1;
+    if (!loadedPages.has(nextPage)) {
+      loadData(nextPage, true);
+    }
+  }
+}, [data.length, hasMore, loading, preloading, loadData, loadedPages]);
 ```
 
 These changes ensure that:
+- The first page (page 1) is loaded initially.
+- Subsequent pages are loaded correctly based on the current data length.
+- Preloading of the next page happens automatically after the current page is loaded.
 - Each page is only loaded once.
-- The loading state is tracked accurately across renders.
-- The next page is only loaded when the current page is fully loaded.
-- The intersection observer triggers the load for the next unloaded page.
 
-This should prevent multiple calls to the same page and provide a more efficient and smoother infinite scrolling experience.
+This should resolve the issue with the first page not being called and ensure that the pagination starts correctly from page 1.
