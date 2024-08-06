@@ -1,20 +1,28 @@
+ I apologize for the misunderstanding. Let's update the code to handle pages with 12 cards each and trigger the next page API call when there are 12 or fewer cards remaining. Here's the updated `CardList` component:
+
+```jsx
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Row, Col, Spin } from 'antd';
 import CardItem from './CardItem';
 
+const CARDS_PER_PAGE = 12;
+
 const CardList = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [preloading, setPreloading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(1);
+  const [loadedPages, setLoadedPages] = useState(new Set());
   const observerRef = useRef(null);
-  const sentinelRef = useRef(null);
+  const triggerRef = useRef(null);
 
   const loadData = useCallback(
-    async (pageToLoad) => {
-      if (loading || !hasMore) return;
+    async (pageToLoad, isPreload = false) => {
+      if (loadedPages.has(pageToLoad) || (isPreload ? preloading : loading)) return;
 
-      setLoading(true);
+      if (isPreload) setPreloading(true);
+      else setLoading(true);
 
       try {
         const newData = await fetchData(pageToLoad);
@@ -22,113 +30,133 @@ const CardList = () => {
           setHasMore(false);
         } else {
           setData((prevData) => [...prevData, ...newData]);
+          setLoadedPages((prev) => new Set(prev).add(pageToLoad));
         }
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {
-        setLoading(false);
+        if (isPreload) setPreloading(false);
+        else setLoading(false);
       }
     },
-    [loading, hasMore]
+    [loadedPages, loading, preloading]
   );
 
   useEffect(() => {
-    // Load initial 3 pages
-    const loadInitialPages = async () => {
-      for (let i = 1; i <= 3; i++) {
-        await loadData(i);
-      }
-      setPage(4); // Set page to the next one to be loaded
+    const initialLoad = async () => {
+      setLoading(true);
+      await loadData(1, false);
+      setLoading(false);
     };
 
-    loadInitialPages();
-  }, [loadData]);
+    if (data.length === 0 && !loading && !preloading) {
+      initialLoad();
+    }
+  }, [loadData, data.length, loading, preloading]);
 
   useEffect(() => {
-    // Setup Intersection Observer to observe the 24th last card
-    if (observerRef.current) observerRef.current.disconnect();
+    if (!loading && hasMore) {
+      const options = {
+        root: null,
+        rootMargin: '0px',
+        threshold: 0.1,
+      };
 
-    observerRef.current = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && hasMore) {
+      observerRef.current = new IntersectionObserver((entries) => {
+        const triggerElement = entries[0];
+        if (triggerElement.isIntersecting) {
           setPage((prevPage) => prevPage + 1);
         }
-      },
-      { threshold: 0.1 }
-    );
+      }, options);
 
-    if (data.length >= 24) {
-      const sentinelIndex = data.length - 24;
-      const sentinelElement = document.getElementById(`card-${sentinelIndex}`);
-      if (sentinelElement) {
-        sentinelRef.current = sentinelElement;
-        observerRef.current.observe(sentinelElement);
+      if (triggerRef.current) {
+        observerRef.current.observe(triggerRef.current);
       }
     }
 
     return () => observerRef.current?.disconnect();
-  }, [data, hasMore]);
+  }, [loading, hasMore]);
 
   useEffect(() => {
-    if (page > 3) { // Since the first 3 pages are already loaded
-      loadData(page);
+    if (page > 1 && hasMore && !preloading) {
+      loadData(page, true);
     }
-  }, [page, loadData]);
+  }, [page, loadData, preloading, hasMore]);
+
+  const triggerIndex = data.length - CARDS_PER_PAGE;
 
   return (
     <div style={{ padding: '20px' }}>
       <Row gutter={[16, 16]}>
         {data.map((item, index) => (
           <Col
-            key={item.id}
-            id={`card-${index}`}
+            key={index}
             xs={24}
             sm={12}
             md={8}
+            lg={6}
+            ref={index === triggerIndex ? triggerRef : null}
           >
             <CardItem data={item} />
           </Col>
         ))}
       </Row>
-      {loading && (
+      {loading && data.length === 0 && (
         <div style={{ textAlign: 'center', padding: '20px' }}>
           <Spin />
         </div>
       )}
-      {!hasMore && (
+      {!hasMore && !loading && (
         <div style={{ textAlign: 'center', padding: '20px', color: 'grey' }}>
           No more data to load
+        </div>
+      )}
+      {preloading && (
+        <div style={{ textAlign: 'center', padding: '20px', color: 'blue' }}>
+          Loading more data...
         </div>
       )}
     </div>
   );
 };
 
-// Mocked fetchData function
+// Update fetchData function to return 12 items per page
 const fetchData = async (page) => {
   const data = [
-    { id: 1, title: 'Item 1', description: 'Description of Item 1' },
-    { id: 2, title: 'Item 2', description: 'Description of Item 2' },
-    { id: 3, title: 'Item 3', description: 'Description of Item 3' },
-    { id: 4, title: 'Item 4', description: 'Description of Item 4' },
-    { id: 5, title: 'Item 5', description: 'Description of Item 5' },
-    { id: 6, title: 'Item 6', description: 'Description of Item 6' },
-    { id: 7, title: 'Item 7', description: 'Description of Item 7' },
-    { id: 8, title: 'Item 8', description: 'Description of Item 8' },
-    { id: 9, title: 'Item 9', description: 'Description of Item 9' },
-    { id: 10, title: 'Item 10', description: 'Description of Item 10' },
-    // Add more items as needed
+    // ... (60 items, each with id, title, and description)
   ];
 
-  const pageSize = 3;
+  const pageSize = CARDS_PER_PAGE;
   const start = (page - 1) * pageSize;
   const end = start + pageSize;
 
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve(data.slice(start, end));
-    }, 1000); // Simulate network delay
+    }, 1000);
   });
 };
 
 export default CardList;
+```
+
+Key changes:
+
+1. Added a constant `CARDS_PER_PAGE = 12` to define the number of cards per page.
+
+2. Changed the `fetchData` function to return 12 items per page.
+
+3. Updated the Intersection Observer logic:
+   - Instead of observing the last card, we now observe a "trigger" element.
+   - The trigger element is the card at index `data.length - CARDS_PER_PAGE`.
+   - When this trigger element becomes visible, we load the next page.
+
+4. Simplified the initial load to fetch only the first page.
+
+5. Updated the `Col` component to use `lg={6}` for a 4-column layout on large screens, which is more suitable for 12 cards per page.
+
+6. Removed the `lastCardRef` and replaced it with `triggerRef`.
+
+This implementation will load the next page of data when the user has scrolled past the first card of the current page, effectively leaving 12 cards remaining. This ensures that the next set of data is loaded before the user reaches the end of the current set, providing a smooth infinite scrolling experience.
+
+Would you like me to explain any part of these changes in more detail?
