@@ -1,6 +1,11 @@
- I understand you'd like to see the entire updated code. Here's the complete `CardList` component with all the modifications we've discussed:
+ Here's the modified `CardList` component with added search functionality:
 
-```javascript
+```jsx
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { Row, Col, Spin, Input } from 'antd';
+import CardItem from './CardItem';
+
+const { Search } = Input;
 const CARDS_PER_PAGE = 12;
 
 const CardList = () => {
@@ -12,22 +17,19 @@ const CardList = () => {
   const [loadedPages, setLoadedPages] = useState(new Set());
   const observerRef = useRef(null);
   const lastCardRef = useRef(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
 
   const loadData = useCallback(
     async (pageToLoad, isPreload = false) => {
-      if (loadedPages.has(pageToLoad)) return;
-      
-      if (isPreload) {
-        if (preloading) return;
-        setPreloading(true);
-      } else {
-        if (loading) return;
-        setLoading(true);
-      }
+      if (loadedPages.has(pageToLoad) || (isPreload ? preloading : loading)) return;
+
+      if (isPreload) setPreloading(true);
+      else setLoading(true);
 
       try {
-        console.log(`Loading page ${pageToLoad}, isPreload: ${isPreload}`);
-        const newData = await fetchData(pageToLoad);
+        const newData = await fetchData(pageToLoad, searchTerm);
         if (newData.length === 0) {
           setHasMore(false);
         } else {
@@ -41,7 +43,7 @@ const CardList = () => {
         else setLoading(false);
       }
     },
-    [loadedPages, loading, preloading]
+    [loadedPages, loading, preloading, searchTerm]
   );
 
   useEffect(() => {
@@ -49,19 +51,19 @@ const CardList = () => {
       setLoading(true);
       for (let i = 1; i <= 2; i++) {
         await loadData(i, false);
+        setPage(i);
         if (!hasMore) break;
       }
-      setPage(2); // Set page to 2 after loading initial pages
       setLoading(false);
     };
 
-    if (data.length === 0 && !loading && !preloading) {
+    if (data.length === 0 && !loading && !preloading && !isSearching) {
       initialLoad();
     }
-  }, [loadData, data.length, hasMore, loading, preloading]);
+  }, [loadData, data.length, hasMore, loading, preloading, isSearching]);
 
   useEffect(() => {
-    if (!loading && hasMore) {
+    if (!loading && hasMore && !isSearching) {
       const options = {
         root: null,
         rootMargin: '0px',
@@ -70,7 +72,7 @@ const CardList = () => {
 
       observerRef.current = new IntersectionObserver((entries) => {
         const lastCard = entries[0];
-        if (lastCard.isIntersecting && !loadedPages.has(page + 1)) {
+        if (lastCard.isIntersecting) {
           setPage((prevPage) => prevPage + 1);
         }
       }, options);
@@ -81,16 +83,16 @@ const CardList = () => {
     }
 
     return () => observerRef.current?.disconnect();
-  }, [loading, hasMore, page, loadedPages]);
+  }, [loading, hasMore, data, isSearching]);
 
   useEffect(() => {
     const remainingCards = data.length % CARDS_PER_PAGE;
     const shouldLoadNextPage = remainingCards === 0 || remainingCards >= CARDS_PER_PAGE / 2;
 
-    if (shouldLoadNextPage && !preloading && hasMore && !loadedPages.has(page + 1)) {
+    if (shouldLoadNextPage && !preloading && hasMore && !isSearching) {
       loadData(page + 1, true);
     }
-  }, [page, loadData, preloading, data.length, hasMore, loadedPages]);
+  }, [page, loadData, preloading, data.length, hasMore, isSearching]);
 
   useEffect(() => {
     if (observerRef.current && lastCardRef.current) {
@@ -98,22 +100,49 @@ const CardList = () => {
     }
   }, [data, observerRef, lastCardRef]);
 
+  const handleSearch = async (value) => {
+    setSearchTerm(value);
+    setIsSearching(true);
+    setLoading(true);
+    setPage(1);
+    setLoadedPages(new Set());
+    setHasMore(true);
+
+    try {
+      const results = await fetchData(1, value);
+      setSearchResults(results);
+      setData(results);
+    } catch (error) {
+      console.error('Error searching data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const displayData = isSearching ? searchResults : data;
+
   return (
     <div style={{ padding: '20px' }}>
+      <Search
+        placeholder="Search..."
+        onSearch={handleSearch}
+        style={{ marginBottom: '20px' }}
+        allowClear
+      />
       <Row gutter={[16, 16]}>
-        {data.map((item, index) => (
+        {displayData.map((item, index) => (
           <Col
             key={index}
             xs={24}
             sm={12}
             md={8}
-            ref={index === data.length - CARDS_PER_PAGE / 2 ? lastCardRef : null}
+            ref={index === displayData.length - CARDS_PER_PAGE / 2 ? lastCardRef : null}
           >
             <CardItem data={item} />
           </Col>
         ))}
       </Row>
-      {loading && data.length === 0 && (
+      {loading && displayData.length === 0 && (
         <div style={{ textAlign: 'center', padding: '20px' }}>
           <Spin />
         </div>
@@ -135,19 +164,4 @@ const CardList = () => {
 export default CardList;
 ```
 
-This updated version includes all the changes we've discussed:
-
-1. The `loadData` function now checks if a page has already been loaded before fetching it.
-2. The initial load sets the page to 2 after loading the first two pages.
-3. The intersection observer effect checks if the next page has already been loaded before incrementing the page number.
-4. The preloading effect checks if the next page has already been loaded before triggering a preload.
-
-I've also added a console.log in the `loadData` function to help with debugging. This should help you track when pages are being loaded and whether they're being loaded as part of the initial load or as a preload.
-
-If you're still experiencing issues with this code, it would be helpful to:
-
-1. Check the console logs to see the order and frequency of page loads.
-2. Verify that the `fetchData` function is not returning duplicate data.
-3. Ensure that the `CARDS_PER_PAGE` constant matches the actual number of items returned by each `fetchData` call.
-
-Let me know if you need any further clarification or if you're still seeing unexpected behavior with this updated code.
+Would you like me to explain or break down the changes made to add the search functionality?
