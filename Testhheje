@@ -1,4 +1,4 @@
- Certainly. I'll modify the code to ensure that the AbortController is properly implemented and that requests are being canceled when components unmount or when they're no longer needed. Here's the updated version:
+ I apologize for the confusion. If all the API calls are getting canceled, that's not the intended behavior. Let's adjust the code to ensure that only unnecessary or outdated requests are canceled, while allowing the necessary ones to complete. Here's a revised approach:
 
 ```jsx
 import React, {
@@ -13,8 +13,14 @@ import { observer } from "mobx-react-lite";
 
 const App = () => {
   // ... (state declarations remain the same)
+  const abortControllerRef = useRef(new AbortController());
 
-  const fetchData = useCallback(async (page, signal) => {
+  const fetchData = useCallback(async (page) => {
+    // Cancel any ongoing requests before starting a new one
+    abortControllerRef.current.abort();
+    abortControllerRef.current = new AbortController();
+    const signal = abortControllerRef.current.signal;
+
     try {
       const res = await ClientStore.Project.load(
         unit.value,
@@ -24,7 +30,6 @@ const App = () => {
         page,
         signal
       );
-      if (signal.aborted) throw new Error('Aborted');
       return res;
     } catch (error) {
       if (error.name === 'AbortError') {
@@ -35,16 +40,15 @@ const App = () => {
     }
   }, [unit.value, program.value, phase.value, name.value]);
 
-  const loadData = useCallback(async (pageToLoad, isPreload = false, signal) => {
+  const loadData = useCallback(async (pageToLoad, isPreload = false) => {
     if (loadedPages.has(pageToLoad) || (isPreload ? preloading : loading)) return;
 
     if (isPreload) setPreloading(true);
     else setLoading(true);
 
     try {
-      const newData = await fetchData(pageToLoad, signal);
-      if (signal.aborted) return;
-
+      const newData = await fetchData(pageToLoad);
+      
       if (newData.length === 0) {
         setHasMore(false);
       } else {
@@ -55,47 +59,34 @@ const App = () => {
         setHasMore(false);
       }
     } catch (error) {
-      if (!signal.aborted) {
-        setHasMore(false);
-        console.error("Error fetching data:", error);
-      }
+      setHasMore(false);
+      console.error("Error fetching data:", error);
     } finally {
-      if (!signal.aborted) {
-        if (isPreload) setPreloading(false);
-        else setLoading(false);
-      }
+      if (isPreload) setPreloading(false);
+      else setLoading(false);
     }
   }, [loadedPages, loading, preloading, fetchData]);
 
   useEffect(() => {
-    const controller = new AbortController();
-    const signal = controller.signal;
-
     const initialLoad = async () => {
       setLoading(true);
       try {
         for (let i = 1; i <= 1; i++) {
-          await loadData(i, false, signal);
-          if (signal.aborted) return;
+          await loadData(i, false);
           setPage(i);
           if (!hasMore) break;
         }
       } finally {
-        if (!signal.aborted) setLoading(false);
+        setLoading(false);
       }
     };
 
     if (data.length === 0 && !loading && !preloading && hasMore) {
       initialLoad();
     }
-
-    return () => controller.abort();
   }, [loadData, data.length, hasMore, loading, preloading]);
 
   useEffect(() => {
-    const controller = new AbortController();
-    const signal = controller.signal;
-
     if (!loading && hasMore) {
       const options = {
         root: null,
@@ -105,7 +96,7 @@ const App = () => {
 
       observerRef.current = new IntersectionObserver((entries) => {
         const lastCard = entries[0];
-        if (lastCard.isIntersecting && !signal.aborted) {
+        if (lastCard.isIntersecting) {
           setPage((prevPage) => prevPage + 1);
         }
       }, options);
@@ -116,73 +107,58 @@ const App = () => {
     }
 
     return () => {
-      controller.abort();
       observerRef.current?.disconnect();
     };
   }, [loading, hasMore, data]);
 
   useEffect(() => {
-    const controller = new AbortController();
-    const signal = controller.signal;
-
     const remainingCards = data.length % CARDS_PER_PAGE;
     const shouldLoadNextPage =
       remainingCards === 0 || remainingCards >= CARDS_PER_PAGE / 2;
 
     if (shouldLoadNextPage && !preloading && hasMore) {
-      loadData(page + 1, true, signal);
+      loadData(page + 1, true);
     }
-
-    return () => controller.abort();
   }, [page, loadData, preloading, data.length, hasMore]);
 
   useEffect(() => {
-    const controller = new AbortController();
-    const signal = controller.signal;
-
     if (UserStore.logined) {
-      AdoloadData(signal);
-      loadDP(signal);
-      loadProgram(signal);
+      AdoloadData();
+      loadDP();
+      loadProgram();
     }
-
-    return () => controller.abort();
   }, [UserStore.logined]);
 
-  // Update these functions to accept a signal parameter
-  async function AdoloadData(signal) {
+  async function AdoloadData() {
     try {
-      const ADO_data = await ClientStore.Benefits.adoDataList(signal);
-      if (signal.aborted) return;
+      const ADO_data = await ClientStore.Benefits.adoDataList();
       setadoData(ADO_data);
     } catch (error) {
-      if (!signal.aborted) console.error("Error loading ADO data:", error);
+      console.error("Error loading ADO data:", error);
     }
   }
 
-  async function loadDP(signal) {
+  async function loadDP() {
     try {
       setLoading(true);
-      const res = await ClientStore.BU.load(signal);
-      if (signal.aborted) return;
+      const res = await ClientStore.BU.load();
       setDP(res);
     } catch (error) {
-      if (!signal.aborted) console.error("Error loading DP:", error);
+      console.error("Error loading DP:", error);
     } finally {
-      if (!signal.aborted) setLoading(false);
+      setLoading(false);
     }
   }
 
-  async function loadProgram(signal) {
+  async function loadProgram() {
     try {
       setLoading(true);
-      const res = await ClientStore.Program.load(signal);
-      if (signal.aborted) return;
+      const res = await ClientStore.Program.load();
       setProgramList(res);
     } catch (error) {
-      if (!signal.aborted) console.error("Error loading programs:", error);
+      console.error("Error loading programs:", error);
     } finally {
-      if (!signal.aborted) setLoading(false);
+      setLoading(false);
     }
   }
 
@@ -196,11 +172,16 @@ const App = () => {
 export default observer(App);
 ```
 
-Key changes:
+Key changes in this version:
 
-1. The `fetchData` function now properly handles aborted requests.
-2. All async functions (`AdoloadData`, `loadDP`, `loadProgram`) now accept a `signal` parameter and handle aborted requests.
-3. We're consistently checking `signal.aborted` before making state updates.
-4. Error handling has been improved to distinguish between aborted requests and other types of errors.
+1. We're using a single `AbortController` (stored in a ref) for the main data fetching operation. This allows us to cancel the previous request when a new one starts, rather than canceling all requests when the component unmounts.
 
-These changes should ensure that requests are properly canceled when components unmount or when they're no longer needed, which should reduce or eliminate the "red link" API calls in the network tab. If you're still seeing issues, it might be worth checking if all API calls in your `ClientStore` methods are also set up to accept and respect the abort signal.
+2. The `fetchData` function now creates a new `AbortController` for each request, canceling the previous one if it exists.
+
+3. We've removed the `signal` parameter from `AdoloadData`, `loadDP`, and `loadProgram` as these are typically one-time loads that we don't need to cancel.
+
+4. The cleanup functions in the `useEffect` hooks no longer abort requests, as we're managing this within the `fetchData` function.
+
+This approach should allow your necessary API calls to complete while still providing a mechanism to cancel outdated requests when new ones are made. It should prevent the "all pages API getting canceled" issue you were experiencing.
+
+If you're still encountering issues, it might be helpful to look at the implementation of the API calls in your `ClientStore` to ensure they're handling cancellation correctly.
