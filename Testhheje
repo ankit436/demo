@@ -1,4 +1,4 @@
- I apologize for the confusion. If all the API calls are getting canceled, that's not the intended behavior. Let's adjust the code to ensure that only unnecessary or outdated requests are canceled, while allowing the necessary ones to complete. Here's a revised approach:
+ Certainly, I understand. Let's stick with the approach from the second-to-last answer, which provides a good balance between canceling unnecessary requests and ensuring the initial load completes. Here's that version again for reference:
 
 ```jsx
 import React, {
@@ -15,10 +15,12 @@ const App = () => {
   // ... (state declarations remain the same)
   const abortControllerRef = useRef(new AbortController());
 
-  const fetchData = useCallback(async (page) => {
-    // Cancel any ongoing requests before starting a new one
-    abortControllerRef.current.abort();
-    abortControllerRef.current = new AbortController();
+  const fetchData = useCallback(async (page, isInitialLoad = false) => {
+    if (!isInitialLoad) {
+      // Cancel any ongoing requests before starting a new one, but not for the initial load
+      abortControllerRef.current.abort();
+      abortControllerRef.current = new AbortController();
+    }
     const signal = abortControllerRef.current.signal;
 
     try {
@@ -40,14 +42,14 @@ const App = () => {
     }
   }, [unit.value, program.value, phase.value, name.value]);
 
-  const loadData = useCallback(async (pageToLoad, isPreload = false) => {
+  const loadData = useCallback(async (pageToLoad, isPreload = false, isInitialLoad = false) => {
     if (loadedPages.has(pageToLoad) || (isPreload ? preloading : loading)) return;
 
     if (isPreload) setPreloading(true);
     else setLoading(true);
 
     try {
-      const newData = await fetchData(pageToLoad);
+      const newData = await fetchData(pageToLoad, isInitialLoad);
       
       if (newData.length === 0) {
         setHasMore(false);
@@ -71,11 +73,8 @@ const App = () => {
     const initialLoad = async () => {
       setLoading(true);
       try {
-        for (let i = 1; i <= 1; i++) {
-          await loadData(i, false);
-          setPage(i);
-          if (!hasMore) break;
-        }
+        await loadData(1, false, true);  // Pass true for isInitialLoad
+        setPage(1);
       } finally {
         setLoading(false);
       }
@@ -85,82 +84,6 @@ const App = () => {
       initialLoad();
     }
   }, [loadData, data.length, hasMore, loading, preloading]);
-
-  useEffect(() => {
-    if (!loading && hasMore) {
-      const options = {
-        root: null,
-        rootMargin: "0px",
-        threshold: 0.1,
-      };
-
-      observerRef.current = new IntersectionObserver((entries) => {
-        const lastCard = entries[0];
-        if (lastCard.isIntersecting) {
-          setPage((prevPage) => prevPage + 1);
-        }
-      }, options);
-
-      if (lastCardRef.current) {
-        observerRef.current.observe(lastCardRef.current);
-      }
-    }
-
-    return () => {
-      observerRef.current?.disconnect();
-    };
-  }, [loading, hasMore, data]);
-
-  useEffect(() => {
-    const remainingCards = data.length % CARDS_PER_PAGE;
-    const shouldLoadNextPage =
-      remainingCards === 0 || remainingCards >= CARDS_PER_PAGE / 2;
-
-    if (shouldLoadNextPage && !preloading && hasMore) {
-      loadData(page + 1, true);
-    }
-  }, [page, loadData, preloading, data.length, hasMore]);
-
-  useEffect(() => {
-    if (UserStore.logined) {
-      AdoloadData();
-      loadDP();
-      loadProgram();
-    }
-  }, [UserStore.logined]);
-
-  async function AdoloadData() {
-    try {
-      const ADO_data = await ClientStore.Benefits.adoDataList();
-      setadoData(ADO_data);
-    } catch (error) {
-      console.error("Error loading ADO data:", error);
-    }
-  }
-
-  async function loadDP() {
-    try {
-      setLoading(true);
-      const res = await ClientStore.BU.load();
-      setDP(res);
-    } catch (error) {
-      console.error("Error loading DP:", error);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function loadProgram() {
-    try {
-      setLoading(true);
-      const res = await ClientStore.Program.load();
-      setProgramList(res);
-    } catch (error) {
-      console.error("Error loading programs:", error);
-    } finally {
-      setLoading(false);
-    }
-  }
 
   // ... (rest of the component remains the same)
 
@@ -172,16 +95,12 @@ const App = () => {
 export default observer(App);
 ```
 
-Key changes in this version:
+In this version:
 
-1. We're using a single `AbortController` (stored in a ref) for the main data fetching operation. This allows us to cancel the previous request when a new one starts, rather than canceling all requests when the component unmounts.
+1. The initial page load (typically page 1) will not be canceled.
+2. For subsequent page loads, if a new request is made while a previous one is still in progress, the previous request will be canceled.
+3. If multiple pages are requested simultaneously, the behavior would be:
+   - The initial load (page 1) will complete.
+   - For other pages, the last request will complete, and any requests made before it (but after the initial load) will be canceled.
 
-2. The `fetchData` function now creates a new `AbortController` for each request, canceling the previous one if it exists.
-
-3. We've removed the `signal` parameter from `AdoloadData`, `loadDP`, and `loadProgram` as these are typically one-time loads that we don't need to cancel.
-
-4. The cleanup functions in the `useEffect` hooks no longer abort requests, as we're managing this within the `fetchData` function.
-
-This approach should allow your necessary API calls to complete while still providing a mechanism to cancel outdated requests when new ones are made. It should prevent the "all pages API getting canceled" issue you were experiencing.
-
-If you're still encountering issues, it might be helpful to look at the implementation of the API calls in your `ClientStore` to ensure they're handling cancellation correctly.
+This approach provides a good balance between ensuring the initial data load and preventing unnecessary or outdated requests from completing. It should help in managing multiple simultaneous requests while still allowing the important initial data to load without interruption.
