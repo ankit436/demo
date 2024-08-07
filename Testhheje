@@ -1,0 +1,161 @@
+ Certainly. I'll modify the code to use AbortController for all asynchronous operations to prevent errors when the component unmounts. Here's the updated version:
+
+```jsx
+import React, {
+  useState,
+  useContext,
+  useEffect,
+  useCallback,
+  useRef,
+} from "react";
+import { observer } from "mobx-react-lite";
+// ... (other imports remain the same)
+
+const App = () => {
+  // ... (state declarations remain the same)
+
+  const fetchData = useCallback(async (page, signal) => {
+    return await ClientStore.Project.load(
+      unit.value,
+      program.value,
+      phase.value,
+      name.value,
+      page,
+      signal
+    );
+  }, [unit.value, program.value, phase.value, name.value]);
+
+  const loadData = useCallback(async (pageToLoad, isPreload = false, signal) => {
+    if (loadedPages.has(pageToLoad) || (isPreload ? preloading : loading)) return;
+
+    if (isPreload) setPreloading(true);
+    else setLoading(true);
+
+    try {
+      const newData = await fetchData(pageToLoad, signal);
+      if (signal.aborted) return;
+
+      if (newData.length === 0) {
+        setHasMore(false);
+      } else {
+        setData((prevData) => [...prevData, ...newData]);
+        setLoadedPages((prev) => new Set(prev).add(pageToLoad));
+      }
+      if (newData?.length < 12) {
+        setHasMore(false);
+      }
+    } catch (error) {
+      if (!signal.aborted) {
+        setHasMore(false);
+        console.error("Error fetching data:", error);
+      }
+    } finally {
+      if (!signal.aborted) {
+        if (isPreload) setPreloading(false);
+        else setLoading(false);
+      }
+    }
+  }, [loadedPages, loading, preloading, fetchData]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    const signal = controller.signal;
+
+    const initialLoad = async () => {
+      setLoading(true);
+      for (let i = 1; i <= 1; i++) {
+        await loadData(i, false, signal);
+        if (signal.aborted) return;
+        setPage(i);
+        if (!hasMore) break;
+      }
+      setLoading(false);
+    };
+
+    if (data.length === 0 && !loading && !preloading && hasMore) {
+      initialLoad();
+    }
+
+    return () => controller.abort();
+  }, [loadData, data.length, hasMore, loading, preloading]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    const signal = controller.signal;
+
+    if (!loading && hasMore) {
+      const options = {
+        root: null,
+        rootMargin: "0px",
+        threshold: 0.1,
+      };
+
+      observerRef.current = new IntersectionObserver((entries) => {
+        const lastCard = entries[0];
+        if (lastCard.isIntersecting && !signal.aborted) {
+          setPage((prevPage) => prevPage + 1);
+        }
+      }, options);
+
+      if (lastCardRef.current) {
+        observerRef.current.observe(lastCardRef.current);
+      }
+    }
+
+    return () => {
+      controller.abort();
+      observerRef.current?.disconnect();
+    };
+  }, [loading, hasMore, data]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    const signal = controller.signal;
+
+    const remainingCards = data.length % CARDS_PER_PAGE;
+    const shouldLoadNextPage =
+      remainingCards === 0 || remainingCards >= CARDS_PER_PAGE / 2;
+
+    if (shouldLoadNextPage && !preloading && hasMore) {
+      loadData(page + 1, true, signal);
+    }
+
+    return () => controller.abort();
+  }, [page, loadData, preloading, data.length, hasMore]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    const signal = controller.signal;
+
+    if (UserStore.logined) {
+      AdoloadData(signal);
+      loadDP(signal);
+      loadProgram(signal);
+    }
+
+    return () => controller.abort();
+  }, [UserStore.logined]);
+
+  // ... (rest of the component remains the same)
+
+  return (
+    // ... (JSX remains the same)
+  );
+};
+
+export default observer(App);
+```
+
+In this updated version:
+
+1. We've added AbortController to `fetchData`, `loadData`, and all `useEffect` hooks that perform asynchronous operations.
+
+2. We're passing the `signal` to all asynchronous functions.
+
+3. We're checking `signal.aborted` before updating state in asynchronous operations to prevent updates after the component has unmounted.
+
+4. We're using the cleanup function in `useEffect` hooks to abort any ongoing requests when the component unmounts or when dependencies change.
+
+These changes should help prevent errors related to state updates on an unmounted component and cancel any ongoing requests when they're no longer needed.
+
+Would you like me to explain or break down any part of this code?
