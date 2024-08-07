@@ -1,4 +1,4 @@
- Certainly. I'll modify the code to use AbortController for all asynchronous operations to prevent errors when the component unmounts. Here's the updated version:
+ Certainly. I'll modify the code to ensure that the AbortController is properly implemented and that requests are being canceled when components unmount or when they're no longer needed. Here's the updated version:
 
 ```jsx
 import React, {
@@ -15,14 +15,24 @@ const App = () => {
   // ... (state declarations remain the same)
 
   const fetchData = useCallback(async (page, signal) => {
-    return await ClientStore.Project.load(
-      unit.value,
-      program.value,
-      phase.value,
-      name.value,
-      page,
-      signal
-    );
+    try {
+      const res = await ClientStore.Project.load(
+        unit.value,
+        program.value,
+        phase.value,
+        name.value,
+        page,
+        signal
+      );
+      if (signal.aborted) throw new Error('Aborted');
+      return res;
+    } catch (error) {
+      if (error.name === 'AbortError') {
+        console.log('Fetch aborted');
+      } else {
+        throw error;
+      }
+    }
   }, [unit.value, program.value, phase.value, name.value]);
 
   const loadData = useCallback(async (pageToLoad, isPreload = false, signal) => {
@@ -63,13 +73,16 @@ const App = () => {
 
     const initialLoad = async () => {
       setLoading(true);
-      for (let i = 1; i <= 1; i++) {
-        await loadData(i, false, signal);
-        if (signal.aborted) return;
-        setPage(i);
-        if (!hasMore) break;
+      try {
+        for (let i = 1; i <= 1; i++) {
+          await loadData(i, false, signal);
+          if (signal.aborted) return;
+          setPage(i);
+          if (!hasMore) break;
+        }
+      } finally {
+        if (!signal.aborted) setLoading(false);
       }
-      setLoading(false);
     };
 
     if (data.length === 0 && !loading && !preloading && hasMore) {
@@ -136,6 +149,43 @@ const App = () => {
     return () => controller.abort();
   }, [UserStore.logined]);
 
+  // Update these functions to accept a signal parameter
+  async function AdoloadData(signal) {
+    try {
+      const ADO_data = await ClientStore.Benefits.adoDataList(signal);
+      if (signal.aborted) return;
+      setadoData(ADO_data);
+    } catch (error) {
+      if (!signal.aborted) console.error("Error loading ADO data:", error);
+    }
+  }
+
+  async function loadDP(signal) {
+    try {
+      setLoading(true);
+      const res = await ClientStore.BU.load(signal);
+      if (signal.aborted) return;
+      setDP(res);
+    } catch (error) {
+      if (!signal.aborted) console.error("Error loading DP:", error);
+    } finally {
+      if (!signal.aborted) setLoading(false);
+    }
+  }
+
+  async function loadProgram(signal) {
+    try {
+      setLoading(true);
+      const res = await ClientStore.Program.load(signal);
+      if (signal.aborted) return;
+      setProgramList(res);
+    } catch (error) {
+      if (!signal.aborted) console.error("Error loading programs:", error);
+    } finally {
+      if (!signal.aborted) setLoading(false);
+    }
+  }
+
   // ... (rest of the component remains the same)
 
   return (
@@ -146,16 +196,11 @@ const App = () => {
 export default observer(App);
 ```
 
-In this updated version:
+Key changes:
 
-1. We've added AbortController to `fetchData`, `loadData`, and all `useEffect` hooks that perform asynchronous operations.
+1. The `fetchData` function now properly handles aborted requests.
+2. All async functions (`AdoloadData`, `loadDP`, `loadProgram`) now accept a `signal` parameter and handle aborted requests.
+3. We're consistently checking `signal.aborted` before making state updates.
+4. Error handling has been improved to distinguish between aborted requests and other types of errors.
 
-2. We're passing the `signal` to all asynchronous functions.
-
-3. We're checking `signal.aborted` before updating state in asynchronous operations to prevent updates after the component has unmounted.
-
-4. We're using the cleanup function in `useEffect` hooks to abort any ongoing requests when the component unmounts or when dependencies change.
-
-These changes should help prevent errors related to state updates on an unmounted component and cancel any ongoing requests when they're no longer needed.
-
-Would you like me to explain or break down any part of this code?
+These changes should ensure that requests are properly canceled when components unmount or when they're no longer needed, which should reduce or eliminate the "red link" API calls in the network tab. If you're still seeing issues, it might be worth checking if all API calls in your `ClientStore` methods are also set up to accept and respect the abort signal.
