@@ -1,0 +1,188 @@
+function isFormulaValid(formula) {
+    const operators = ['+', '-', '*', '/', '%', '**', '//']; // Python operators
+    let previousType = null;
+    let bracketStack = [];
+
+    for (let i = 0; i < formula.length; i++) {
+        const current = formula[i];
+
+        if (current.type === 'operator') {
+            if (previousType === 'open_bracket' || previousType === null) {
+                // Allow unary operators (+, -) after open bracket or at the start
+                if (current.value === '+' || current.value === '-') {
+                    // Valid unary operator at start or after '('
+                } else {
+                    return { isValid: false, position: i, msg: `Operator '${current.value}' cannot be placed here at position ${i + 1}.` };
+                }
+            } else if (previousType === 'operator') {
+                return { isValid: false, position: i, msg: `Two consecutive operators found at position ${i + 1}.` };
+            }
+            if (!operators.includes(current.value)) {
+                return { isValid: false, position: i, msg: `Invalid operator '${current.value}' at position ${i + 1}.` };
+            }
+        } else if (current.type === 'custom' || current.type === 'report') {
+            if (previousType === 'close_bracket' || previousType === 'value') {
+                return { isValid: false, position: i, msg: `Unexpected value '${current.label}' at position ${i + 1}. Expected an operator before this value.` };
+            }
+        } else if (current.type === 'open_bracket') {
+            bracketStack.push('(');
+            if (previousType === 'close_bracket' || previousType === 'value') {
+                return { isValid: false, position: i, msg: `Unexpected '(' at position ${i + 1}. Expected an operator before this bracket.` };
+            }
+        } else if (current.type === 'close_bracket') {
+            if (bracketStack.length === 0) {
+                return { isValid: false, position: i, msg: `Unmatched ')' at position ${i + 1}.` };
+            }
+            if (previousType === 'operator' || previousType === 'open_bracket') {
+                return { isValid: false, position: i, msg: `Unexpected ')' at position ${i + 1}. Expected a value or '(' before this bracket.` };
+            }
+            bracketStack.pop();
+        }
+
+        previousType = current.type === 'operator' ? 'operator' : 
+                        current.type === 'open_bracket' ? 'open_bracket' :
+                        current.type === 'close_bracket' ? 'close_bracket' : 
+                        'value';
+    }
+
+    if (previousType === 'operator' || previousType === 'open_bracket') {
+        return { isValid: false, position: formula.length - 1, msg: "Formula ends with an operator or open bracket." };
+    }
+
+    if (bracketStack.length !== 0) {
+        return { isValid: false, position: formula.length - 1, msg: "There are unmatched '(' brackets." };
+    }
+
+    return { isValid: true, position: -1, msg: "Formula is valid." };
+}
+
+// Run all test cases
+function runAllTestCases() {
+    const testCases = [
+        {
+            description: "Valid Formula with Basic Operations",
+            formula: [
+                { 'type': 'custom', 'value': 3, 'label': '3' },
+                { 'type': 'operator', 'value': '+', 'label': '+' },
+                { 'type': 'custom', 'value': 2, 'label': '2' },
+                { 'type': 'operator', 'value': '-', 'label': '-' },
+                { 'type': 'custom', 'value': 1, 'label': '1' }
+            ],
+            expected: { isValid: true, position: -1, msg: "Formula is valid." }
+        },
+        {
+            description: "Valid Formula with Leading Negative Number",
+            formula: [
+                { 'type': 'operator', 'value': '-', 'label': '-' },
+                { 'type': 'custom', 'value': 3, 'label': '3' },
+                { 'type': 'operator', 'value': '+', 'label': '+' },
+                { 'type': 'custom', 'value': 1, 'label': '1' }
+            ],
+            expected: { isValid: true, position: -1, msg: "Formula is valid." }
+        },
+        {
+            description: "Valid Formula with Parentheses and Unary Operator",
+            formula: [
+                { 'type': 'custom', 'value': 3, 'label': '3' },
+                { 'type': 'operator', 'value': '-', 'label': '-' },
+                { 'type': 'open_bracket', 'value': '(', 'label': '(' },
+                { 'type': 'operator', 'value': '+', 'label': '+' },
+                { 'type': 'custom', 'value': 2, 'label': '2' },
+                { 'type': 'close_bracket', 'value': ')', 'label': ')' }
+            ],
+            expected: { isValid: true, position: -1, msg: "Formula is valid." }
+        },
+        {
+            description: "Invalid Formula with Consecutive Operators",
+            formula: [
+                { 'type': 'custom', 'value': 3, 'label': '3' },
+                { 'type': 'operator', 'value': '+', 'label': '+' },
+                { 'type': 'operator', 'value': '-', 'label': '-' },
+                { 'type': 'custom', 'value': 1, 'label': '1' }
+            ],
+            expected: { isValid: false, position: 2, msg: "Two consecutive operators found at position 3." }
+        },
+        {
+            description: "Invalid Formula with Missing Operator",
+            formula: [
+                { 'type': 'custom', 'value': 3, 'label': '3' },
+                { 'type': 'custom', 'value': 2, 'label': '2' }
+            ],
+            expected: { isValid: false, position: 1, msg: "Unexpected value '2' at position 2. Expected an operator before this value." }
+        },
+        {
+            description: "Invalid Formula with Unmatched Closing Bracket",
+            formula: [
+                { 'type': 'custom', 'value': 3, 'label': '3' },
+                { 'type': 'operator', 'value': '+', 'label': '+' },
+                { 'type': 'custom', 'value': 2, 'label': '2' },
+                { 'type': 'close_bracket', 'value': ')', 'label': ')' }
+            ],
+            expected: { isValid: false, position: 3, msg: "Unmatched ')' at position 4." }
+        },
+        {
+            description: "Invalid Formula Ending with Operator",
+            formula: [
+                { 'type': 'custom', 'value': 3, 'label': '3' },
+                { 'type': 'operator', 'value': '+', 'label': '+' }
+            ],
+            expected: { isValid: false, position: 1, msg: "Formula ends with an operator or open bracket." }
+        },
+        {
+            description: "Invalid Formula with Unmatched Opening Bracket",
+            formula: [
+                { 'type': 'open_bracket', 'value': '(', 'label': '(' },
+                { 'type': 'custom', 'value': 3, 'label': '3' },
+                { 'type': 'operator', 'value': '+', 'label': '+' },
+                { 'type': 'custom', 'value': 1, 'label': '1' }
+            ],
+            expected: { isValid: false, position: 3, msg: "There are unmatched '(' brackets." }
+        },
+        {
+            description: "Valid Formula with Complex Operations",
+            formula: [
+                { 'type': 'custom', 'value': 3, 'label': '3' },
+                { 'type': 'operator', 'value': '**', 'label': '**' },
+                { 'type': 'custom', 'value': 2, 'label': '2' },
+                { 'type': 'operator', 'value': '//', 'label': '//' },
+                { 'type': 'custom', 'value': 1, 'label': '1' }
+            ],
+            expected: { isValid: true, position: -1, msg: "Formula is valid." }
+        },
+        {
+            description: "Invalid Formula with Unsupported Operator",
+            formula: [
+                { 'type': 'custom', 'value': 3, 'label': '3' },
+                { 'type': 'operator', 'value': '&', 'label': '&' },
+                { 'type': 'custom', 'value': 2, 'label': '2' }
+            ],
+            expected: { isValid: false, position: 1, msg: "Invalid operator '&' at position 2." }
+        },
+{
+            description: "Valid Formula with Unary Plus Inside Parentheses",
+            formula: [
+                { 'type': 'custom', 'value': 3, 'label': '3' },
+                { 'type': 'operator', 'value': '-', 'label': '-' },
+                { 'type': 'open_bracket', 'value': '(', 'label': '(' },
+                { 'type': 'operator', 'value': '+', 'label': '+' },
+                { 'type': 'custom', 'value': 2, 'label': '2' },
+                { 'type': 'close_bracket', 'value': ')', 'label': ')' }
+            ],
+            expected: { isValid: true, position: -1, msg: "Formula is valid." }
+        }
+    ];
+
+    testCases.forEach((testCase, index) => {
+        const result = isFormulaValid(testCase.formula);
+        const passed = JSON.stringify(result) === JSON.stringify(testCase.expected);
+
+        console.log(`Test Case ${index + 1}: ${testCase.description} - ${passed ? "Passed" : "Failed"}`);
+        if (!passed) {
+            console.log(`   Expected: ${JSON.stringify(testCase.expected)}`);
+            console.log(`   Received: ${JSON.stringify(result)}`);
+        }
+    });
+}
+
+// Run all test cases
+runAllTestCases();
