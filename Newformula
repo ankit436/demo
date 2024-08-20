@@ -79,8 +79,8 @@ export class FormulaValidator {
                 return false;
             }
         } else if (this.binaryOperators.includes(token.value)) {
-            if (!lastToken || 
-                (lastToken.type === "operator" && lastToken.value !== ")") ||
+            if (!lastToken ||
+                (lastToken.type === "operator" && !this.binaryOperators.includes(lastToken.value) && lastToken.value !== ")") ||
                 index === tokens.length - 1) {
                 errors[index] = `Invalid operator placement: '${token.value}'`;
                 return false;
@@ -94,9 +94,8 @@ export class FormulaValidator {
                 errors[index] = `Unary operator '${token.value}' used in invalid context.`;
                 return false;
             }
-            // Allow unary operators at the beginning, after an opening parenthesis, or following binary operators
             if (index === 0 || lastToken && (lastToken.type === "operator" && (lastToken.value === "(" || this.binaryOperators.includes(lastToken.value)))) {
-                return true; // Valid placement of unary operator
+                return true;
             } else {
                 errors[index] = `Unary operator '${token.value}' used in invalid context.`;
                 return false;
