@@ -1,3 +1,8 @@
+If you want to handle a custom type (`Custom`) without throwing unnecessary errors, you can modify the `FormulaValidator` class to properly handle this type and avoid throwing errors for it. Here's how you can adjust the `FormulaValidator` class to accommodate the `Custom` type:
+
+### Updated `FormulaValidator` Class
+
+```javascript
 // FormulaValidator.js
 export class FormulaValidator {
     constructor() {
@@ -8,12 +13,10 @@ export class FormulaValidator {
     }
 
     async validate(tokens) {
-        // Cancel the previous request if it exists
         if (this.currentAbortController) {
             this.currentAbortController.abort();
         }
 
-        // Create a new AbortController for the new request
         this.currentAbortController = new AbortController();
         const { signal } = this.currentAbortController;
 
@@ -24,7 +27,7 @@ export class FormulaValidator {
             if (error.name === 'AbortError') {
                 return { valid: true, errors: null }; // Optionally return valid true for cancelled validations
             } else {
-                throw error; // Rethrow unexpected errors
+                throw error;
             }
         }
     }
@@ -36,13 +39,13 @@ export class FormulaValidator {
         let lastToken = null;
 
         for (let index = 0; index < tokens.length; index++) {
-            if (signal.aborted) throw new AbortError(); // Standard AbortError
+            if (signal.aborted) throw new AbortError();
 
             const token = tokens[index];
 
             if (token.type === "operator") {
                 valid = this._validateOperator(token, lastToken, bracketStack, index, errors) && valid;
-            } else if (token.type === "number" || token.type === "report") {
+            } else if (token.type === "number" || token.type === "report" || token.type === "custom") {
                 valid = this._validateOperand(token, lastToken, index, errors) && valid;
             } else {
                 errors[index] = `Invalid token type: ${token.type}`;
@@ -64,7 +67,7 @@ export class FormulaValidator {
 
     _validateOperator(token, lastToken, bracketStack, index, errors) {
         if (token.value === "(") {
-            if (lastToken && lastToken.type === "number") {
+            if (lastToken && (lastToken.type === "number" || lastToken.type === "report" || lastToken.type === "custom")) {
                 errors[index] = `Implicit multiplication detected before '(' at position ${index}. Use '*' explicitly.`;
                 return false;
             }
@@ -106,7 +109,7 @@ export class FormulaValidator {
 
     _validateOperand(token, lastToken, index, errors) {
         if (lastToken) {
-            if (lastToken.type === "number" || lastToken.type === "report") {
+            if (lastToken.type === "number" || lastToken.type === "report" || lastToken.type === "custom") {
                 errors[index] = "Missing operator between operands.";
                 return false;
             }
@@ -118,3 +121,83 @@ export class FormulaValidator {
         return true;
     }
 }
+```
+
+### Changes Made:
+
+1. **Custom Type Handling**: Added handling for `custom` type tokens without throwing unnecessary errors.
+2. **Updated `_validateOperand`**: Ensured that the `custom` type is treated similarly to `number` and `report` in operand validation.
+3. **Updated `_validateOperator`**: Adjusted to consider `custom` type tokens in operator validation.
+
+### Integration with React Component
+
+You can integrate this updated `FormulaValidator` class into your React component as before. The `custom` type will be handled without causing unnecessary validation errors.
+
+```javascript
+import React, { useState } from 'react';
+import { FormulaValidator } from './FormulaValidator';
+
+const FormulaInput = () => {
+    const [formula, setFormula] = useState('');
+    const [validation, setValidation] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+
+    const handleChange = (event) => {
+        setFormula(event.target.value);
+    };
+
+    const handleValidate = async () => {
+        setLoading(true);
+        setError(null);
+        setValidation(null);
+
+        const tokens = tokenize(formula); // Assume tokenize is a function to convert formula into tokens
+        const validator = new FormulaValidator();
+
+        try {
+            const result = await validator.validate(tokens);
+            setValidation(result);
+        } catch (err) {
+            if (err.name === 'AbortError') {
+                console.log('Validation was aborted.');
+            } else {
+                setError('Validation failed.');
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <div>
+            <input type="text" value={formula} onChange={handleChange} placeholder="Enter formula" />
+            <button onClick={handleValidate} disabled={loading}>
+                {loading ? 'Validating...' : 'Validate'}
+            </button>
+            {validation && !validation.valid && (
+                <div>
+                    <h3>Errors:</h3>
+                    <ul>
+                        {Object.entries(validation.errors).map(([index, error]) => (
+                            <li key={index}>{error}</li>
+                        ))}
+                    </ul>
+                </div>
+            )}
+            {error && <div>{error}</div>}
+        </div>
+    );
+};
+
+// Example tokenize function
+function tokenize(formula) {
+    // Convert formula string to tokens based on the provided example
+    // Implement your tokenization logic here
+    return [];
+}
+
+export default FormulaInput;
+```
+
+In this setup, the `custom` type is handled appropriately, ensuring that the formula validation does not throw unnecessary errors for this type.
