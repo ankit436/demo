@@ -425,3 +425,152 @@ Key changes and features:
 This implementation allows you to start multiple validation requests, and only the most recent one will complete. All previous ongoing validations will be cancelled.
 
 To use this in your application, you would create a single instance of `FormulaValidator` and call its `validateFormula` method whenever you need to validate a formula. If you call it again before the previous validation is complete, the previous one will be automatically cancelled.
+
+
+
+
+
+
+
+
+
+let abortController = null;
+
+async function isFormulaValid(formula) {
+    // If there was a previous request, abort it
+    if (abortController) {
+        abortController.abort();
+    }
+
+    // Create a new AbortController for this request
+    abortController = new AbortController();
+    const signal = abortController.signal;
+
+    // The core validation logic wrapped in a promise to support cancellation
+    const validationPromise = new Promise((resolve, reject) => {
+        if (signal.aborted) {
+            return reject({ isValid: false, msg: "Validation aborted due to a new request." });
+        }
+
+        try {
+            const operators = new Set(['+', '-', '*', '/', '%', '**', '//']);
+            let previousType = null;
+            let bracketCount = 0;
+            let errorDict = {};
+
+            function addError(position, message) {
+                if (!errorDict[position]) {
+                    errorDict[position] = [];
+                }
+                errorDict[position].push(message);
+            }
+
+            // Filter out spaces
+            formula = formula.filter(item => item.type !== 'space');
+
+            for (let i = 0; i < formula.length; i++) {
+                if (signal.aborted) {
+                    return reject({ isValid: false, msg: "Validation aborted due to a new request." });
+                }
+
+                const current = formula[i];
+                const currentType = current.type;
+
+                if (currentType === 'operator') {
+                    if (current.value === '(') {
+                        bracketCount++;
+                        if (previousType === 'close_bracket' || previousType === 'value') {
+                            addError(i, `Unexpected '('. Add an operator before this bracket.`);
+                            addError(i - 1, `Missing operator before '('.`);
+                        }
+                    } else if (current.value === ')') {
+                        if (bracketCount === 0) {
+                            addError(i, `Unmatched ')'. Add a matching '(' earlier in the formula.`);
+                        }
+                        if (previousType === 'operator' && i > 0 && formula[i-1].value !== '+' && formula[i-1].value !== '-') {
+                            addError(i, `Unexpected ')'. Add a value or '(' before this bracket.`);
+                            addError(i - 1, `Missing value or '(' before ')'.`);
+                        }
+                        bracketCount--;
+                    } else if (operators.has(current.value)) {
+                        if (previousType === 'open_bracket' || previousType === null || 
+                            (previousType === 'operator' && (current.value === '+' || current.value === '-'))) {
+                            // Allow multiple unary operators
+                            if (current.value !== '+' && current.value !== '-') {
+                                addError(i, `Operator '${current.value}' cannot be placed here. Only '+' or '-' are allowed as unary operators.`);
+                            }
+                        } else if (previousType === 'operator' && current.value !== '+' && current.value !== '-') {
+                            addError(i - 1, `Consecutive operator '${formula[i-1].value}'.`);
+                            addError(i, `Consecutive operator '${current.value}'.`);
+                        }
+                    } else {
+                        addError(i, `Invalid operator '${current.value}'.`);
+                    }
+                } else if (currentType === 'custom' || currentType === 'report' || currentType === 'value') {
+                    if (previousType === 'close_bracket' || previousType === 'value') {
+                        addError(i, `Unexpected value '${current.label || current.value}'. Add an operator before this value.`);
+                        addError(i - 1, `Missing operator before '${current.label || current.value}'.`);
+                    }
+                    if (currentType === 'value') {
+                        // Check for scientific notation and trailing decimal point
+                        const valueStr = current.value.toString();
+                        if (!/^-?(\d+\.?\d*|\.\d+)([eE][-+]?\d+)?$/.test(valueStr)) {
+                            addError(i, `Invalid number format: '${valueStr}'.`);
+                        }
+                    }
+                } else if (currentType === 'open_bracket') {
+                    bracketCount++;
+                    if (previousType === 'close_bracket' || previousType === 'value') {
+                        addError(i, `Unexpected '('. Add an operator before this bracket.`);
+                        addError(i - 1, `Missing operator before '('.`);
+                    }
+                } else if (currentType === 'close_bracket') {
+                    if (bracketCount === 0) {
+                        addError(i, `Unmatched ')'. Add a matching '(' earlier in the formula.`);
+                    }
+                    if (previousType === 'operator' && i > 0 && formula[i-1].value !== '+' && formula[i-1].value !== '-') {
+                        addError(i, `Unexpected ')'. Add a value or '(' before this bracket.`);
+                        addError(i - 1, `Missing value or '(' before ')'.`);
+                    }
+                    bracketCount--;
+                }
+
+                previousType = currentType;
+            }
+
+            if (previousType === 'operator' && formula[formula.length - 1].value !== '+' && formula[formula.length - 1].value !== '-') {
+                addError(formula.length - 1, "Formula ends with a non-unary operator. Complete the formula with a value or closing bracket.");
+            }
+
+            if (bracketCount !== 0) {
+                let bracketError = bracketCount > 0 
+                    ? `There are ${bracketCount} unmatched '(' bracket(s). Add matching ')' to close all brackets.`
+                    : `There are ${Math.abs(bracketCount)} extra ')' bracket(s). Remove excess closing brackets or add matching '(' earlier in the formula.`;
+                
+                formula.forEach((item, index) => {
+                    if (item.type === 'open_bracket' || item.type === 'close_bracket') {
+                        addError(index, bracketError);
+                    }
+                });
+            }
+
+            if (Object.keys(errorDict).length > 0) {
+                let errorMessages = Object.entries(errorDict).map(([position, messages]) => 
+                    `Position ${parseInt(position) + 1}:\n${messages.map(msg => `  - ${msg}`).join('\n')}`
+                ).join('\n\n');
+
+                return resolve({
+                    isValid: false,
+                    errorDict: errorDict,
+                    msg: `The formula contains the following errors:\n\n${errorMessages}`
+                });
+            }
+
+            return resolve({ isValid: true, errorDict: {}, msg: "Formula is valid." });
+        } catch (error) {
+            return reject({ isValid: false, msg: "An unexpected error occurred during validation." });
+        }
+    });
+
+    return validationPromise;
+}
