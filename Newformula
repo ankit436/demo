@@ -94,6 +94,136 @@ export class FormulaValidator {
                 errors[index] = `Unary operator '${token.value}' used in invalid context.`;
                 return false;
             }
+            if (index === 0 || (lastToken && (lastToken.type === "operator" && (lastToken.value === "(" || this.binaryOperators.includes(lastToken.value))))) {
+                return true;
+            } else {
+                errors[index] = `Unary operator '${token.value}' used in invalid context.`;
+                return false;
+            }
+        } else if (!this.validOperators.includes(token.value)) {
+            errors[index] = `Invalid operator: '${token.value}'`;
+            return false;
+        }
+
+        return true;
+    }
+
+    _validateOperand(token, lastToken, index, errors) {
+        if (lastToken) {
+            if (lastToken.type === "number" || lastToken.type === "report" || lastToken.type === "custom") {
+                errors[index] = "Missing operator between operands.";
+                return false;
+            }
+            if (lastToken.value === "/" && parseFloat(token.value) === 0) {
+                errors[index] = "Division by zero.";
+                return false;
+            }
+        }
+        return true;
+    }
+}
+
+
+
+
+
+
+// FormulaValidator.js
+export class FormulaValidator {
+    constructor() {
+        this.currentAbortController = null;
+        this.binaryOperators = ["+", "-", "*", "/", "%", "**"];
+        this.unaryOperators = ["+", "-"];
+        this.validOperators = [...this.binaryOperators, "(", ")"];
+    }
+
+    async validate(tokens) {
+        if (this.currentAbortController) {
+            this.currentAbortController.abort();
+        }
+
+        this.currentAbortController = new AbortController();
+        const { signal } = this.currentAbortController;
+
+        try {
+            const result = await this._validate(tokens, signal);
+            return result;
+        } catch (error) {
+            if (error.name === 'AbortError') {
+                return { valid: true, errors: null }; // Optionally return valid true for cancelled validations
+            } else {
+                throw error;
+            }
+        }
+    }
+
+    async _validate(tokens, signal) {
+        const errors = {};
+        let valid = true;
+        let bracketStack = [];
+        let lastToken = null;
+
+        for (let index = 0; index < tokens.length; index++) {
+            if (signal.aborted) throw new AbortError();
+
+            const token = tokens[index];
+
+            if (token.type === "operator") {
+                valid = this._validateOperator(token, lastToken, bracketStack, index, errors) && valid;
+            } else if (token.type === "number" || token.type === "report" || token.type === "custom") {
+                valid = this._validateOperand(token, lastToken, index, errors) && valid;
+            } else {
+                errors[index] = `Invalid token type: ${token.type}`;
+                valid = false;
+            }
+
+            lastToken = token;
+        }
+
+        if (bracketStack.length > 0) {
+            bracketStack.forEach((pos) => {
+                errors[pos] = "Unmatched opening bracket.";
+            });
+            valid = false;
+        }
+
+        return { valid, errors: valid ? null : errors };
+    }
+
+    _validateOperator(token, lastToken, bracketStack, index, errors) {
+        if (token.value === "(") {
+            if (lastToken && (lastToken.type === "number" || lastToken.type === "report" || lastToken.type === "custom")) {
+                errors[index] = `Implicit multiplication detected before '(' at position ${index}. Use '*' explicitly.`;
+                return false;
+            }
+            bracketStack.push(index);
+        } else if (token.value === ")") {
+            if (bracketStack.length === 0) {
+                errors[index] = "Unmatched closing bracket.";
+                return false;
+            } else {
+                bracketStack.pop();
+            }
+            if (lastToken && lastToken.type === "operator" && lastToken.value !== ")") {
+                errors[index] = `Operator '${lastToken.value}' before ')' is invalid.`;
+                return false;
+            }
+        } else if (this.binaryOperators.includes(token.value)) {
+            if (!lastToken ||
+                (lastToken.type === "operator" && !this.binaryOperators.includes(lastToken.value) && lastToken.value !== ")") ||
+                index === tokens.length - 1) {
+                errors[index] = `Invalid operator placement: '${token.value}'`;
+                return false;
+            }
+            if (lastToken && lastToken.value === "(") {
+                errors[index] = `Operator '${token.value}' immediately after '(' is invalid.`;
+                return false;
+            }
+        } else if (this.unaryOperators.includes(token.value)) {
+            if (lastToken && lastToken.type !== "operator" && lastToken.value !== "(") {
+                errors[index] = `Unary operator '${token.value}' used in invalid context.`;
+                return false;
+            }
             if (index === 0 || lastToken && (lastToken.type === "operator" && (lastToken.value === "(" || this.binaryOperators.includes(lastToken.value)))) {
                 return true;
             } else {
