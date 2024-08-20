@@ -91,7 +91,14 @@ export class FormulaValidator {
             }
         } else if (this.unaryOperators.includes(token.value)) {
             if (lastToken && lastToken.type !== "operator" && lastToken.value !== "(") {
-                errors[index] = `Invalid unary operator placement: '${token.value}'`;
+                errors[index] = `Unary operator '${token.value}' used in invalid context.`;
+                return false;
+            }
+            // Allow unary operators at the beginning, after an opening parenthesis, or following binary operators
+            if (index === 0 || lastToken && (lastToken.type === "operator" && (lastToken.value === "(" || this.binaryOperators.includes(lastToken.value)))) {
+                return true; // Valid placement of unary operator
+            } else {
+                errors[index] = `Unary operator '${token.value}' used in invalid context.`;
                 return false;
             }
         } else if (!this.validOperators.includes(token.value)) {
