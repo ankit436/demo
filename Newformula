@@ -33,12 +33,12 @@ class FormulaValidator {
         let lastToken = null;
 
         for (let index = 0; index < tokens.length; index++) {
-            if (signal.aborted) throw new AbortError();
+            if (signal.aborted) throw new DOMException('Operation aborted', 'AbortError'); // Fix here
 
             const token = tokens[index];
 
             if (token.type === "operator") {
-                valid = this._validateOperator(token, lastToken, bracketStack, index, errors) && valid;
+                valid = this._validateOperator(token, lastToken, bracketStack, index, errors, tokens) && valid;
             } else if (token.type === "number" || token.type === "report" || token.type === "custom") {
                 valid = this._validateOperand(token, lastToken, index, errors) && valid;
             } else {
@@ -59,54 +59,55 @@ class FormulaValidator {
         return { valid, errors: valid ? null : errors };
     }
 
-    _validateOperator(token, lastToken, bracketStack, index, errors) {
-    if (token.value === "(") {
-        if (lastToken && (lastToken.type === "number" || lastToken.type === "report" || lastToken.type === "custom")) {
-            errors[index] = `Implicit multiplication detected before '(' at position ${index}. Use '*' explicitly.`;
+    _validateOperator(token, lastToken, bracketStack, index, errors, tokens) { // Added tokens as a parameter
+        if (token.value === "(") {
+            if (lastToken && (lastToken.type === "number" || lastToken.type === "report" || lastToken.type === "custom")) {
+                errors[index] = `Implicit multiplication detected before '(' at position ${index}. Use '*' explicitly.`;
+                return false;
+            }
+            bracketStack.push(index);
+        } else if (token.value === ")") {
+            if (bracketStack.length === 0) {
+                errors[index] = "Unmatched closing bracket.";
+                return false;
+            } else {
+                bracketStack.pop();
+            }
+            if (lastToken && lastToken.type === "operator" && lastToken.value !== ")") {
+                errors[index] = `Operator '${lastToken.value}' before ')' is invalid.`;
+                return false;
+            }
+        } else if (this.binaryOperators.includes(token.value)) {
+            if (!lastToken ||
+                (lastToken.type === "operator" && !this.binaryOperators.includes(lastToken.value) && lastToken.value !== ")") ||
+                index === tokens.length - 1) { // Now referencing tokens from the method parameter
+                errors[index] = `Invalid operator placement: '${token.value}'`;
+                return false;
+            }
+            if (lastToken && lastToken.value === "(") {
+                errors[index] = `Operator '${token.value}' immediately after '(' is invalid.`;
+                return false;
+            }
+            // Check for consecutive binary operators, except for '**'
+            if (lastToken && this.binaryOperators.includes(lastToken.value) && lastToken.value !== "**" && token.value !== "**") {
+                errors[index] = `Consecutive binary operators '${lastToken.value}' and '${token.value}' are invalid.`;
+                return false;
+            }
+        } else if (this.unaryOperators.includes(token.value)) {
+            if (!lastToken || lastToken.type === "operator" || lastToken.value === "(") {
+                // Correctly handle the unary operator case
+            } else {
+                errors[index] = `Unary operator '${token.value}' used in invalid context.`;
+                return false;
+            }
+        } else if (!this.validOperators.includes(token.value)) {
+            errors[index] = `Invalid operator: '${token.value}'`;
             return false;
         }
-        bracketStack.push(index);
-    } else if (token.value === ")") {
-        if (bracketStack.length === 0) {
-            errors[index] = "Unmatched closing bracket.";
-            return false;
-        } else {
-            bracketStack.pop();
-        }
-        if (lastToken && lastToken.type === "operator" && lastToken.value !== ")") {
-            errors[index] = `Operator '${lastToken.value}' before ')' is invalid.`;
-            return false;
-        }
-    } else if (this.binaryOperators.includes(token.value)) {
-        if (!lastToken ||
-            (lastToken.type === "operator" && !this.binaryOperators.includes(lastToken.value) && lastToken.value !== ")") ||
-            index === token.length - 1) {
-            errors[index] = `Invalid operator placement: '${token.value}'`;
-            return false;
-        }
-        if (lastToken && lastToken.value === "(") {
-            errors[index] = `Operator '${token.value}' immediately after '(' is invalid.`;
-            return false;
-        }
-        // Check for consecutive binary operators, except for '**'
-        if (lastToken && this.binaryOperators.includes(lastToken.value) && lastToken.value !== "**" && token.value !== "**") {
-            errors[index] = `Consecutive binary operators '${lastToken.value}' and '${token.value}' are invalid.`;
-            return false;
-        }
-    } else if (this.unaryOperators.includes(token.value)) {
-        if (!lastToken || lastToken.type === "operator" || lastToken.value === "(") {
-            // Correctly handle the unary operator case
-        } else {
-            errors[index] = `Unary operator '${token.value}' used in invalid context.`;
-            return false;
-        }
-    } else if (!this.validOperators.includes(token.value)) {
-        errors[index] = `Invalid operator: '${token.value}'`;
-        return false;
+
+        return true;
     }
 
-    return true;
-}
     _validateOperand(token, lastToken, index, errors) {
         if (lastToken) {
             if (lastToken.type === "number" || lastToken.type === "report" || lastToken.type === "custom") {
@@ -139,8 +140,7 @@ const tc2 = [
 
 const tc3 = [
     { "agg_func": "SUM", "id": "109d7b02-e53e-4dd5-99c2-90860c1ad70f", "label": "Test", "type": "report" },
-    { "label": "++", "type": "operator", "value": "++" },
-
+    { "label": "**", "type": "operator", "value": "**" },
     { "agg_func": "SUM", "id": "109d7b02-e53e-4dd5-99c2-90860c1ad70f", "label": "Test", "type": "report" }
 ];
 
