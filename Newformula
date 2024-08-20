@@ -8,10 +8,12 @@ export class FormulaValidator {
     }
 
     async validate(tokens) {
+        // Cancel the previous request if it exists
         if (this.currentAbortController) {
             this.currentAbortController.abort();
         }
 
+        // Create a new AbortController for the new request
         this.currentAbortController = new AbortController();
         const { signal } = this.currentAbortController;
 
@@ -20,9 +22,9 @@ export class FormulaValidator {
             return result;
         } catch (error) {
             if (error.name === 'AbortError') {
-                return { valid: true, errors: null };
+                return { valid: true, errors: null }; // Optionally return valid true for cancelled validations
             } else {
-                throw error;
+                throw error; // Rethrow unexpected errors
             }
         }
     }
@@ -34,7 +36,7 @@ export class FormulaValidator {
         let lastToken = null;
 
         for (let index = 0; index < tokens.length; index++) {
-            if (signal.aborted) throw new AbortError();
+            if (signal.aborted) throw new AbortError(); // Standard AbortError
 
             const token = tokens[index];
 
