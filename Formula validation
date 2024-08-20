@@ -301,3 +301,127 @@ This updated version addresses all the cases we discussed:
 This version should now handle most Python-like formula evaluations correctly. However, it's important to note that this is still a simplified version and may not catch every possible edge case that Python handles. For the most accurate results, you'd need to implement a full parser and evaluator that mimics Python's exact behavior.
 
 Is there any specific part of this updated function you'd like me to explain further?
+
+
+
+
+ Certainly! We can modify the function to work asynchronously and implement a cancellation mechanism. This approach will allow you to cancel ongoing validation requests if a new one comes in. Here's how we can do this:
+
+```javascript
+class FormulaValidator {
+    constructor() {
+        this.currentValidationController = null;
+    }
+
+    async validateFormula(formula) {
+        // Cancel any ongoing validation
+        if (this.currentValidationController) {
+            this.currentValidationController.abort();
+        }
+
+        // Create a new AbortController for this validation
+        this.currentValidationController = new AbortController();
+        const signal = this.currentValidationController.signal;
+
+        try {
+            return await this._validateFormulaAsync(formula, signal);
+        } catch (error) {
+            if (error.name === 'AbortError') {
+                return { isValid: false, errorDict: {}, msg: "Validation was cancelled." };
+            }
+            throw error;
+        } finally {
+            // Clear the current controller if it's the one we just used
+            if (this.currentValidationController && this.currentValidationController.signal === signal) {
+                this.currentValidationController = null;
+            }
+        }
+    }
+
+    async _validateFormulaAsync(formula, signal) {
+        const operators = new Set(['+', '-', '*', '/', '%', '**', '//']);
+        let previousType = null;
+        let bracketCount = 0;
+        let errorDict = {};
+
+        function addError(position, message) {
+            if (!errorDict[position]) {
+                errorDict[position] = [];
+            }
+            errorDict[position].push(message);
+        }
+
+        // Filter out spaces
+        formula = formula.filter(item => item.type !== 'space');
+
+        for (let i = 0; i < formula.length; i++) {
+            // Check if the validation has been cancelled
+            if (signal.aborted) {
+                throw new DOMException('Validation aborted', 'AbortError');
+            }
+
+            const current = formula[i];
+            const currentType = current.type;
+
+            // ... [The rest of the validation logic remains the same as in the previous version]
+            // ... [Copy the validation logic from the previous answer here]
+
+            previousType = currentType;
+
+            // Simulate some async work (remove this in production)
+            await new Promise(resolve => setTimeout(resolve, 10));
+        }
+
+        // ... [The rest of the error checking logic remains the same]
+        // ... [Copy the final error checking and return logic from the previous answer here]
+
+        if (Object.keys(errorDict).length > 0) {
+            let errorMessages = Object.entries(errorDict).map(([position, messages]) => 
+                `Position ${parseInt(position) + 1}:\n${messages.map(msg => `  - ${msg}`).join('\n')}`
+            ).join('\n\n');
+
+            return {
+                isValid: false,
+                errorDict: errorDict,
+                msg: `The formula contains the following errors:\n\n${errorMessages}`
+            };
+        }
+
+        return { isValid: true, errorDict: {}, msg: "Formula is valid." };
+    }
+}
+
+// Usage:
+const validator = new FormulaValidator();
+
+async function validateFormulaWithCancellation(formula) {
+    try {
+        const result = await validator.validateFormula(formula);
+        console.log(result);
+    } catch (error) {
+        console.error("Validation error:", error);
+    }
+}
+
+// Example usage:
+validateFormulaWithCancellation(formula1);
+validateFormulaWithCancellation(formula2); // This will cancel the validation of formula1 if it's still ongoing
+```
+
+Key changes and features:
+
+1. We've created a `FormulaValidator` class to manage the state of ongoing validations.
+
+2. The `validateFormula` method is now asynchronous and uses an `AbortController` to allow cancellation.
+
+3. If a new validation request comes in while another is in progress, the ongoing validation is cancelled.
+
+4. The actual validation logic is moved to a private `_validateFormulaAsync` method, which checks for cancellation at each step.
+
+5. We've added a small delay in the validation loop to simulate async work. You can remove this in production if your validation doesn't need to be async.
+
+6. If a validation is cancelled, it returns a specific message indicating the cancellation.
+
+This implementation allows you to start multiple validation requests, and only the most recent one will complete. All previous ongoing validations will be cancelled.
+
+To use this in your application, you would create a single instance of `FormulaValidator` and call its `validateFormula` method whenever you need to validate a formula. If you call it again before the previous validation is complete, the previous one will be automatically cancelled.
