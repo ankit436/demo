@@ -1,0 +1,261 @@
+ Sure, here's the updated code with the addition of keydown event handling for mathematical operators and numbers:
+
+```javascript
+const FormulaBuilder = forwardRef(
+  (
+    {
+      customKeys,
+      typeKeys,
+      formulaName,
+      onAddFormula,
+      onEditFormula,
+      item = {},
+      selectAggFunc,
+      patternItem,
+      setEditFormula,
+      setPatternItem,
+      projectbenefitdriver,
+    },
+    ref
+  ) => {
+    const name = useBindTarget(item.name || "");
+    const description = useBindTarget(item.description || "");
+    const [pattern, setPattern] = useState(item.pattern || []);
+    const [benefitdriver, setBenefitDriver] = useState(
+      item.benefitdriver || ""
+    );
+    const [selected, setselected] = useState(item?.pattern?.length - 1 || null);
+    const [Focus, setFocus] = useState(false);
+    const containerRef = useRef(null);
+    const [lastInRow, setLastInRow] = useState([]);
+    const validatorRef = useRef(formulavalidator);
+    const [validatingResult, setvalidatingResult] = useState(null);
+
+    // ...
+
+    const handleKeyDown = (event) => {
+      if (Focus) {
+        if (selected !== null) {
+          let newSelected = selected;
+          const container = containerRef.current;
+          const children = Array.from(container.children);
+
+          if (event.key === "Backspace") {
+            if (!Focus) {
+              document.getElementById("handelback").click();
+            }
+            return;
+          } else if (event.key === "ArrowRight") {
+            if (selected < children.length - 1) {
+              newSelected = selected + 1;
+            } else {
+              newSelected = -1;
+            }
+          } else if (event.key === "ArrowLeft") {
+            if (selected >= 0) {
+              newSelected = selected - 1;
+            } else {
+              newSelected = children.length - 1;
+            }
+          } else if (event.key === "ArrowDown") {
+            const { top } =
+              children[selected === -1 ? 0 : selected].getBoundingClientRect();
+            newSelected = children.findIndex(
+              (child, index) =>
+                index > selected && child.getBoundingClientRect().top > top
+            );
+            if (newSelected === -1) {
+              newSelected = selected;
+            }
+          } else if (event.key === "ArrowUp") {
+            const { top } =
+              children[selected === -1 ? 0 : selected].getBoundingClientRect();
+            newSelected = [...children]
+              .reverse()
+              .findIndex(
+                (child, index) =>
+                  children.length - 1 - index < selected &&
+                  child.getBoundingClientRect().top < top
+              );
+            if (newSelected !== -1) {
+              newSelected = children.length - 1 - newSelected;
+            } else {
+              newSelected = selected;
+            }
+          } else if (event.key === "+" || event.key === "-" || event.key === "*" || event.key === "/") {
+            setOperator(event.key);
+          } else if (!isNaN(parseInt(event.key))) {
+            onAdd({ value: event.key });
+          }
+          setselected(newSelected);
+        }
+      }
+    };
+
+    useEffect(() => {
+      window.addEventListener("keydown", handleKeyDown);
+      return () => {
+        window.removeEventListener("keydown", handleKeyDown);
+      };
+    }, [selected, Focus]);
+
+    const setOperator = (k) => {
+      if (selected != null) {
+        const newitem = [...pattern];
+        newitem.splice(selected + 1, 0, {
+          type: "operator",
+          value: k,
+          label: k,
+        });
+        setPattern(newitem);
+
+        if (item.pattern) {
+          const datas = JSON.parse(JSON.stringify(item));
+          datas.pattern.splice(selected + 1, 0, {
+            type: "operator",
+            value: k,
+            label: k,
+          });
+          setEditFormula(datas);
+        }
+        setselected(selected + 1);
+      } else {
+        setPattern([
+          ...pattern,
+          {
+            type: "operator",
+            value: k,
+            label: k,
+          },
+        ]);
+        if (item.pattern) {
+          let datas = JSON.parse(JSON.stringify(item));
+          datas.pattern.push({
+            type: "operator",
+            value: k,
+            label: k,
+          });
+          setEditFormula(datas);
+        }
+      }
+    };
+
+    const onAdd = (tr) => {
+      if (Number.isNaN(+tr.value) || tr.value.trim() === "") {
+        showErr("please input a number");
+      } else if (selected != null) {
+        const newitem = [...pattern];
+        newitem.splice(selected + 1, 0, {
+          type: "number",
+          value: tr.value,
+          label: tr.value,
+        });
+        setPattern(newitem);
+
+        if (item.pattern) {
+          const datas = JSON.parse(JSON.stringify(item));
+          datas.pattern.splice(selected + 1, 0, {
+            type: "number",
+            value: tr.value,
+            label: tr.value,
+          });
+          setEditFormula(datas);
+        }
+        setselected(selected + 1);
+        tr.onChange({ target: { value: "0" } });
+      } else {
+        setPattern([
+          ...pattern,
+          {
+            type: "number",
+            value: tr.value,
+            label: tr.value,
+          },
+        ]);
+        if (item.pattern) {
+          let datas = JSON.parse(JSON.stringify(item));
+          datas.pattern.push({
+            type: "number",
+            value: tr.value,
+            label: tr.value,
+          });
+          setEditFormula(datas);
+        }
+        tr.onChange({ target: { value: "0" } });
+      }
+    };
+
+    return (
+      <div
+        ref={containerRef}
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          flexWrap: "wrap",
+          position: "relative",
+        }}
+        onFocus={() => setFocus(true)}
+        onBlur={() => setFocus(false)}
+      >
+        {pattern?.map((it, n) => {
+          const isLast = lastInRow[n]?.isLast || false;
+          return (
+            <div
+              style={{
+                display: "flex",
+                flexGrow: isLast ? 1 : 0,
+              }}
+            >
+              {n === 0 && (
+                <div
+                  className={selected === -1 ? "blinking-cursor" : ""}
+                  style={{
+                    cursor: "pointer",
+                    width: 2,
+                    caretColor: "transparent",
+                    position: "relative",
+                    left: -3,
+                  }}
+                  onClick={() => {
+                    if (selected === -1) {
+                      setselected(null);
+                    } else {
+                      setselected(-1);
+                    }
+                  }}
+                ></div>
+              )}
+              {renderPattern(it, n)}
+
+              <div
+                style={{
+                  flex: 1,
+                  caretColor: "transparent",
+                  minWidth: 4,
+                  position: "relative",
+                }}
+                className={n === selected && Focus ? "blinking-cursor" : ""}
+                onClick={() => {
+                  if (selected === n) {
+                    setselected(null);
+                  } else {
+                    setselected(n);
+                  }
+                }}
+              ></div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
+);
+```
+
+The main changes are:
+
+1. Added new cases in the `handleKeyDown` function to handle the keydown events for mathematical operators (`+`, `-`, `*`, `/`) and numbers (0-9).
+2. Added new functions `setOperator` and `onAdd` to handle the addition of operators and numbers, respectively, to the `pattern` state.
+3. Updated the `handleKeyDown` function to call the `setOperator` and `onAdd` functions when the corresponding keydown events are detected.
+
+With these changes, the `FormulaBuilder` component now handles keydown events for mathematical operators and numbers, allowing users to manipulate the formula directly using the keyboard.
