@@ -394,37 +394,37 @@ async function runTests() {
         // Test Case 16: Combined Complex Case
         {
             tokens: [
-                { type: "operator", value: "(" },          // 0
-                { type: "operator", value: "-" },          // 1
-                { type: "operator", value: "(" },          // 2
-                { type: "number", value: "3" },            // 3
-                { type: "operator", value: "+" },          // 4
-                { type: "number", value: "5" },            // 5
-                { type: "operator", value: ")" },          // 6
-                { type: "operator", value: ")" },          // 7
-                { type: "operator", value: "*" },          // 8
-                { type: "number", value: "4" },            // 9
-                { type: "operator", value: "+" },          // 10
-                { type: "operator", value: "(" },          // 11
-                { type: "number", value: "2" },            // 12
-                { type: "operator", value: ")" },          // 13
-                { type: "operator", value: "(" },          // 14
-                { type: "number", value: "5" },            // 15
-                { type: "operator", value: ")" },          // 16
-                { type: "operator", value: "+" },          // 17
-                { type: "operator", value: "(" },          // 18
-                { type: "operator", value: "*" },          // 19
-                { type: "operator", value: ")" },          // 20
-                { type: "number", value: "7" },            // 21
-                { type: "operator", value: "+" },          // 22
-                { type: "operator", value: "*" },          // 23
-                { type: "number", value: "6" },            // 24
-                { type: "operator", value: "**" },         // 25
-                { type: "number", value: "3" },            // 26
-                { type: "number", value: "2" },            // 27
-                { type: "number", value: "5" },            // 28
-                { type: "invalid", value: "?" },           // 29
-                { type: "number", value: "3" }             // 30
+                { type: "operator", value: "(" },
+                { type: "operator", value: "-" },
+                { type: "operator", value: "(" },
+                { type: "number", value: "3" },
+                { type: "operator", value: "+" },
+                { type: "number", value: "5" },
+                { type: "operator", value: ")" },
+                { type: "operator", value: ")" },
+                { type: "operator", value: "*" },
+                { type: "number", value: "4" },
+                { type: "operator", value: "+" },
+                { type: "operator", value: "(" },
+                { type: "number", value: "2" },
+                { type: "operator", value: ")" },
+                { type: "operator", value: "(" },
+                { type: "number", value: "5" },
+                { type: "operator", value: ")" },
+                { type: "operator", value: "+" },
+                { type: "operator", value: "(" },
+                { type: "operator", value: "*" },
+                { type: "operator", value: ")" },
+                { type: "number", value: "7" },
+                { type: "operator", value: "+" },
+                { type: "operator", value: "*" },
+                { type: "number", value: "6" },
+                { type: "operator", value: "**" },
+                { type: "number", value: "3" },
+                { type: "number", value: "2" },
+                { type: "number", value: "5" },
+                { type: "invalid", value: "?" },
+                { type: "number", value: "3" }
             ],
             expected: {
                 valid: false,
@@ -433,6 +433,59 @@ async function runTests() {
                     19: "Binary operator '*' after '(' is invalid.",
                     23: "Binary operator '*' after another operator is invalid.",
                     29: "Invalid token type: invalid"
+                }
+            }
+        },
+        // Test Case 17: Unary Operators After Close Bracket
+// Test Case 17: Unary Operators After Close Bracket
+        {
+            tokens: [
+                { type: "operator", value: "(" },
+                { type: "number", value: "3" },
+                { type: "operator", value: ")" },
+                { type: "operator", value: "-" },
+                { type: "number", value: "2" }
+            ],
+            expected: { valid: true, errors: null }
+        },
+        // Test Case 18: Unary Operator After Number
+        {
+            tokens: [
+                { type: "number", value: "5" },
+                { type: "operator", value: "-" },
+                { type: "number", value: "3" }
+            ],
+            expected: { valid: true, errors: null }
+        },
+        // Test Case 19: Multiple Brackets and Operators
+        {
+            tokens: [
+                { type: "operator", value: "(" },
+                { type: "number", value: "7" },
+                { type: "operator", value: "+" },
+                { type: "operator", value: "(" },
+                { type: "number", value: "5" },
+                { type: "operator", value: "*" },
+                { type: "number", value: "2" },
+                { type: "operator", value: ")" },
+                { type: "operator", value: ")" }
+            ],
+            expected: { valid: true, errors: null }
+        },
+        // Test Case 20: Mixed Valid and Invalid Tokens
+        {
+            tokens: [
+                { type: "number", value: "4" },
+                { type: "operator", value: "+" },
+                { type: "number", value: "2" },
+                { type: "operator", value: "*" },
+                { type: "operator", value: "(" },
+                { type: "invalid", value: "?" }
+            ],
+            expected: {
+                valid: false,
+                errors: {
+                    5: "Invalid token type: invalid"
                 }
             }
         }
