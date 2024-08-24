@@ -1,10 +1,10 @@
- 
 class FormulaValidator {
     constructor() {
         this.currentAbortController = null;
         this.binaryOperators = ["+", "-", "*", "/", "%", "**"];
         this.unaryOperators = ["+", "-"];
         this.validOperators = [...this.binaryOperators, ...this.unaryOperators, "(", ")"];
+        this.formulaType = ["number", "report", "custom"];
     }
 
     async validate(tokens) {
@@ -16,14 +16,12 @@ class FormulaValidator {
         const { signal } = this.currentAbortController;
 
         try {
-            const result = await this._validate(tokens, signal);
-            return result;
+            return await this._validate(tokens, signal);
         } catch (error) {
             if (error.name === 'AbortError') {
                 return { valid: true, errors: null };
-            } else {
-                throw error;
             }
+            throw error;
         }
     }
 
@@ -38,17 +36,12 @@ class FormulaValidator {
             if (signal.aborted) throw new DOMException('Operation aborted', 'AbortError');
 
             const token = tokens[index];
+            const isOperator = token.type === "operator";
 
-            if (token.type === "operator") {
-              
+            if (isOperator) {
                 valid = this._validateOperator(token, lastToken, bracketStack, index, errors, tokens, asteriskCount) && valid;
-                   if (token.value === "*") {
-                    asteriskCount++;
-                } else {
-                    asteriskCount = 0;
-                }
-               
-            } else if (token.type === "number" || token.type === "report" || token.type === "custom") {
+                asteriskCount = token.value === "*" ? asteriskCount + 1 : 0;
+            } else if (this.formulaType.includes(token.type)) {
                 valid = this._validateOperand(token, lastToken, index, errors) && valid;
                 asteriskCount = 0;
             } else {
@@ -60,9 +53,7 @@ class FormulaValidator {
         }
 
         if (bracketStack.length > 0) {
-            bracketStack.forEach((pos) => {
-                errors[pos] = "Unmatched opening bracket.";
-            });
+            bracketStack.forEach(pos => errors[pos] = "Unmatched opening bracket.");
             valid = false;
         }
 
@@ -73,18 +64,17 @@ class FormulaValidator {
         const nextToken = tokens[index + 1];
 
         if (token.value === "(") {
-            if (lastToken && (lastToken.type === "number" || lastToken.type === "report" || lastToken.type === "custom" || lastToken.value === ")")) {
+            if (lastToken && (this.formulaType.includes(lastToken.type) || lastToken.value === ")")) {
                 errors[index] = `Implicit multiplication detected before '(' at position ${index}. Use '*' explicitly.`;
                 return false;
             }
             bracketStack.push(index);
         } else if (token.value === ")") {
-            if (bracketStack.length === 0) {
+            if (!bracketStack.length) {
                 errors[index] = "Unmatched closing bracket.";
                 return false;
-            } else {
-                bracketStack.pop();
             }
+            bracketStack.pop();
             if (lastToken && lastToken.type === "operator" && lastToken.value !== ")") {
                 errors[index] = `Operator '${lastToken.value}' before ')' is invalid.`;
                 return false;
@@ -98,8 +88,8 @@ class FormulaValidator {
                 errors[index] = `Operator '${token.value}' at the end is invalid.`;
                 return false;
             }
-            if ( lastToken && lastToken.type === "operator" && 
-                (lastToken.value !== ")" && !this.unaryOperators.includes(token.value)) && !(lastToken.value === "*" && token.value === "*") ) {
+            if (lastToken && lastToken.type === "operator" && lastToken.value !== ")" && 
+                !(lastToken.value === "*" && token.value === "*")) {
                 errors[index] = `Binary operator '${token.value}' after another operator is invalid.`;
                 return false;
             }
@@ -113,14 +103,13 @@ class FormulaValidator {
     }
 
     _validateOperand(token, lastToken, index, errors) {
-        if (lastToken && (lastToken.type === "number" || lastToken.type === "report" || lastToken.type === "custom" || lastToken.value === ")")) {
+        if (lastToken && (this.formulaType.includes(lastToken.type) || lastToken.value === ")")) {
             errors[index] = "Missing operator between operands.";
             return false;
         }
         return true;
     }
 }
-
 
 
 (async function runTests() {
@@ -130,17 +119,10 @@ class FormulaValidator {
         // Test Case 1: Exponentiation Operator (**)
         {
             tokens: [
-               { type: "operator", value: "(" },
-                { type: "number", value: "3" },
-                { type: "operator", value: "+" },
-                  { type: "number", value: "3" },
-                 { type: "operator", value: ")" },
-                 
-                { type: "operator", value: "+" },
-                 
-                  
-                { type: "number", value: "3" },
+                { type: "operator", value: "(" },
+                { type: "operator", value: ")" },
                 
+                { type: "number", value: "3" }
             ],
             expected: { valid: true, errors: null }
         },
@@ -185,8 +167,8 @@ class FormulaValidator {
         {
             tokens: [
                 { type: "number", value: "2" },
-                { type: "operator", value: "*" },
                 { type: "operator", value: "+" },
+                { type: "operator", value: "-" },
                 { type: "number", value: "3" }
             ],
             expected: { valid: true, errors: null }
