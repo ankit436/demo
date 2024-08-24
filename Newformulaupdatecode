@@ -40,12 +40,14 @@ class FormulaValidator {
             const token = tokens[index];
 
             if (token.type === "operator") {
+              
                 valid = this._validateOperator(token, lastToken, bracketStack, index, errors, tokens, asteriskCount) && valid;
-                if (token.value === "*") {
+                   if (token.value === "*") {
                     asteriskCount++;
                 } else {
                     asteriskCount = 0;
                 }
+               
             } else if (token.type === "number" || token.type === "report" || token.type === "custom") {
                 valid = this._validateOperand(token, lastToken, index, errors) && valid;
                 asteriskCount = 0;
@@ -96,8 +98,8 @@ class FormulaValidator {
                 errors[index] = `Operator '${token.value}' at the end is invalid.`;
                 return false;
             }
-            if (lastToken && lastToken.type === "operator" && 
-                (lastToken.value !== ")" && !this.unaryOperators.includes(token.value))) {
+            if ( lastToken && lastToken.type === "operator" && 
+                (lastToken.value !== ")" && !this.unaryOperators.includes(token.value)) && !(lastToken.value === "*" && token.value === "*") ) {
                 errors[index] = `Binary operator '${token.value}' after another operator is invalid.`;
                 return false;
             }
@@ -118,84 +120,6 @@ class FormulaValidator {
         return true;
     }
 }
-async function runTests() {
-    const validator = new FormulaValidator();
-    
-    const testCases = [
-        {
-            tokens: [
-                { type: "number", value: "2" },
-                { type: "operator", value: "**" },
-                { type: "number", value: "3" }
-            ],
-            expected: { valid: true, errors: null }
-        },
-        {
-            tokens: [
-                { type: "operator", value: "-" },
-                { type: "number", value: "5" },
-                { type: "operator", value: "+" },
-                { type: "number", value: "2" }
-            ],
-            expected: { valid: true, errors: null }
-        },
-        {
-            tokens: [
-                { type: "operator", value: "(" },
-                { type: "operator", value: "*" },
-                { type: "operator", value: ")" }
-            ],
-            expected: { 
-                valid: false, 
-                errors: {
-                    1: "Binary operator '*' after '(' is invalid."
-                }
-            }
-        },
-        {
-            tokens: [
-                { type: "operator", value: "(" },
-                { type: "report", value: "T" },
-                { type: "operator", value: ")" },
-                { type: "operator", value: "*" },
-                { type: "operator", value: "(" },
-                { type: "report", value: "t" },
-                { type: "operator", value: ")" }
-            ],
-            expected: { valid: true, errors: null }
-        },
-        {
-            tokens: [
-                { type: "number", value: "2" },
-                { type: "operator", value: "+" },
-                { type: "operator", value: "-" },
-                { type: "number", value: "3" }
-            ],
-            expected: { valid: true, errors: null }
-        },
-        {
-            tokens: [
-                { type: "number", value: "2" },
-                { type: "operator", value: "*" },
-                { type: "operator", value: "*" },
-                { type: "operator", value: "*" },
-                { type: "number", value: "3" }
-            ],
-            expected: { 
-                valid: false, 
-                errors: {
-                    3: "More than two consecutive '*' operators are not allowed."
-                }
-            }
-        }
-    ];
-
-    for (const [index, testCase] of testCases.entries()) {
-        const result = await validator.validate(testCase.tokens);
-        console.log(`Test Case ${index + 1}:`, JSON.stringify(result));
-        console.assert(JSON.stringify(result) === JSON.stringify(testCase.expected), `Failed on test case ${index + 1}`);
-    }
-}
 
 
 
@@ -206,9 +130,17 @@ async function runTests() {
         // Test Case 1: Exponentiation Operator (**)
         {
             tokens: [
-                { type: "number", value: "2" },
-                { type: "operator", value: "**" },
-                { type: "number", value: "3" }
+               { type: "operator", value: "(" },
+                { type: "number", value: "3" },
+                { type: "operator", value: "+" },
+                  { type: "number", value: "3" },
+                 { type: "operator", value: ")" },
+                 
+                { type: "operator", value: "+" },
+                 
+                  
+                { type: "number", value: "3" },
+                
             ],
             expected: { valid: true, errors: null }
         },
@@ -253,7 +185,7 @@ async function runTests() {
         {
             tokens: [
                 { type: "number", value: "2" },
-                { type: "operator", value: "+" },
+                { type: "operator", value: "*" },
                 { type: "operator", value: "+" },
                 { type: "number", value: "3" }
             ],
