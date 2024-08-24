@@ -88,8 +88,8 @@ class FormulaValidator {
                 errors[index] = `Operator '${token.value}' at the end is invalid.`;
                 return false;
             }
-            if ( lastToken && lastToken.type === "operator" && 
-                (lastToken.value !== ")" && !this.unaryOperators.includes(token.value)) && !(lastToken.value === "*" && token.value === "*") ) {
+            if ( lastToken && lastToken.type === "operator" && this._isValidBinarySequence(token, lastToken)
+                 ) {
                 errors[index] = `Binary operator '${token.value}' after another operator is invalid.`;
                 return false;
             }
@@ -109,7 +109,13 @@ class FormulaValidator {
         }
         return true;
     }
+
+	 _isValidBinarySequence(token, lastToken) {
+        return (lastToken.value !== ")" && !this.unaryOperators.includes(token.value)) && !(lastToken.value === "*" && token.value === "*")
+    }
 }
+
+
 
 
 
