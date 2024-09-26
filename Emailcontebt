@@ -1,47 +1,47 @@
-import smtplib
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-
 def send_email(card):
-    # Format the email content with card details
+    # Format the email content with proper HTML structure
     email_body = f"""
-    Dear Team,
+    <html>
+    <body>
+    <p>Dear Team,</p>
 
-    A new card has been created with the following details:
+    <p>A new card has been created with the following details:</p>
 
-    - **Ado Project Name**: {card['ado_project_name']}
-    - **Opportunity ID**: {card['opportunity_id']}
-    - **Program**: {card['program']}
-    - **Phase**: {card['phase']}
-    - **Region**: {card['region']}
-    - **Standardized Benefit Type**: {card['standardized_benefit_type']}
-    - **Project Status**: {card['status']}
-    - **IT Owner**: {card['it_owner']}
-    - **Business EVP**: {card['business_evp']}
-    - **Sponsor**: {card['sponsor']}
-    - **Project Description**: {card['project_description']}
+    <ul>
+        <li><b>Ado Project Name</b>: {card['ado_project_name']}</li>
+        <li><b>Opportunity ID</b>: {card['opportunity_id']}</li>
+        <li><b>Program</b>: {card['program']}</li>
+        <li><b>Phase</b>: {card['phase']}</li>
+        <li><b>Region</b>: {card['region']}</li>
+        <li><b>Standardized Benefit Type</b>: {card['standardized_benefit_type']}</li>
+        <li><b>Project Status</b>: {card['status']}</li>
+        <li><b>IT Owner</b>: {card['it_owner']}</li>
+        <li><b>Business EVP</b>: {card['business_evp']}</li>
+        <li><b>Sponsor</b>: {card['sponsor']}</li>
+        <li><b>Project Description</b>: {card['project_description']}</li>
+    </ul>
 
-    Please feel free to reach out if you need more information.
+    <p>Please feel free to reach out if you need more information.</p>
 
-    Best regards,
-    Your Name
+    <p>Best regards,<br>Your Name</p>
+    </body>
+    </html>
     """
 
-    # Set up the email parameters
+    # Set up email parameters (same as before)
     sender_email = "your_email@example.com"
     receiver_email = "recipient@example.com"
     subject = f"New Card Created: {card['name']}"
-    
-    # Create email
+
     msg = MIMEMultipart()
     msg['From'] = sender_email
     msg['To'] = receiver_email
     msg['Subject'] = subject
 
-    # Attach the body to the email
+    # Attach the formatted HTML content to the email
     msg.attach(MIMEText(email_body, 'html'))
 
-    # Send the email via SMTP (dummy SMTP for example)
+    # Send the email (same as before)
     try:
         with smtplib.SMTP('smtp.example.com', 587) as server:
             server.starttls()
