@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 1200 900" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="1200" height="900" fill="#f8f9fa" />
+  
+  <!-- Title -->
+  <text x="600" y="50" font-family="Arial" font-size="24" text-anchor="middle" font-weight="bold" fill="#333">Document Management System - Detailed Architecture</text>
+
+  <!-- Presentation Layer -->
+  <rect x="150" y="100" width="900" height="100" rx="10" ry="10" fill="#e3f2fd" stroke="#2196f3" stroke-width="2" />
+  <text x="600" y="135" font-family="Arial" font-size="18" text-anchor="middle" font-weight="bold" fill="#1565c0">Presentation Layer</text>
+  
+  <rect x="180" y="150" width="160" height="40" rx="5" ry="5" fill="#bbdefb" stroke="#1976d2" stroke-width="1" />
+  <text x="260" y="175" font-family="Arial" font-size="14" text-anchor="middle" fill="#0d47a1">User Interface</text>
+  
+  <rect x="380" y="150" width="160" height="40" rx="5" ry="5" fill="#bbdefb" stroke="#1976d2" stroke-width="1" />
+  <text x="460" y="175" font-family="Arial" font-size="14" text-anchor="middle" fill="#0d47a1">Web Portal</text>
+  
+  <rect x="580" y="150" width="160" height="40" rx="5" ry="5" fill="#bbdefb" stroke="#1976d2" stroke-width="1" />
+  <text x="660" y="175" font-family="Arial" font-size="14" text-anchor="middle" fill="#0d47a1">Dashboard</text>
+
+  <rect x="780" y="150" width="160" height="40" rx="5" ry="5" fill="#bbdefb" stroke="#1976d2" stroke-width="1" />
+  <text x="860" y="175" font-family="Arial" font-size="14" text-anchor="middle" fill="#0d47a1">Search Interface</text>
+
+  <!-- Application Layer -->
+  <rect x="150" y="220" width="900" height="180" rx="10" ry="10" fill="#e8f5e9" stroke="#4caf50" stroke-width="2" />
+  <text x="600" y="250" font-family="Arial" font-size="18" text-anchor="middle" font-weight="bold" fill="#2e7d32">Application Layer</text>
+  
+  <!-- Application Layer - Left Column -->
+  <rect x="180" y="280" width="160" height="40" rx="5" ry="5" fill="#c8e6c9" stroke="#388e3c" stroke-width="1" />
+  <text x="260" y="305" font-family="Arial" font-size="14" text-anchor="middle" fill="#1b5e20">Authentication</text>
+  
+  <rect x="180" y="340" width="160" height="40" rx="5" ry="5" fill="#c8e6c9" stroke="#388e3c" stroke-width="1" />
+  <text x="260" y="365" font-family="Arial" font-size="14" text-anchor="middle" fill="#1b5e20">Authorization</text>
+  
+  <!-- Application Layer - Middle-Left Column -->
+  <rect x="370" y="280" width="160" height="40" rx="5" ry="5" fill="#c8e6c9" stroke="#388e3c" stroke-width="1" />
+  <text x="450" y="305" font-family="Arial" font-size="14" text-anchor="middle" fill="#1b5e20">Document Upload</text>
+  
+  <rect x="370" y="340" width="160" height="40" rx="5" ry="5" fill="#c8e6c9" stroke="#388e3c" stroke-width="1" />
+  <text x="450" y="365" font-family="Arial" font-size="14" text-anchor="middle" fill="#1b5e20">Metadata Management</text>
+  
+  <!-- Application Layer - Middle-Right Column -->
+  <rect x="560" y="280" width="160" height="40" rx="5" ry="5" fill="#c8e6c9" stroke="#388e3c" stroke-width="1" />
+  <text x="640" y="305" font-family="Arial" font-size="14" text-anchor="middle" fill="#1b5e20">Workflow Engine</text>
+  
+  <rect x="560" y="340" width="160" height="40" rx="5" ry="5" fill="#c8e6c9" stroke="#388e3c" stroke-width="1" />
+  <text x="640" y="365" font-family="Arial" font-size="14" text-anchor="middle" fill="#1b5e20">Notification Service</text>
+  
+  <!-- Application Layer - Right Column -->
+  <rect x="750" y="280" width="160" height="40" rx="5" ry="5" fill="#c8e6c9" stroke="#388e3c" stroke-width="1" />
+  <text x="830" y="305" font-family="Arial" font-size="14" text-anchor="middle" fill="#1b5e20">Search Engine</text>
+  
+  <rect x="750" y="340" width="160" height="40" rx="5" ry="5" fill="#c8e6c9" stroke="#388e3c" stroke-width="1" />
+  <text x="830" y="365" font-family="Arial" font-size="14" text-anchor="middle" fill="#1b5e20">Reporting Module</text>
+
+  <!-- AI/ML Layer (MVP3) -->
+  <rect x="150" y="420" width="900" height="100" rx="10" ry="10" fill="#fff3e0" stroke="#ff9800" stroke-width="2" opacity="0.9" />
+  <text x="600" y="455" font-family="Arial" font-size="18" text-anchor="middle" font-weight="bold" fill="#e65100">AI/ML Layer (MVP3)</text>
+  
+  <rect x="180" y="470" width="160" height="40" rx="5" ry="5" fill="#ffe0b2" stroke="#f57c00" stroke-width="1" />
+  <text x="260" y="495" font-family="Arial" font-size="14" text-anchor="middle" fill="#e65100">Document Validation</text>
+  
+  <rect x="380" y="470" width="160" height="40" rx="5" ry="5" fill="#ffe0b2" stroke="#f57c00" stroke-width="1" />
+  <text x="460" y="495" font-family="Arial" font-size="14" text-anchor="middle" fill="#e65100">Copilot Assistant</text>
+  
+  <rect x="580" y="470" width="160" height="40" rx="5" ry="5" fill="#ffe0b2" stroke="#f57c00" stroke-width="1" />
+  <text x="660" y="495" font-family="Arial" font-size="14" text-anchor="middle" fill="#e65100">Metadata Extraction</text>
+
+  <rect x="780" y="470" width="160" height="40" rx="5" ry="5" fill="#ffe0b2" stroke="#f57c00" stroke-width="1" />
+  <text x="860" y="495" font-family="Arial" font-size="14" text-anchor="middle" fill="#e65100">Smart Recommendations</text>
+
+  <!-- Integration Layer -->
+  <rect x="150" y="540" width="900" height="100" rx="10" ry="10" fill="#e0f7fa" stroke="#00bcd4" stroke-width="2" />
+  <text x="600" y="575" font-family="Arial" font-size="18" text-anchor="middle" font-weight="bold" fill="#006064">Integration Layer</text>
+  
+  <rect x="180" y="590" width="160" height="40" rx="5" ry="5" fill="#b2ebf2" stroke="#0097a7" stroke-width="1" />
+  <text x="260" y="615" font-family="Arial" font-size="14" text-anchor="middle" fill="#006064">SailPoint</text>
+  
+  <rect x="380" y="590" width="160" height="40" rx="5" ry="5" fill="#b2ebf2" stroke="#0097a7" stroke-width="1" />
+  <text x="460" y="615" font-family="Arial" font-size="14" text-anchor="middle" fill="#006064">Archer</text>
+  
+  <rect x="580" y="590" width="160" height="40" rx="5" ry="5" fill="#b2ebf2" stroke="#0097a7" stroke-width="1" />
+  <text x="660" y="615" font-family="Arial" font-size="14" text-anchor="middle" fill="#006064">BPM</text>
+
+  <rect x="780" y="590" width="160" height="40" rx="5" ry="5" fill="#b2ebf2" stroke="#0097a7" stroke-width="1" />
+  <text x="860" y="615" font-family="Arial" font-size="14" text-anchor="middle" fill="#006064">iCAMS/MWD</text>
+
+  <!-- Data Layer -->
+  <rect x="150" y="660" width="900" height="180" rx="10" ry="10" fill="#f3e5f5" stroke="#9c27b0" stroke-width="2" />
+  <text x="600" y="690" font-family="Arial" font-size="18" text-anchor="middle" font-weight="bold" fill="#4a148c">Data Layer</text>
+  
+  <!-- Document Storage -->
+  <rect x="180" y="720" width="300" height="100" rx="5" ry="5" fill="#e1bee7" stroke="#7b1fa2" stroke-width="1" />
+  <text x="330" y="745" font-family="Arial" font-size="16" text-anchor="middle" fill="#4a148c">Document Storage</text>
+  <rect x="200" y="760" width="120" height="30" rx="5" ry="5" fill="#d1c4e9" stroke="#512da8" stroke-width="1" />
+  <text x="260" y="780" font-family="Arial" font-size="12" text-anchor="middle" fill="#4a148c">Document Files</text>
+  <rect x="340" y="760" width="120" height="30" rx="5" ry="5" fill="#d1c4e9" stroke="#512da8" stroke-width="1" />
+  <text x="400" y="780" font-family="Arial" font-size="12" text-anchor="middle" fill="#4a148c">Version History</text>
+
+  <!-- Metadata Storage -->
+  <rect x="520" y="720" width="300" height="100" rx="5" ry="5" fill="#e1bee7" stroke="#7b1fa2" stroke-width="1" />
+  <text x="670" y="745" font-family="Arial" font-size="16" text-anchor="middle" fill="#4a148c">Metadata Storage</text>
+  <rect x="540" y="760" width="120" height="30" rx="5" ry="5" fill="#d1c4e9" stroke="#512da8" stroke-width="1" />
+  <text x="600" y="780" font-family="Arial" font-size="12" text-anchor="middle" fill="#4a148c">Document Metadata</text>
+  <rect x="680" y="760" width="120" height="30" rx="5" ry="5" fill="#d1c4e9" stroke="#512da8" stroke-width="1" />
+  <text x="740" y="780" font-family="Arial" font-size="12" text-anchor="middle" fill="#4a148c">Reference Data</text>
+
+  <!-- Connection Lines - Vertical -->
+  <!-- Presentation to Application -->
+  <line x1="600" y1="200" x2="600" y2="220" stroke="#333" stroke-width="2" stroke-dasharray="5,3" />
+  <!-- Application to AI/ML -->
+  <line x1="600" y1="400" x2="600" y2="420" stroke="#333" stroke-width="2" stroke-dasharray="5,3" />
+  <!-- AI/ML to Integration -->
+  <line x1="600" y1="520" x2="600" y2="540" stroke="#333" stroke-width="2" stroke-dasharray="5,3" />
+  <!-- Integration to Data -->
+  <line x1="600" y1="640" x2="600" y2="660" stroke="#333" stroke-width="2" stroke-dasharray="5,3" />
+
+  <!-- MVP Labels -->
+  <rect x="40" y="150" width="80" height="30" rx="15" ry="15" fill="#1976d2" stroke="#0d47a1" stroke-width="1" />
+  <text x="80" y="170" font-family="Arial" font-size="14" text-anchor="middle" fill="white" font-weight="bold">MVP 1</text>
+  
+  <rect x="40" y="310" width="80" height="30" rx="15" ry="15" fill="#1976d2" stroke="#0d47a1" stroke-width="1" />
+  <text x="80" y="330" font-family="Arial" font-size="14" text-anchor="middle" fill="white" font-weight="bold">MVP 1</text>
+  
+  <rect x="40" y="485" width="80" height="30" rx="15" ry="15" fill="#e65100" stroke="#bf360c" stroke-width="1" />
+  <text x="80" y="505" font-family="Arial" font-size="14" text-anchor="middle" fill="white" font-weight="bold">MVP 3</text>
+  
+  <rect x="40" y="605" width="80" height="30" rx="15" ry="15" fill="#00796b" stroke="#004d40" stroke-width="1" />
+  <text x="80" y="625" font-family="Arial" font-size="14" text-anchor="middle" fill="white" font-weight="bold">MVP 2/3</text>
+  
+  <rect x="40" y="750" width="80" height="30" rx="15" ry="15" fill="#1976d2" stroke="#0d47a1" stroke-width="1" />
+  <text x="80" y="770" font-family="Arial" font-size="14" text-anchor="middle" fill="white" font-weight="bold">MVP 1</text>
+
+  <!-- Legend -->
+  <rect x="1000" y="820" width="20" height="10" fill="#1976d2" />
+  <text x="1025" y="830" font-family="Arial" font-size="12" fill="#333">MVP 1</text>
+  
+  <rect x="1000" y="840" width="20" height="10" fill="#00796b" />
+  <text x="1025" y="850" font-family="Arial" font-size="12" fill="#333">MVP 2</text>
+  
+  <rect x="1000" y="860" width="20" height="10" fill="#e65100" />
+  <text x="1025" y="870" font-family="Arial" font-size="12" fill="#333">MVP 3</text>
+</svg>
