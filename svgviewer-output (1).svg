@@ -1,0 +1,208 @@
+<svg viewBox="0 0 1000 700" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect x="0" y="0" width="1000" height="700" fill="#f8f9fa" rx="5" ry="5"/>
+  
+  <!-- Title -->
+  <text x="500" y="30" font-family="Arial" font-size="24" text-anchor="middle" font-weight="bold">Document Management System - Detailed HLD</text>
+  
+  <!-- User Layer -->
+  <rect x="50" y="50" width="900" height="80" fill="#e8eaf6" stroke="#3f51b5" stroke-width="2" rx="5" ry="5"/>
+  <text x="500" y="70" font-family="Arial" font-size="18" text-anchor="middle" font-weight="bold" fill="#1a237e">Users</text>
+  
+  <!-- User Icons -->
+  <rect x="100" y="85" width="120" height="30" fill="#c5cae9" stroke="#3949ab" stroke-width="1" rx="3" ry="3"/>
+  <text x="160" y="105" font-family="Arial" font-size="14" text-anchor="middle">Uploaders</text>
+  
+  <rect x="240" y="85" width="120" height="30" fill="#c5cae9" stroke="#3949ab" stroke-width="1" rx="3" ry="3"/>
+  <text x="300" y="105" font-family="Arial" font-size="14" text-anchor="middle">Reviewers</text>
+  
+  <rect x="380" y="85" width="120" height="30" fill="#c5cae9" stroke="#3949ab" stroke-width="1" rx="3" ry="3"/>
+  <text x="440" y="105" font-family="Arial" font-size="14" text-anchor="middle">Approvers</text>
+  
+  <rect x="520" y="85" width="120" height="30" fill="#c5cae9" stroke="#3949ab" stroke-width="1" rx="3" ry="3"/>
+  <text x="580" y="105" font-family="Arial" font-size="14" text-anchor="middle">Viewers</text>
+  
+  <rect x="660" y="85" width="120" height="30" fill="#c5cae9" stroke="#3949ab" stroke-width="1" rx="3" ry="3"/>
+  <text x="720" y="105" font-family="Arial" font-size="14" text-anchor="middle">Admins</text>
+  
+  <rect x="800" y="85" width="120" height="30" fill="#c5cae9" stroke="#3949ab" stroke-width="1" rx="3" ry="3"/>
+  <text x="860" y="105" font-family="Arial" font-size="14" text-anchor="middle">System Admins</text>
+  
+  <!-- Presentation Layer -->
+  <rect x="50" y="150" width="900" height="100" fill="#e3f2fd" stroke="#2196f3" stroke-width="2" rx="5" ry="5"/>
+  <text x="500" y="170" font-family="Arial" font-size="18" text-anchor="middle" font-weight="bold" fill="#0d47a1">Presentation Layer</text>
+  
+  <!-- Web Components -->
+  <rect x="75" y="190" width="200" height="40" fill="#bbdefb" stroke="#1976d2" stroke-width="1" rx="3" ry="3"/>
+  <text x="175" y="215" font-family="Arial" font-size="14" text-anchor="middle" font-weight="bold">Web Portal UI (React.js)</text>
+  
+  <!-- UI Components -->
+  <rect x="290" y="190" width="90" height="40" fill="#bbdefb" stroke="#1976d2" stroke-width="1" rx="3" ry="3"/>
+  <text x="335" y="215" font-family="Arial" font-size="12" text-anchor="middle">Landing Page</text>
+  
+  <rect x="390" y="190" width="90" height="40" fill="#bbdefb" stroke="#1976d2" stroke-width="1" rx="3" ry="3"/>
+  <text x="435" y="215" font-family="Arial" font-size="12" text-anchor="middle">Upload Form</text>
+  
+  <rect x="490" y="190" width="90" height="40" fill="#bbdefb" stroke="#1976d2" stroke-width="1" rx="3" ry="3"/>
+  <text x="535" y="215" font-family="Arial" font-size="12" text-anchor="middle">Review UI</text>
+  
+  <rect x="590" y="190" width="90" height="40" fill="#bbdefb" stroke="#1976d2" stroke-width="1" rx="3" ry="3"/>
+  <text x="635" y="215" font-family="Arial" font-size="12" text-anchor="middle">Search UI</text>
+  
+  <rect x="690" y="190" width="90" height="40" fill="#bbdefb" stroke="#1976d2" stroke-width="1" rx="3" ry="3"/>
+  <text x="735" y="215" font-family="Arial" font-size="12" text-anchor="middle">Admin UI</text>
+  
+  <rect x="790" y="190" width="140" height="40" fill="#bbdefb" stroke="#1976d2" stroke-width="1" rx="3" ry="3"/>
+  <text x="860" y="215" font-family="Arial" font-size="12" text-anchor="middle">AI Copilot UI (MVP3)</text>
+  
+  <!-- API Gateway -->
+  <rect x="300" y="260" width="400" height="40" fill="#e1bee7" stroke="#9c27b0" stroke-width="2" rx="5" ry="5"/>
+  <text x="500" y="285" font-family="Arial" font-size="16" text-anchor="middle" font-weight="bold" fill="#4a148c">API Gateway / API Management</text>
+  
+  <!-- Authentication Layer -->
+  <rect x="200" y="310" width="600" height="40" fill="#f3e5f5" stroke="#9c27b0" stroke-width="2" rx="5" ry="5"/>
+<text x="500" y="335" font-family="Arial" font-size="16" text-anchor="middle" font-weight="bold" fill="#4a148c">Authentication and  Authorization (SailPoint Integration)</text>
+  
+  <!-- Application Services Layer -->
+  <rect x="50" y="360" width="900" height="150" fill="#e8f5e9" stroke="#4caf50" stroke-width="2" rx="5" ry="5"/>
+  <text x="500" y="380" font-family="Arial" font-size="18" text-anchor="middle" font-weight="bold" fill="#1b5e20">Application Services Layer</text>
+  
+  <!-- Core Services -->
+  <rect x="70" y="400" width="170" height="90" fill="#c8e6c9" stroke="#388e3c" stroke-width="1" rx="3" ry="3"/>
+  <text x="155" y="420" font-family="Arial" font-size="14" text-anchor="middle" font-weight="bold">Document Management</text>
+  <line x1="70" y1="430" x2="240" y2="430" stroke="#388e3c" stroke-width="1"/>
+  <text x="85" y="445" font-family="Arial" font-size="10" text-anchor="start">• Storage and Retrieval</text>
+  <text x="85" y="460" font-family="Arial" font-size="10" text-anchor="start">• Version Control</text>
+  <text x="85" y="475" font-family="Arial" font-size="10" text-anchor="start">• PDF Conversion</text>
+  <text x="85" y="490" font-family="Arial" font-size="10" text-anchor="start">• Metadata Management</text>
+  
+  <rect x="250" y="400" width="170" height="90" fill="#c8e6c9" stroke="#388e3c" stroke-width="1" rx="3" ry="3"/>
+  <text x="335" y="420" font-family="Arial" font-size="14" text-anchor="middle" font-weight="bold">Workflow Engine</text>
+  <line x1="250" y1="430" x2="420" y2="430" stroke="#388e3c" stroke-width="1"/>
+  <text x="265" y="445" font-family="Arial" font-size="10" text-anchor="start">• Process Definition</text>
+  <text x="265" y="460" font-family="Arial" font-size="10" text-anchor="start">• Task Assignment</text>
+  <text x="265" y="475" font-family="Arial" font-size="10" text-anchor="start">• Status Tracking</text>
+  <text x="265" y="490" font-family="Arial" font-size="10" text-anchor="start">• Lifecycle Management</text>
+  
+  <rect x="430" y="400" width="170" height="90" fill="#c8e6c9" stroke="#388e3c" stroke-width="1" rx="3" ry="3"/>
+  <text x="515" y="420" font-family="Arial" font-size="14" text-anchor="middle" font-weight="bold">Access Management</text>
+  <line x1="430" y1="430" x2="600" y2="430" stroke="#388e3c" stroke-width="1"/>
+  <text x="445" y="445" font-family="Arial" font-size="10" text-anchor="start">• Role-Based Control</text>
+  <text x="445" y="460" font-family="Arial" font-size="10" text-anchor="start">• User/Group Management</text>
+  <text x="445" y="475" font-family="Arial" font-size="10" text-anchor="start">• Permission Management</text>
+  <text x="445" y="490" font-family="Arial" font-size="10" text-anchor="start">• Access Audit Logging</text>
+  
+  <rect x="610" y="400" width="170" height="90" fill="#c8e6c9" stroke="#388e3c" stroke-width="1" rx="3" ry="3"/>
+  <text x="695" y="420" font-family="Arial" font-size="14" text-anchor="middle" font-weight="bold">Notification Service</text>
+  <line x1="610" y1="430" x2="780" y2="430" stroke="#388e3c" stroke-width="1"/>
+  <text x="625" y="445" font-family="Arial" font-size="10" text-anchor="start">• Email Templates</text>
+  <text x="625" y="460" font-family="Arial" font-size="10" text-anchor="start">• Event Triggers</text>
+  <text x="625" y="475" font-family="Arial" font-size="10" text-anchor="start">• Delivery Tracking</text>
+  <text x="625" y="490" font-family="Arial" font-size="10" text-anchor="start">• Notification History</text>
+  
+  <rect x="790" y="400" width="140" height="90" fill="#c8e6c9" stroke="#388e3c" stroke-width="1" rx="3" ry="3"/>
+  <text x="860" y="420" font-family="Arial" font-size="14" text-anchor="middle" font-weight="bold">AI Services</text>
+  <text x="860" y="435" font-family="Arial" font-size="10" text-anchor="middle" font-style="italic">(MVP3)</text>
+  <line x1="790" y1="445" x2="930" y2="445" stroke="#388e3c" stroke-width="1"/>
+  <text x="805" y="460" font-family="Arial" font-size="10" text-anchor="start">• Document Validation</text>
+  <text x="805" y="475" font-family="Arial" font-size="10" text-anchor="start">• Intelligent Search</text>
+  <text x="805" y="490" font-family="Arial" font-size="10" text-anchor="start">• Copilot Assistance</text>
+  
+  <!-- Business Services Layer -->
+  <rect x="50" y="520" width="900" height="60" fill="#ffecb3" stroke="#ffa000" stroke-width="2" rx="5" ry="5"/>
+  <text x="500" y="540" font-family="Arial" font-size="18" text-anchor="middle" font-weight="bold" fill="#ff6f00">Business Services Layer</text>
+  
+  <!-- Business Services -->
+  <rect x="70" y="550" width="125" height="25" fill="#ffe082" stroke="#ffb300" stroke-width="1" rx="3" ry="3"/>
+  <text x="132" y="567" font-family="Arial" font-size="12" text-anchor="middle">Search and Indexing</text>
+  
+  <rect x="205" y="550" width="125" height="25" fill="#ffe082" stroke="#ffb300" stroke-width="1" rx="3" ry="3"/>
+  <text x="267" y="567" font-family="Arial" font-size="12" text-anchor="middle">Reporting</text>
+  
+  <rect x="340" y="550" width="125" height="25" fill="#ffe082" stroke="#ffb300" stroke-width="1" rx="3" ry="3"/>
+  <text x="402" y="567" font-family="Arial" font-size="12" text-anchor="middle">Audit and Compliance</text>
+  
+  <rect x="475" y="550" width="125" height="25" fill="#ffe082" stroke="#ffb300" stroke-width="1" rx="3" ry="3"/>
+  <text x="537" y="567" font-family="Arial" font-size="12" text-anchor="middle">Document Lifecycle</text>
+  
+  <rect x="610" y="550" width="125" height="25" fill="#ffe082" stroke="#ffb300" stroke-width="1" rx="3" ry="3"/>
+  <text x="672" y="567" font-family="Arial" font-size="12" text-anchor="middle">Bulk Operations</text>
+  
+  <rect x="745" y="550" width="185" height="25" fill="#ffe082" stroke="#ffb300" stroke-width="1" rx="3" ry="3"/>
+  <text x="837" y="567" font-family="Arial" font-size="12" text-anchor="middle">Automated Recertification</text>
+  
+  <!-- Data Access Layer -->
+  <rect x="50" y="590" width="900" height="45" fill="#e0f7fa" stroke="#00acc1" stroke-width="2" rx="5" ry="5"/>
+  <text x="500" y="618" font-family="Arial" font-size="16" text-anchor="middle" font-weight="bold" fill="#006064">Data Access Layer</text>
+  
+  <!-- Data Repositories -->
+  <rect x="50" y="645" width="900" height="45" fill="#fff3e0" stroke="#ff9800" stroke-width="2" rx="5" ry="5"/>
+  <text x="500" y="673" font-family="Arial" font-size="16" text-anchor="middle" font-weight="bold" fill="#e65100">Data Repositories</text>
+  
+  <!-- Data Stores -->
+  <rect x="70" y="650" width="150" height="35" fill="#ffe0b2" stroke="#f57c00" stroke-width="1" rx="3" ry="3"/>
+  <text x="145" y="673" font-family="Arial" font-size="12" text-anchor="middle">Document Repository</text>
+  
+  <rect x="230" y="650" width="150" height="35" fill="#ffe0b2" stroke="#f57c00" stroke-width="1" rx="3" ry="3"/>
+  <text x="305" y="673" font-family="Arial" font-size="12" text-anchor="middle">Metadata Database</text>
+  
+  <rect x="390" y="650" width="150" height="35" fill="#ffe0b2" stroke="#f57c00" stroke-width="1" rx="3" ry="3"/>
+  <text x="465" y="673" font-family="Arial" font-size="12" text-anchor="middle">User adn Access DB</text>
+  
+  <rect x="550" y="650" width="150" height="35" fill="#ffe0b2" stroke="#f57c00" stroke-width="1" rx="3" ry="3"/>
+  <text x="625" y="673" font-family="Arial" font-size="12" text-anchor="middle">Workflow Database</text>
+  
+  <rect x="710" y="650" width="70" height="35" fill="#ffe0b2" stroke="#f57c00" stroke-width="1" rx="3" ry="3"/>
+  <text x="745" y="673" font-family="Arial" font-size="12" text-anchor="middle">Logs</text>
+  
+  <rect x="790" y="650" width="140" height="35" fill="#ffe0b2" stroke="#f57c00" stroke-width="1" rx="3" ry="3"/>
+  <text x="860" y="673" font-family="Arial" font-size="12" text-anchor="middle">Reference Data</text>
+  
+  <!-- Integration Layer Connection -->
+  <rect x="50" y="700" width="900" height="0" fill="none" stroke="#9c27b0" stroke-width="2"/>
+  
+  <!-- Main Connection Arrows -->
+  <line x1="500" y1="130" x2="500" y2="150" stroke="#333" stroke-width="2"/>
+  <polygon points="500,150 504,142 496,142" fill="#333"/>
+  
+  <line x1="500" y1="250" x2="500" y2="260" stroke="#333" stroke-width="2"/>
+  <polygon points="500,260 504,252 496,252" fill="#333"/>
+  
+  <line x1="500" y1="300" x2="500" y2="310" stroke="#333" stroke-width="2"/>
+  <polygon points="500,310 504,302 496,302" fill="#333"/>
+  
+  <line x1="500" y1="350" x2="500" y2="360" stroke="#333" stroke-width="2"/>
+  <polygon points="500,360 504,352 496,352" fill="#333"/>
+  
+  <line x1="500" y1="510" x2="500" y2="520" stroke="#333" stroke-width="2"/>
+  <polygon points="500,520 504,512 496,512" fill="#333"/>
+  
+  <line x1="500" y1="580" x2="500" y2="590" stroke="#333" stroke-width="2"/>
+  <polygon points="500,590 504,582 496,582" fill="#333"/>
+  
+  <line x1="500" y1="635" x2="500" y2="645" stroke="#333" stroke-width="2"/>
+  <polygon points="500,645 504,637 496,637" fill="#333"/>
+  
+  <!-- Integration Layer -->
+  <rect x="50" y="700" width="900" height="0" fill="none" stroke="#673ab7" stroke-width="0"/>
+  <rect x="250" y="700" width="500" height="0" fill="#ede7f6" stroke="#673ab7" stroke-width="0" rx="5" ry="5"/>
+  
+  <!-- MVP Indicators -->
+  <rect x="20" y="380" width="20" height="70" fill="#d50000" stroke="none" rx="2" ry="2"/>
+  <text x="30" y="420" font-family="Arial" font-size="12" text-anchor="middle" fill="white" transform="rotate(-90,30,420)">MVP 1</text>
+  
+  <rect x="20" y="450" width="20" height="70" fill="#ff6d00" stroke="none" rx="2" ry="2"/>
+  <text x="30" y="490" font-family="Arial" font-size="12" text-anchor="middle" fill="white" transform="rotate(-90,30,490)">MVP 2</text>
+  
+  <rect x="20" y="520" width="20" height="70" fill="#00c853" stroke="none" rx="2" ry="2"/>
+  <text x="30" y="560" font-family="Arial" font-size="12" text-anchor="middle" fill="white" transform="rotate(-90,30,560)">MVP 3</text>
+  
+  <!-- Legend -->
+  <rect x="780" y="10" width="210" height="30" fill="none" stroke="#333" stroke-width="1" rx="3" ry="3"/>
+  <rect x="790" y="17" width="15" height="15" fill="#d50000" stroke="none" rx="2" ry="2"/>
+  <text x="815" y="28" font-family="Arial" font-size="12" text-anchor="start">MVP 1</text>
+  <rect x="855" y="17" width="15" height="15" fill="#ff6d00" stroke="none" rx="2" ry="2"/>
+  <text x="880" y="28" font-family="Arial" font-size="12" text-anchor="start">MVP 2</text>
+  <rect x="920" y="17" width="15" height="15" fill="#00c853" stroke="none" rx="2" ry="2"/>
+  <text x="945" y="28" font-family="Arial" font-size="12" text-anchor="start">MVP 3</text>
+</svg>
